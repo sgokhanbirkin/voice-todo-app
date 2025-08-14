@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 /// Controller for managing app localization
@@ -22,13 +23,16 @@ class LocaleController extends GetxController {
   void onInit() {
     super.onInit();
     // Initialize with system locale if supported, otherwise default to English
-    final systemLocale = Get.deviceLocale;
-    if (systemLocale != null &&
-        supportedLocales.any(
-          (locale) => locale.languageCode == systemLocale.languageCode,
-        )) {
-      _currentLocale.value = Locale(systemLocale.languageCode);
-    }
+    // Use WidgetsBinding.instance.addPostFrameCallback to avoid build conflicts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final systemLocale = Get.deviceLocale;
+      if (systemLocale != null &&
+          supportedLocales.any(
+            (locale) => locale.languageCode == systemLocale.languageCode,
+          )) {
+        _currentLocale.value = Locale(systemLocale.languageCode);
+      }
+    });
   }
 
   /// Change app locale
