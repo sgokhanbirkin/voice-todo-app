@@ -357,10 +357,14 @@ class TaskController extends GetxController {
 
   /// Sets the filter priority and updates filtered tasks
   void setFilterPriority(TaskPriority? priority) {
-    Logger.instance.debug('🔥 Filter changing from ${filterPriority.value} to $priority');
+    Logger.instance.debug(
+      '🔥 Filter changing from ${filterPriority.value} to $priority',
+    );
     filterPriority.value = priority;
     _updateFilteredTasks();
-    Logger.instance.debug('🔥 After filter: ${filteredTasks.length} tasks shown');
+    Logger.instance.debug(
+      '🔥 After filter: ${filteredTasks.length} tasks shown',
+    );
   }
 
   /// Sets the sort field and updates filtered tasks

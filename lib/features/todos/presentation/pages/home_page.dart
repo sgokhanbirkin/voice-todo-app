@@ -1199,11 +1199,14 @@ class _HomePageBody extends StatelessWidget {
 
       return GestureDetector(
         onTap: () {
+          print('🎯 Priority filter card tapped: $priority');
           if (controller.filterPriority.value == priority) {
             // Same priority clicked - clear filter
+            print('🎯 Clearing filter (same priority)');
             controller.setFilterPriority(null);
           } else {
             // Different priority clicked - set filter
+            print('🎯 Setting filter to: $priority');
             controller.setFilterPriority(priority);
           }
         },
