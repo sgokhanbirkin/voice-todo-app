@@ -183,12 +183,14 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              SizedBox(height: 32.h),
+              SizedBox(height: 20.h),
 
-              // Menu Items
+              // Menu Items - Scrollable Content
               Expanded(
-                child: Column(
-                  children: [
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: 16.h), // Bottom padding for scroll
+                  child: Column(
+                    children: [
                     _buildAnimatedMenuTile(
                       context: context,
                       icon: Icons.home,
@@ -317,12 +319,12 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
 
-                    const Spacer(),
+                    SizedBox(height: 24.h), // Extra space before logout
 
                     // Logout Button
                     Container(
                       width: double.infinity,
-                      margin: EdgeInsets.only(bottom: 20.h),
+                      margin: EdgeInsets.only(bottom: 16.h),
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           _zoomDrawerController.toggle?.call();
@@ -345,7 +347,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
