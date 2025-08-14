@@ -400,146 +400,139 @@ class _HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final controller = Get.find<TaskController>();
-      
+
       if (controller.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                SizedBox(height: 16.h),
-                Text(
-                  l10n.loading,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (controller.hasError.value) {
-          return Center(
-            child: Padding(
-              padding: Responsive.getResponsivePadding(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64.sp,
-                    color: AppColors.error,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    l10n.error,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.headlineSmall?.copyWith(color: AppColors.error),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    controller.errorMessage.value,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  SizedBox(height: 16.h),
-                  ElevatedButton(
-                    onPressed: () => controller.loadTasks(),
-                    child: Text(l10n.retry),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (controller.tasks.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: Responsive.getResponsivePadding(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.task_alt,
-                    size: 80.sp,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.5),
-                  ),
-                  SizedBox(height: 24.h),
-                  Text(
-                    l10n.noTasks,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    l10n.noTasksDescription,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: () => controller.refresh(),
+        return Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Task Statistics Summary
-              if (controller.taskStatistics.value != null)
-                _buildTaskSummary(context, controller.taskStatistics.value!),
-
-              // Task List
-              Expanded(
-                child: ResponsiveBuilder(
-                  mobile: (context) => ListView.builder(
-                    padding: Responsive.getResponsivePadding(context),
-                    itemCount: controller.filteredTasks.length,
-                    itemBuilder: (context, index) {
-                      final task = controller.filteredTasks[index];
-                      return _buildTaskCard(context, task, controller);
-                    },
-                  ),
-                  tablet: (context) => GridView.builder(
-                    padding: Responsive.getResponsivePadding(context),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16.w,
-                      mainAxisSpacing: 16.h,
-                      childAspectRatio: 2.5,
-                    ),
-                    itemCount: controller.filteredTasks.length,
-                    itemBuilder: (context, index) {
-                      final task = controller.filteredTasks[index];
-                      return _buildTaskCard(context, task, controller);
-                    },
-                  ),
-                  desktop: (context) => GridView.builder(
-                    padding: Responsive.getResponsivePadding(context),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 16.w,
-                      mainAxisSpacing: 16.h,
-                      childAspectRatio: 2.2,
-                    ),
-                    itemCount: controller.filteredTasks.length,
-                    itemBuilder: (context, index) {
-                      final task = controller.filteredTasks[index];
-                      return _buildTaskCard(context, task, controller);
-                    },
-                  ),
-                ),
-              ),
+              const CircularProgressIndicator(),
+              SizedBox(height: 16.h),
+              Text(l10n.loading, style: Theme.of(context).textTheme.bodyLarge),
             ],
           ),
         );
+      }
+
+      if (controller.hasError.value) {
+        return Center(
+          child: Padding(
+            padding: Responsive.getResponsivePadding(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64.sp, color: AppColors.error),
+                SizedBox(height: 16.h),
+                Text(
+                  l10n.error,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineSmall?.copyWith(color: AppColors.error),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  controller.errorMessage.value,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                SizedBox(height: 16.h),
+                ElevatedButton(
+                  onPressed: () => controller.loadTasks(),
+                  child: Text(l10n.retry),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      if (controller.tasks.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: Responsive.getResponsivePadding(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.task_alt,
+                  size: 80.sp,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.5),
+                ),
+                SizedBox(height: 24.h),
+                Text(
+                  l10n.noTasks,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  l10n.noTasksDescription,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () => controller.refresh(),
+        child: Column(
+          children: [
+            // Task Statistics Summary
+            if (controller.taskStatistics.value != null)
+              _buildTaskSummary(context, controller.taskStatistics.value!),
+
+            // Task List
+            Expanded(
+              child: ResponsiveBuilder(
+                mobile: (context) => ListView.builder(
+                  padding: Responsive.getResponsivePadding(context),
+                  itemCount: controller.filteredTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = controller.filteredTasks[index];
+                    return _buildTaskCard(context, task, controller);
+                  },
+                ),
+                tablet: (context) => GridView.builder(
+                  padding: Responsive.getResponsivePadding(context),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: 2.5,
+                  ),
+                  itemCount: controller.filteredTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = controller.filteredTasks[index];
+                    return _buildTaskCard(context, task, controller);
+                  },
+                ),
+                desktop: (context) => GridView.builder(
+                  padding: Responsive.getResponsivePadding(context),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: 2.2,
+                  ),
+                  itemCount: controller.filteredTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = controller.filteredTasks[index];
+                    return _buildTaskCard(context, task, controller);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     });
   }
 

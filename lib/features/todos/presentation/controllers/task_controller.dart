@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
@@ -70,6 +71,27 @@ class TaskController extends GetxController {
     loadTaskStatistics();
   }
 
+  /// Shows a snackbar safely
+  void _showSnackbar(String title, String message, {bool isError = false}) {
+    try {
+      if (Get.context != null) {
+        Get.snackbar(
+          title,
+          message,
+          backgroundColor: isError 
+              ? Colors.red.withValues(alpha: 0.9) 
+              : Colors.green.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } catch (e) {
+      // Silently handle snackbar errors - using debugPrint in development
+      debugPrint('Snackbar error: $e');
+    }
+  }
+
   /// Validates task title
   String? validateTaskTitle(String? title) {
     return Validators.taskTitle(title);
@@ -116,12 +138,12 @@ class TaskController extends GetxController {
       final descriptionError = validateTaskDescription(task.description);
 
       if (titleError != null) {
-        Get.snackbar('Validation Error', titleError);
+        _showSnackbar('Validation Error', titleError, isError: true);
         return;
       }
 
       if (descriptionError != null) {
-        Get.snackbar('Validation Error', descriptionError);
+        _showSnackbar('Validation Error', descriptionError, isError: true);
         return;
       }
 
@@ -134,14 +156,14 @@ class TaskController extends GetxController {
           tasks.add(createdTask);
           _updateFilteredTasks();
           _updateCategorizedTasks();
-          Get.snackbar('Success', 'Task created successfully');
+          _showSnackbar('Success', 'Task created successfully');
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to create task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to create task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     } finally {
       isLoading.value = false;
     }
@@ -161,15 +183,15 @@ class TaskController extends GetxController {
             tasks[index] = updatedTask;
             _updateFilteredTasks();
             _updateCategorizedTasks();
-            Get.snackbar('Success', 'Task updated successfully');
+            _showSnackbar('Success', 'Task updated successfully');
           }
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to update task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to update task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     } finally {
       isLoading.value = false;
     }
@@ -187,14 +209,14 @@ class TaskController extends GetxController {
           tasks.removeWhere((task) => task.id == taskId);
           _updateFilteredTasks();
           _updateCategorizedTasks();
-          Get.snackbar('Success', 'Task deleted successfully');
+          _showSnackbar('Success', 'Task deleted successfully');
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to delete task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to delete task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     } finally {
       isLoading.value = false;
     }
@@ -215,11 +237,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to complete task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to complete task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     }
   }
 
@@ -238,14 +260,15 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          Get.snackbar(
+          _showSnackbar(
             'Error',
             'Failed to uncomplete task: ${failure.message}',
+            isError: true,
           );
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     }
   }
 
@@ -264,11 +287,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to star task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to star task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     }
   }
 
@@ -287,11 +310,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to unstar task: ${failure.message}');
+          _showSnackbar('Error', 'Failed to unstar task: ${failure.message}', isError: true);
         },
       );
     } catch (e) {
-      Get.snackbar('Error', 'Unexpected error: $e');
+      _showSnackbar('Error', 'Unexpected error: $e', isError: true);
     }
   }
 
