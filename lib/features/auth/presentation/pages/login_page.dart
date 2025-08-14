@@ -50,7 +50,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (result.isSuccess) {
         Logger.instance.info('Login successful: ${result.dataOrNull?.email}');
-        Get.offAllNamed('/home'); // Navigate to home and clear stack
+        if (context.mounted) {
+          context.go('/home'); // Navigate to home and clear stack
+        }
       } else {
         _showErrorSnackBar(result.errorOrNull?.message ?? 'Login failed');
       }

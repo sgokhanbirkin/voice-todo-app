@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:get/get.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/todos/presentation/pages/home_page.dart';
@@ -106,32 +105,44 @@ class AppRouter {
 /// Navigation helper methods
 class AppNavigation {
   /// Navigate to home page
-  static void goToHome() {
-    Get.offAllNamed('/home');
+  static void goToHome(BuildContext context) {
+    if (context.mounted) {
+      context.go('/home');
+    }
   }
 
   /// Navigate to login page
-  static void goToLogin() {
-    Get.offAllNamed('/');
+  static void goToLogin(BuildContext context) {
+    if (context.mounted) {
+      context.go('/');
+    }
   }
 
   /// Navigate to register page
-  static void goToRegister() {
-    Get.toNamed('/register');
+  static void goToRegister(BuildContext context) {
+    if (context.mounted) {
+      context.go('/register');
+    }
   }
 
   /// Navigate to add task page
-  static void goToAddTask() {
-    Get.toNamed('/add-task');
+  static void goToAddTask(BuildContext context) {
+    if (context.mounted) {
+      context.go('/add-task');
+    }
   }
 
   /// Navigate to settings page
-  static void goToSettings() {
-    Get.toNamed('/settings');
+  static void goToSettings(BuildContext context) {
+    if (context.mounted) {
+      context.go('/settings');
+    }
   }
 
   /// Go back
-  static void goBack() {
-    Get.back();
+  static void goBack(BuildContext context) {
+    if (context.mounted) {
+      context.pop();
+    }
   }
 }
