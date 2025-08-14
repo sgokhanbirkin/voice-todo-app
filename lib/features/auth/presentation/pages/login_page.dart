@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/logger.dart';
 import '../../../../product/widgets/app_scaffold.dart';
 import '../controllers/auth_controller.dart';
@@ -233,7 +234,9 @@ class _LoginPageState extends State<LoginPage> {
               // Register Button
               OutlinedButton(
                 onPressed: () {
-                  Get.toNamed('/register');
+                  if (context.mounted) {
+                    context.go('/register');
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
