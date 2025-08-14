@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
 import '../../../../core/validation/validators.dart';
+import '../../../../core/logger.dart';
 
 /// Task controller for managing task state and operations
 class TaskController extends GetxController {
