@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/result.dart';
 import '../../../../core/errors.dart';
+import '../../../../core/validation/validators.dart';
 import '../../../../core/logger.dart';
 import '../../../../data/remote/supabase_service.dart';
 
@@ -32,6 +33,21 @@ class AuthController extends GetxController {
     super.onInit();
     // TODO: Check for existing authentication state
     _checkAuthState();
+  }
+
+  /// Validates email format
+  String? validateEmail(String? email) {
+    return Validators.email(email);
+  }
+
+  /// Validates password strength
+  String? validatePassword(String? password) {
+    return Validators.password(password);
+  }
+
+  /// Validates password confirmation
+  String? validateConfirmPassword(String? password, String? confirmPassword) {
+    return Validators.confirmPassword(confirmPassword, password);
   }
 
   /// Checks the current authentication state

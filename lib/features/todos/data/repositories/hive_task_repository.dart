@@ -235,18 +235,26 @@ class HiveTaskRepository implements ITaskRepository {
   }
 
   @override
-  Future<AppResult<List<TaskEntity>>> getTasksBySyncStatus(String syncStatus) async {
+  Future<AppResult<List<TaskEntity>>> getTasksBySyncStatus(
+    String syncStatus,
+  ) async {
     try {
       if (!_database.isReady) {
         return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
       final tasks = _tasksBox.values.cast<TaskEntity>().toList();
-      final filteredTasks = tasks.where((task) => task.syncStatus == syncStatus).toList();
-      _logger.info('Retrieved ${filteredTasks.length} tasks with sync status: $syncStatus');
+      final filteredTasks = tasks
+          .where((task) => task.syncStatus == syncStatus)
+          .toList();
+      _logger.info(
+        'Retrieved ${filteredTasks.length} tasks with sync status: $syncStatus',
+      );
       return AppResult.success(filteredTasks);
     } catch (e) {
       _logger.error('Failed to get tasks by sync status: $e');
-      return const AppResult.failure(DatabaseFailure('Failed to get tasks by sync status'));
+      return const AppResult.failure(
+        DatabaseFailure('Failed to get tasks by sync status'),
+      );
     }
   }
 

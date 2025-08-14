@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
+import '../../../../core/validation/validators.dart';
 
 /// Task controller for managing task state and operations
 class TaskController extends GetxController {
@@ -68,6 +69,16 @@ class TaskController extends GetxController {
     loadTasks();
   }
 
+  /// Validates task title
+  String? validateTaskTitle(String? title) {
+    return Validators.taskTitle(title);
+  }
+
+  /// Validates task description
+  String? validateTaskDescription(String? description) {
+    return Validators.taskDescription(description);
+  }
+
   /// Loads all tasks from the repository
   Future<void> loadTasks() async {
     try {
@@ -96,9 +107,23 @@ class TaskController extends GetxController {
     }
   }
 
-  /// Creates a new task
+  /// Creates a new task with validation
   Future<void> createTask(TaskEntity task) async {
     try {
+      // Validate task data
+      final titleError = validateTaskTitle(task.title);
+      final descriptionError = validateTaskDescription(task.description);
+
+      if (titleError != null) {
+        Get.snackbar('Validation Error', titleError);
+        return;
+      }
+
+      if (descriptionError != null) {
+        Get.snackbar('Validation Error', descriptionError);
+        return;
+      }
+
       isLoading.value = true;
 
       final result = await _taskRepository.createTask(task);

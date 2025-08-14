@@ -283,6 +283,7 @@ class HomePage extends StatelessWidget {
   ) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
     TaskPriority selectedPriority = TaskPriority.medium;
 
     showDialog(
@@ -292,47 +293,54 @@ class HomePage extends StatelessWidget {
           title: Text(l10n.addTask),
           content: SizedBox(
             width: Responsive.isDesktop(context) ? 400.w : double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    labelText: l10n.taskTitle,
-                    border: const OutlineInputBorder(),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      labelText: l10n.taskTitle,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: controller.validateTaskTitle,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                   ),
-                ),
-                SizedBox(height: 16.h),
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                    labelText: l10n.taskDescription,
-                    border: const OutlineInputBorder(),
+                  SizedBox(height: 16.h),
+                  TextFormField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      labelText: l10n.taskDescription,
+                      border: const OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                    validator: controller.validateTaskDescription,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                   ),
-                  maxLines: 3,
-                ),
-                SizedBox(height: 16.h),
-                DropdownButtonFormField<TaskPriority>(
-                  value: selectedPriority,
-                  decoration: InputDecoration(
-                    labelText: l10n.taskPriority,
-                    border: const OutlineInputBorder(),
+                  SizedBox(height: 16.h),
+                  DropdownButtonFormField<TaskPriority>(
+                    value: selectedPriority,
+                    decoration: InputDecoration(
+                      labelText: l10n.taskPriority,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: TaskPriority.values.map((priority) {
+                      return DropdownMenuItem(
+                        value: priority,
+                        child: Text(_getPriorityName(l10n, priority)),
+                      );
+                    }).toList(),
+                    onChanged: (priority) {
+                      if (priority != null) {
+                        setState(() {
+                          selectedPriority = priority;
+                        });
+                      }
+                    },
                   ),
-                  items: TaskPriority.values.map((priority) {
-                    return DropdownMenuItem(
-                      value: priority,
-                      child: Text(_getPriorityName(l10n, priority)),
-                    );
-                  }).toList(),
-                  onChanged: (priority) {
-                    if (priority != null) {
-                      setState(() {
-                        selectedPriority = priority;
-                      });
-                    }
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           actions: [
@@ -342,8 +350,7 @@ class HomePage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (titleController.text.trim().isEmpty) {
-                  Get.snackbar(l10n.error, 'Task title cannot be empty');
+                if (!formKey.currentState!.validate()) {
                   return;
                 }
 
