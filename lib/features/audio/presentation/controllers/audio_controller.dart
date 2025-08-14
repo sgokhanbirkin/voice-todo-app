@@ -59,7 +59,11 @@ class AudioController extends GetxController {
   /// Current task ID for filtering
   final RxString currentTaskId = ''.obs;
 
-  AudioController(this._audioRepository, this._audioRecorder, this._audioPlayer);
+  AudioController(
+    this._audioRepository,
+    this._audioRecorder,
+    this._audioPlayer,
+  );
 
   @override
   void onInit() {
@@ -149,7 +153,7 @@ class AudioController extends GetxController {
 
       final audioPath = await _audioRecorder.stopRecording();
       isRecording.value = false;
-      
+
       // Create audio entity
       final audioEntity = AudioEntity(
         id: DateTime.now().millisecondsSinceEpoch.toString(),

@@ -97,6 +97,9 @@ abstract class ITaskRepository {
   /// Gets task statistics
   Future<AppResult<TaskStatistics>> getTaskStatistics();
 
+  /// Gets tasks by sync status
+  Future<AppResult<List<TaskEntity>>> getTasksBySyncStatus(String syncStatus);
+
   /// Syncs local tasks with remote storage
   Future<AppResult<void>> syncTasks();
 

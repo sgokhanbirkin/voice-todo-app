@@ -25,7 +25,10 @@ abstract class IAudioRepository {
   Future<AppResult<AudioEntity>> markAsUploaded(String id, String remotePath);
 
   /// Update upload progress
-  Future<AppResult<AudioEntity>> updateUploadProgress(String id, double progress);
+  Future<AppResult<AudioEntity>> updateUploadProgress(
+    String id,
+    double progress,
+  );
 
   /// Get pending uploads (not yet synced to remote)
   Future<AppResult<List<AudioEntity>>> getPendingUploads();
@@ -43,7 +46,10 @@ abstract class IAudioRepository {
   Future<AppResult<String>> exportAudioMetadata(String format);
 
   /// Import audio metadata
-  Future<AppResult<List<AudioEntity>>> importAudioMetadata(String data, String format);
+  Future<AppResult<List<AudioEntity>>> importAudioMetadata(
+    String data,
+    String format,
+  );
 
   /// Clear all audio data
   Future<AppResult<void>> clearAllAudio();
@@ -111,7 +117,7 @@ class AudioStatistics {
     final hours = totalDuration.inHours;
     final minutes = totalDuration.inMinutes % 60;
     final seconds = totalDuration.inSeconds % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m ${seconds}s';
     } else if (minutes > 0) {
