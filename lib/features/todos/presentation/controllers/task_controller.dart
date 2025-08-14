@@ -162,6 +162,7 @@ class TaskController extends GetxController {
           tasks.add(createdTask);
           _updateFilteredTasks();
           _updateCategorizedTasks();
+          loadTaskStatistics(); // Statistics'i güncelle
           _showSnackbar('Success', 'Task created successfully');
         },
         (failure) {
@@ -223,6 +224,7 @@ class TaskController extends GetxController {
           tasks.removeWhere((task) => task.id == taskId);
           _updateFilteredTasks();
           _updateCategorizedTasks();
+          loadTaskStatistics(); // Statistics'i güncelle
           _showSnackbar('Success', 'Task deleted successfully');
         },
         (failure) {
@@ -252,6 +254,7 @@ class TaskController extends GetxController {
             tasks[index] = updatedTask;
             _updateFilteredTasks();
             _updateCategorizedTasks();
+            loadTaskStatistics(); // Statistics'i güncelle
           }
         },
         (failure) {
@@ -279,6 +282,7 @@ class TaskController extends GetxController {
             tasks[index] = updatedTask;
             _updateFilteredTasks();
             _updateCategorizedTasks();
+            loadTaskStatistics(); // Statistics'i güncelle
           }
         },
         (failure) {
