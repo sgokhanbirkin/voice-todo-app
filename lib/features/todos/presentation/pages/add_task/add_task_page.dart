@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../../product/responsive/responsive.dart';
-import '../../../../product/theme/app_theme.dart';
-import '../../../../product/widgets/app_scaffold.dart';
-import '../controllers/task_controller.dart';
-import '../../domain/task_entity.dart';
-import '../../../audio/presentation/controllers/audio_controller.dart';
-import '../../../audio/domain/audio_entity.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../product/responsive/responsive.dart';
+import '../../../../../product/theme/app_theme.dart';
+import '../../../../../product/widgets/app_scaffold.dart';
+import '../../controllers/task_controller.dart';
+import '../../../domain/task_entity.dart';
+import '../../../../audio/presentation/controllers/audio_controller.dart';
+import '../../../../audio/domain/audio_entity.dart';
 
 // Part files for better code organization (SOLID principles)
 part 'add_task_form.dart';

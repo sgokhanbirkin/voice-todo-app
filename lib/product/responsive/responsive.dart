@@ -234,12 +234,13 @@ class ResponsiveWidgets {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(
-          borderRadius ?? Responsive.getResponsiveSpacing(
-            context,
-            mobile: 8,
-            tablet: 10,
-            desktop: 12,
-          ),
+          borderRadius ??
+              Responsive.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 10,
+                desktop: 12,
+              ),
         ),
         border: border,
         boxShadow: shadow != null ? [shadow] : null,

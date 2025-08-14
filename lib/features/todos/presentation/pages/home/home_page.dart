@@ -3,14 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../../product/responsive/responsive.dart';
-import '../../../../product/theme/app_theme.dart';
-import '../../../../product/localization/locale_controller.dart';
-import '../../../auth/presentation/controllers/auth_controller.dart';
-import '../controllers/task_controller.dart';
-import '../../domain/task_entity.dart';
-import '../../domain/i_task_repository.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../product/responsive/responsive.dart';
+import '../../../../../product/theme/app_theme.dart';
+import '../../../../../product/localization/locale_controller.dart';
+import '../../../../auth/presentation/controllers/auth_controller.dart';
+import '../../controllers/task_controller.dart';
+import '../../../domain/task_entity.dart';
+import '../../../domain/i_task_repository.dart';
 
 // Part files for better code organization (SOLID principles)
 part 'home_page_drawer.dart';
