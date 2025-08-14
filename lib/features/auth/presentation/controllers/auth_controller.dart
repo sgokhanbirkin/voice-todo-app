@@ -61,11 +61,15 @@ class AuthController extends GetxController {
         // TODO: Save session to local storage
         await _saveSessionToLocal(response.session!);
 
-        Logger.instance.info('User signed in successfully: ${response.user!.email}');
+        Logger.instance.info(
+          'User signed in successfully: ${response.user!.email}',
+        );
         return AppResult.success(response.user!);
       } else {
         errorMessage.value = 'Authentication failed: Invalid response';
-        return AppResult.failure(AuthFailure('Authentication failed: Invalid response'));
+        return AppResult.failure(
+          AuthFailure('Authentication failed: Invalid response'),
+        );
       }
     } catch (e) {
       final errorMsg = 'Authentication failed: $e';
@@ -139,29 +143,7 @@ class AuthController extends GetxController {
     }
   }
 
-  /// Signs out the current user
-  Future<void> signOut() async {
-    try {
-      isLoading.value = true;
 
-      // TODO: Implement actual sign out logic
-      // This would typically involve clearing tokens, etc.
-
-      // Simulated sign out delay
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Clear authentication state
-      isAuthenticated.value = false;
-      userId.value = '';
-      userEmail.value = '';
-
-      // TODO: Navigate to login page
-    } catch (e) {
-      errorMessage.value = 'Sign out failed: $e';
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
   /// Resets user password
   Future<bool> resetPassword(String email) async {
@@ -251,6 +233,34 @@ class AuthController extends GetxController {
   /// Clears any error messages
   void clearError() {
     errorMessage.value = '';
+  }
+
+  /// Signs out the current user
+  Future<void> signOut() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      // Sign out from Supabase
+      await _supabaseService.signOut();
+
+      // Clear local state
+      isAuthenticated.value = false;
+      userId.value = '';
+      userEmail.value = '';
+      currentSession.value = null;
+
+      // TODO: Clear local storage (Hive)
+      // await _clearLocalSession();
+
+      Logger.instance.info('User signed out successfully');
+    } catch (e) {
+      final errorMsg = 'Sign out failed: $e';
+      errorMessage.value = errorMsg;
+      Logger.instance.error(errorMsg);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Refreshes authentication state

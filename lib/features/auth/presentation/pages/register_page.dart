@@ -4,21 +4,23 @@ import '../../../../core/logger.dart';
 import '../../../../product/widgets/app_scaffold.dart';
 import '../controllers/auth_controller.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _authController = Get.put(AuthController());
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -31,10 +33,11 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -42,19 +45,22 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final result = await _authController.signInWithEmail(
+      final result = await _authController.register(
         _emailController.text.trim(),
         _passwordController.text,
+        _confirmPasswordController.text,
       );
 
-      if (result.isSuccess) {
-        Logger.instance.info('Login successful: ${result.dataOrNull?.email}');
+      if (result) {
+        Logger.instance.info(
+          'Registration successful: ${_emailController.text.trim()}',
+        );
         Get.offAllNamed('/home'); // Navigate to home and clear stack
       } else {
-        _showErrorSnackBar(result.errorOrNull?.message ?? 'Login failed');
+        _showErrorSnackBar(_authController.errorMessage.value);
       }
     } catch (e) {
-      Logger.instance.error('Login error: $e');
+      Logger.instance.error('Registration error: $e');
       _showErrorSnackBar('An unexpected error occurred');
     } finally {
       setState(() {
@@ -76,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Giriş Yap',
+      title: 'Hesap Oluştur',
       showAppBar: false,
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -88,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               // Logo/Icon
               Icon(
-                Icons.mic,
+                Icons.person_add,
                 size: 80,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -105,11 +111,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8),
 
               Text(
-                'Hesabınıza giriş yapın',
+                'Yeni hesap oluşturun',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -143,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Şifre',
-                  hintText: 'Şifrenizi girin',
+                  hintText: 'Şifrenizi oluşturun',
                   prefixIcon: const Icon(Icons.lock_outlined),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -169,11 +175,45 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
+
+              // Confirm Password Field
+              TextFormField(
+                controller: _confirmPasswordController,
+                obscureText: _obscureConfirmPassword,
+                decoration: InputDecoration(
+                  labelText: 'Şifre Tekrar',
+                  hintText: 'Şifrenizi tekrar girin',
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Şifre tekrarı gerekli';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Şifreler eşleşmiyor';
+                  }
+                  return null;
+                },
+              ),
               const SizedBox(height: 24),
 
-              // Login Button
+              // Register Button
               ElevatedButton(
-                onPressed: _isLoading ? null : _handleLogin,
+                onPressed: _isLoading ? null : _handleRegister,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -191,22 +231,12 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       )
                     : const Text(
-                        'Giriş Yap',
+                        'Hesap Oluştur',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-              ),
-              const SizedBox(height: 16),
-
-              // Forgot Password
-              TextButton(
-                onPressed: () {
-                  // TODO: Implement forgot password
-                  _showErrorSnackBar('Şifre sıfırlama yakında eklenecek');
-                },
-                child: const Text('Şifremi Unuttum'),
               ),
               const SizedBox(height: 16),
 
@@ -221,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -230,16 +260,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 16),
 
-              // Register Button
+              // Login Button
               OutlinedButton(
                 onPressed: () {
-                  Get.toNamed('/register');
+                  Get.toNamed('/');
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: const Text(
-                  'Hesap Oluştur',
+                  'Zaten hesabım var',
                   style: TextStyle(fontSize: 16),
                 ),
               ),
