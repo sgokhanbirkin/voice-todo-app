@@ -22,9 +22,12 @@ class HomePage extends StatelessWidget {
     final taskController = Get.find<TaskController>();
 
     return ResponsiveBuilder(
-      mobile: (context) => _buildMobileLayout(context, l10n, authController, taskController),
-      tablet: (context) => _buildTabletLayout(context, l10n, authController, taskController),
-      desktop: (context) => _buildDesktopLayout(context, l10n, authController, taskController),
+      mobile: (context) =>
+          _buildMobileLayout(context, l10n, authController, taskController),
+      tablet: (context) =>
+          _buildTabletLayout(context, l10n, authController, taskController),
+      desktop: (context) =>
+          _buildDesktopLayout(context, l10n, authController, taskController),
     );
   }
 
@@ -143,9 +146,7 @@ class HomePage extends StatelessWidget {
                 // Top bar
                 _buildTopBar(context, l10n, taskController),
                 // Content
-                Expanded(
-                  child: _HomePageBody(l10n: l10n),
-                ),
+                Expanded(child: _HomePageBody(l10n: l10n)),
               ],
             ),
           ),
@@ -168,9 +169,9 @@ class HomePage extends StatelessWidget {
           padding: EdgeInsets.all(16.w),
           child: Text(
             l10n.appTitle,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Expanded(
@@ -223,18 +224,12 @@ class HomePage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
       ),
       child: Row(
         children: [
-          Text(
-            l10n.tasks,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text(l10n.tasks, style: Theme.of(context).textTheme.headlineSmall),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.search),
@@ -391,7 +386,7 @@ class HomePage extends StatelessWidget {
 /// Home page body content
 class _HomePageBody extends StatelessWidget {
   final AppLocalizations l10n;
-  
+
   const _HomePageBody({required this.l10n});
 
   @override
@@ -429,9 +424,9 @@ class _HomePageBody extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     l10n.error,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.error,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineSmall?.copyWith(color: AppColors.error),
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -460,7 +455,9 @@ class _HomePageBody extends StatelessWidget {
                   Icon(
                     Icons.task_alt,
                     size: 80.sp,
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.5),
                   ),
                   SizedBox(height: 24.h),
                   Text(
@@ -471,7 +468,9 @@ class _HomePageBody extends StatelessWidget {
                   Text(
                     l10n.noTasksDescription,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -552,15 +551,27 @@ class _HomePageBody extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildStatItem(context, 'Toplam', stats.totalTasks.toString()),
-                _buildStatItem(context, l10n.completed, stats.completedTasks.toString()),
+                _buildStatItem(
+                  context,
+                  l10n.completed,
+                  stats.completedTasks.toString(),
+                ),
               ],
             ),
             SizedBox(height: 16.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatItem(context, l10n.pending, stats.pendingTasks.toString()),
-                _buildStatItem(context, 'Geciken', stats.overdueTasks.toString()),
+                _buildStatItem(
+                  context,
+                  l10n.pending,
+                  stats.pendingTasks.toString(),
+                ),
+                _buildStatItem(
+                  context,
+                  'Geciken',
+                  stats.overdueTasks.toString(),
+                ),
               ],
             ),
           ],
@@ -569,8 +580,16 @@ class _HomePageBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem(context, 'Toplam', stats.totalTasks.toString()),
-            _buildStatItem(context, l10n.completed, stats.completedTasks.toString()),
-            _buildStatItem(context, l10n.pending, stats.pendingTasks.toString()),
+            _buildStatItem(
+              context,
+              l10n.completed,
+              stats.completedTasks.toString(),
+            ),
+            _buildStatItem(
+              context,
+              l10n.pending,
+              stats.pendingTasks.toString(),
+            ),
             _buildStatItem(context, 'Geciken', stats.overdueTasks.toString()),
           ],
         ),
@@ -695,7 +714,7 @@ class _HomePageBody extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // Task description
             if (task.description != null) ...[
               SizedBox(height: 8.h),
@@ -713,9 +732,9 @@ class _HomePageBody extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ],
-            
+
             SizedBox(height: 12.h),
-            
+
             // Task chips
             Wrap(
               spacing: 8.w,

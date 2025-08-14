@@ -53,12 +53,12 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Voice Todo App',
-          
+
           // Theme configuration
           theme: AppTheme.instance.lightTheme,
           darkTheme: AppTheme.instance.darkTheme,
           themeMode: AppTheme.instance.currentThemeMode,
-          
+
           // Localization configuration
           localizationsDelegates: [
             AppLocalizations.delegate,
@@ -68,7 +68,6 @@ class MyApp extends StatelessWidget {
           ],
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('tr'), // Default to Turkish
-          
           // Router configuration
           routerDelegate: AppRouter.router.routerDelegate,
           routeInformationParser: AppRouter.router.routeInformationParser,

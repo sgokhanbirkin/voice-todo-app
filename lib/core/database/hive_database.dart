@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import '../logger.dart';
 import '../../features/todos/data/adapters/task_entity_adapter.dart';
+import '../../features/audio/data/adapters/audio_entity_adapter.dart';
 
 /// Hive database manager for local data storage
 class HiveDatabase {
@@ -48,8 +49,10 @@ class HiveDatabase {
     Hive.registerAdapter(TaskStatusAdapter());
     Hive.registerAdapter(DurationAdapter());
     
+    // Register AudioEntity adapter
+    Hive.registerAdapter(AudioEntityAdapter());
+    
     // TODO: Register UserEntity adapter
-    // TODO: Register AudioEntity adapter
     
     Logger.instance.info('Hive adapters registered');
   }
