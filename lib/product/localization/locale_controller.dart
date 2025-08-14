@@ -23,8 +23,10 @@ class LocaleController extends GetxController {
     super.onInit();
     // Initialize with system locale if supported, otherwise default to English
     final systemLocale = Get.deviceLocale;
-    if (systemLocale != null && 
-        supportedLocales.any((locale) => locale.languageCode == systemLocale.languageCode)) {
+    if (systemLocale != null &&
+        supportedLocales.any(
+          (locale) => locale.languageCode == systemLocale.languageCode,
+        )) {
       _currentLocale.value = Locale(systemLocale.languageCode);
     }
   }

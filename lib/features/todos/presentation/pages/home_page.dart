@@ -249,55 +249,63 @@ class HomePage extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => Obx(() => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.settings),
-            SizedBox(width: 8.w),
-            Text(l10n.settings),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(l10n.language),
-              subtitle: Text(localeController.getLocaleDisplayName(localeController.currentLocale)),
-              onTap: () {
-                Navigator.pop(context);
-                _showLanguageDialog(context, l10n);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.palette),
-              title: Text(l10n.theme),
-              subtitle: Text(_getThemeDisplayName(l10n, appTheme.currentThemeMode)),
-              onTap: () {
-                Navigator.pop(context);
-                _showThemeDialog(context, l10n);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(l10n.logout),
-              onTap: () async {
-                Navigator.pop(context);
-                await authController.signOut();
-                if (context.mounted) {
-                  context.go('/');
-                }
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.close),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.settings),
+              SizedBox(width: 8.w),
+              Text(l10n.settings),
+            ],
           ),
-        ],
-      )),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(l10n.language),
+                subtitle: Text(
+                  localeController.getLocaleDisplayName(
+                    localeController.currentLocale,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showLanguageDialog(context, l10n);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.palette),
+                title: Text(l10n.theme),
+                subtitle: Text(
+                  _getThemeDisplayName(l10n, appTheme.currentThemeMode),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showThemeDialog(context, l10n);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(l10n.logout),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await authController.signOut();
+                  if (context.mounted) {
+                    context.go('/');
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.close),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -319,42 +327,69 @@ class HomePage extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Obx(() => AlertDialog(
-        title: Text(l10n.selectLanguage),
-        content: isChangingLanguage.value
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(),
-                  SizedBox(height: 16.h),
-                  Text(l10n.loading),
-                ],
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: LocaleController.supportedLocales.map((locale) {
-                  return _buildLanguageOption(
-                    context,
-                    localeController.getLocaleDisplayName(locale),
-                    locale,
-                    localeController.currentLocale,
-                    () => _changeLanguage(localeController, locale, isChangingLanguage, context),
-                  );
-                }).toList(),
-              ),
-        actions: isChangingLanguage.value
-            ? []
-            : [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.cancel),
+             builder: (context) => Obx(
+         () => AlertDialog(
+           contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
+           title: Row(
+             children: [
+               Icon(
+                 Icons.language,
+                 color: Theme.of(context).colorScheme.primary,
+               ),
+               SizedBox(width: 12.w),
+               Text(l10n.selectLanguage),
+             ],
+           ),
+          content: isChangingLanguage.value
+              ? Container(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      SizedBox(height: 20.h),
+                      Text(
+                        'Dil değiştiriliyor...',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: LocaleController.supportedLocales.map((locale) {
+                    return _buildLanguageOption(
+                      context,
+                      localeController.getLocaleDisplayName(locale),
+                      locale,
+                      localeController.currentLocale,
+                      () => _changeLanguage(
+                        localeController,
+                        locale,
+                        isChangingLanguage,
+                        context,
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ],
-      )),
+          actions: isChangingLanguage.value
+              ? []
+              : [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                ],
+        ),
+      ),
     );
   }
 
-  Widget _buildLanguageOption(
+    Widget _buildLanguageOption(
     BuildContext context,
     String title,
     Locale value,
@@ -362,38 +397,101 @@ class HomePage extends StatelessWidget {
     VoidCallback onTap,
   ) {
     final isSelected = value.languageCode == groupValue.languageCode;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          children: [
-            Radio<String>(
-              value: value.languageCode,
-              groupValue: groupValue.languageCode,
-              onChanged: (_) => onTap(),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : null,
-                    ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                width: isSelected ? 2 : 1,
               ),
             ),
-          ],
+            child: Row(
+              children: [
+                Container(
+                  width: 24.w,
+                  height: 24.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.transparent,
+                  ),
+                  child: isSelected
+                      ? Icon(
+                          Icons.check,
+                          size: 16.sp,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        )
+                      : null,
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                              : Theme.of(context).colorScheme.onSurface,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        _getLanguageNativeName(value.languageCode),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7)
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isSelected)
+                  Icon(
+                    Icons.language,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20.sp,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  String _getLanguageNativeName(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return 'English (US)';
+      case 'tr':
+        return 'Türkiye Türkçesi';
+      default:
+        return languageCode.toUpperCase();
+    }
   }
 
   Future<void> _changeLanguage(
@@ -403,78 +501,115 @@ class HomePage extends StatelessWidget {
     BuildContext context,
   ) async {
     isChangingLanguage.value = true;
-    
+
     // Simulate language change delay for better UX
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     localeController.changeLocale(locale);
-    
+
     // Wait a bit more to see the change
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     isChangingLanguage.value = false;
     if (context.mounted) {
       Navigator.pop(context);
     }
   }
 
-    void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
+  void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
     final appTheme = Get.find<AppTheme>();
     final RxBool isChangingTheme = false.obs;
- 
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Obx(() => AlertDialog(
-        title: Text(l10n.selectTheme),
-        content: isChangingTheme.value
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(),
-                  SizedBox(height: 16.h),
-                  Text(l10n.loading),
-                ],
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildThemeOption(
-                    context,
-                    l10n.lightTheme,
-                    ThemeMode.light,
-                    appTheme.currentThemeMode,
-                    () => _changeTheme(appTheme, ThemeMode.light, isChangingTheme, context),
+             builder: (context) => Obx(
+         () => AlertDialog(
+           contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
+           title: Row(
+             children: [
+               Icon(
+                 Icons.palette,
+                 color: Theme.of(context).colorScheme.primary,
+               ),
+               SizedBox(width: 12.w),
+               Text(l10n.selectTheme),
+             ],
+           ),
+          content: isChangingTheme.value
+              ? Container(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      SizedBox(height: 20.h),
+                      Text(
+                        'Tema uygulanıyor...',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
                   ),
-                  _buildThemeOption(
-                    context,
-                    l10n.darkTheme,
-                    ThemeMode.dark,
-                    appTheme.currentThemeMode,
-                    () => _changeTheme(appTheme, ThemeMode.dark, isChangingTheme, context),
-                  ),
-                  _buildThemeOption(
-                    context,
-                    l10n.systemTheme,
-                    ThemeMode.system,
-                    appTheme.currentThemeMode,
-                    () => _changeTheme(appTheme, ThemeMode.system, isChangingTheme, context),
-                  ),
-                ],
-              ),
-        actions: isChangingTheme.value
-            ? []
-            : [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.cancel),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildThemeOption(
+                      context,
+                      l10n.lightTheme,
+                      ThemeMode.light,
+                      appTheme.currentThemeMode,
+                      () => _changeTheme(
+                        appTheme,
+                        ThemeMode.light,
+                        isChangingTheme,
+                        context,
+                      ),
+                    ),
+                    _buildThemeOption(
+                      context,
+                      l10n.darkTheme,
+                      ThemeMode.dark,
+                      appTheme.currentThemeMode,
+                      () => _changeTheme(
+                        appTheme,
+                        ThemeMode.dark,
+                        isChangingTheme,
+                        context,
+                      ),
+                    ),
+                    _buildThemeOption(
+                      context,
+                      l10n.systemTheme,
+                      ThemeMode.system,
+                      appTheme.currentThemeMode,
+                      () => _changeTheme(
+                        appTheme,
+                        ThemeMode.system,
+                        isChangingTheme,
+                        context,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-      )),
+          actions: isChangingTheme.value
+              ? []
+              : [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                ],
+        ),
+      ),
     );
   }
 
-  Widget _buildThemeOption(
+    Widget _buildThemeOption(
     BuildContext context,
     String title,
     ThemeMode value,
@@ -482,38 +617,113 @@ class HomePage extends StatelessWidget {
     VoidCallback onTap,
   ) {
     final isSelected = value == groupValue;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          children: [
-            Radio<ThemeMode>(
-              value: value,
-              groupValue: groupValue,
-              onChanged: (_) => onTap(),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : null,
-                    ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                width: isSelected ? 2 : 1,
               ),
             ),
-          ],
+            child: Row(
+              children: [
+                Container(
+                  width: 24.w,
+                  height: 24.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.transparent,
+                  ),
+                  child: isSelected
+                      ? Icon(
+                          Icons.check,
+                          size: 16.sp,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        )
+                      : null,
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                              : Theme.of(context).colorScheme.onSurface,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        _getThemeDescription(value),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7)
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  _getThemeIcon(value),
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 20.sp,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  IconData _getThemeIcon(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return Icons.light_mode;
+      case ThemeMode.dark:
+        return Icons.dark_mode;
+      case ThemeMode.system:
+        return Icons.settings_system_daydream;
+    }
+  }
+
+  String _getThemeDescription(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'Açık renkli görünüm';
+      case ThemeMode.dark:
+        return 'Koyu renkli görünüm';
+      case ThemeMode.system:
+        return 'Sistem ayarını takip eder';
+    }
   }
 
   Future<void> _changeTheme(
@@ -523,10 +733,10 @@ class HomePage extends StatelessWidget {
     BuildContext context,
   ) async {
     isChangingTheme.value = true;
-    
+
     // Simulate theme change delay for better UX
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     switch (themeMode) {
       case ThemeMode.light:
         appTheme.switchToLight();
@@ -538,10 +748,10 @@ class HomePage extends StatelessWidget {
         appTheme.switchToSystem();
         break;
     }
-    
+
     // Wait a bit more to see the change
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     isChangingTheme.value = false;
     if (context.mounted) {
       Navigator.pop(context);

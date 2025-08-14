@@ -24,6 +24,9 @@ class AppTheme {
   /// Switch to system theme
   void switchToSystem() => _currentThemeMode.value = ThemeMode.system;
 
+  /// Set theme mode
+  void setThemeMode(ThemeMode themeMode) => _currentThemeMode.value = themeMode;
+
   /// Toggle between light and dark themes
   void toggleTheme() {
     if (_currentThemeMode.value == ThemeMode.light) {
