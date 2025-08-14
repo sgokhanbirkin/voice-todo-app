@@ -265,4 +265,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get systemTheme => 'System';
+
+  @override
+  String get taskStatusInProgress => 'In Progress';
+
+  @override
+  String get taskStatusCancelled => 'Cancelled';
+
+  @override
+  String get starTask => 'Star Task';
+
+  @override
+  String get unstarTask => 'Remove Star';
+
+  @override
+  String get overdue => 'Overdue';
+
+  @override
+  String get starred => 'Starred';
+
+  @override
+  String get analytics => 'Analytics';
+
+  @override
+  String get insights => 'Insights';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get audioRecordings => 'Audio Recordings';
+
+  @override
+  String get totalRecordings => 'Total Recordings';
+
+  @override
+  String get recordingTime => 'Recording Time';
+
+  @override
+  String get taskCompletion => 'Task Completion';
+
+  @override
+  String get productivity => 'Productivity';
+
+  @override
+  String get weeklyProgress => 'Weekly Progress';
+
+  @override
+  String get monthlyProgress => 'Monthly Progress';
+
+  @override
+  String get priorityDistribution => 'Priority Distribution';
+
+  @override
+  String get completionRate => 'Completion Rate';
+
+  @override
+  String get averageCompletionTime => 'Average Completion Time';
+
+  @override
+  String get mostProductiveDay => 'Most Productive Day';
+
+  @override
+  String get taskTrends => 'Task Trends';
+
+  @override
+  String get audioInsights => 'Audio Insights';
+
+  @override
+  String get totalDuration => 'Total Duration';
+
+  @override
+  String get averageLength => 'Average Length';
+
+  @override
+  String get recordingQuality => 'Recording Quality';
 }

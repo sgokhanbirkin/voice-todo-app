@@ -607,6 +607,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get systemTheme;
+
+  /// No description provided for @taskStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get taskStatusInProgress;
+
+  /// No description provided for @taskStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get taskStatusCancelled;
+
+  /// No description provided for @starTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Star Task'**
+  String get starTask;
+
+  /// No description provided for @unstarTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Star'**
+  String get unstarTask;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
+
+  /// No description provided for @starred.
+  ///
+  /// In en, this message translates to:
+  /// **'Starred'**
+  String get starred;
+
+  /// No description provided for @analytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get analytics;
+
+  /// No description provided for @insights.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get insights;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @audioRecordings.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Recordings'**
+  String get audioRecordings;
+
+  /// No description provided for @totalRecordings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Recordings'**
+  String get totalRecordings;
+
+  /// No description provided for @recordingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording Time'**
+  String get recordingTime;
+
+  /// No description provided for @taskCompletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Completion'**
+  String get taskCompletion;
+
+  /// No description provided for @productivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Productivity'**
+  String get productivity;
+
+  /// No description provided for @weeklyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Progress'**
+  String get weeklyProgress;
+
+  /// No description provided for @monthlyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Progress'**
+  String get monthlyProgress;
+
+  /// No description provided for @priorityDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Distribution'**
+  String get priorityDistribution;
+
+  /// No description provided for @completionRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Rate'**
+  String get completionRate;
+
+  /// No description provided for @averageCompletionTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Completion Time'**
+  String get averageCompletionTime;
+
+  /// No description provided for @mostProductiveDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Productive Day'**
+  String get mostProductiveDay;
+
+  /// No description provided for @taskTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Trends'**
+  String get taskTrends;
+
+  /// No description provided for @audioInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Insights'**
+  String get audioInsights;
+
+  /// No description provided for @totalDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Duration'**
+  String get totalDuration;
+
+  /// No description provided for @averageLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Length'**
+  String get averageLength;
+
+  /// No description provided for @recordingQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording Quality'**
+  String get recordingQuality;
 }
 
 class _AppLocalizationsDelegate

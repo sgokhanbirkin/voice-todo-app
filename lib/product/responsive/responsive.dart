@@ -147,7 +147,153 @@ class ResponsiveBuilder extends StatelessWidget {
   }
 }
 
-// TODO: Add more responsive utilities (e.g., grid layouts, navigation patterns)
-// TODO: Implement orientation-aware responsive behavior
-// TODO: Add custom breakpoint configuration
-// TODO: Create responsive text scale factors
+/// Responsive widget utilities for common UI patterns
+class ResponsiveWidgets {
+  /// Create a responsive SizedBox with different heights for different devices
+  static Widget verticalSpace(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) {
+    return SizedBox(
+      height: Responsive.getResponsiveSpacing(
+        context,
+        mobile: mobile,
+        tablet: tablet,
+        desktop: desktop,
+      ),
+    );
+  }
+
+  /// Create a responsive SizedBox with different widths for different devices
+  static Widget horizontalSpace(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) {
+    return SizedBox(
+      width: Responsive.getResponsiveSpacing(
+        context,
+        mobile: mobile,
+        tablet: tablet,
+        desktop: desktop,
+      ),
+    );
+  }
+
+  /// Create responsive padding
+  static EdgeInsets responsivePadding(
+    BuildContext context, {
+    double? mobile,
+    double? tablet,
+    double? desktop,
+    double? all,
+    double? horizontal,
+    double? vertical,
+  }) {
+    final deviceSpacing = Responsive.getResponsiveSpacing(
+      context,
+      mobile: mobile ?? all ?? horizontal ?? vertical ?? 16,
+      tablet: tablet ?? all ?? horizontal ?? vertical ?? 20,
+      desktop: desktop ?? all ?? horizontal ?? vertical ?? 24,
+    );
+
+    if (horizontal != null && vertical != null) {
+      return EdgeInsets.symmetric(
+        horizontal: Responsive.getResponsiveSpacing(
+          context,
+          mobile: horizontal,
+          tablet: horizontal * 1.25,
+          desktop: horizontal * 1.5,
+        ),
+        vertical: Responsive.getResponsiveSpacing(
+          context,
+          mobile: vertical,
+          tablet: vertical * 1.25,
+          desktop: vertical * 1.5,
+        ),
+      );
+    }
+
+    return EdgeInsets.all(deviceSpacing);
+  }
+
+  /// Create a responsive container with consistent styling
+  static Container responsiveContainer(
+    BuildContext context, {
+    required Widget child,
+    Color? color,
+    double? borderRadius,
+    Border? border,
+    BoxShadow? shadow,
+  }) {
+    return Container(
+      padding: responsivePadding(context),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(
+          borderRadius ?? Responsive.getResponsiveSpacing(
+            context,
+            mobile: 8,
+            tablet: 10,
+            desktop: 12,
+          ),
+        ),
+        border: border,
+        boxShadow: shadow != null ? [shadow] : null,
+      ),
+      child: child,
+    );
+  }
+
+  /// Create responsive text with device-appropriate font sizes
+  static Widget responsiveText(
+    BuildContext context, {
+    required String text,
+    required double mobileFontSize,
+    required double tabletFontSize,
+    required double desktopFontSize,
+    TextStyle? style,
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+  }) {
+    return Text(
+      text,
+      style: (style ?? const TextStyle()).copyWith(
+        fontSize: Responsive.getResponsiveFontSize(
+          context,
+          mobile: mobileFontSize,
+          tablet: tabletFontSize,
+          desktop: desktopFontSize,
+        ),
+      ),
+      maxLines: maxLines,
+      overflow: overflow,
+      textAlign: textAlign,
+    );
+  }
+
+  /// Create a responsive icon with device-appropriate sizes
+  static Widget responsiveIcon(
+    BuildContext context, {
+    required IconData icon,
+    Color? color,
+    double? mobileSize,
+    double? tabletSize,
+    double? desktopSize,
+  }) {
+    return Icon(
+      icon,
+      color: color,
+      size: Responsive.getResponsiveSpacing(
+        context,
+        mobile: mobileSize ?? 24,
+        tablet: tabletSize ?? 28,
+        desktop: desktopSize ?? 32,
+      ),
+    );
+  }
+}

@@ -47,7 +47,7 @@ class _HomePageDrawer {
                         context: context,
                         icon: Icons.home,
                         title: l10n.home,
-                        subtitle: 'Ana sayfa',
+                        subtitle: l10n.home,
                         onTap: () {
                           zoomDrawerController.toggle?.call();
                         },
@@ -114,7 +114,7 @@ class _HomePageDrawer {
                           _ThemeOptionTile.build(
                             context: context,
                             title: l10n.lightTheme,
-                            subtitle: 'Açık renkli görünüm',
+                            subtitle: l10n.lightTheme,
                             icon: Icons.light_mode,
                             isSelected:
                                 appTheme.currentThemeMode == ThemeMode.light,
@@ -132,7 +132,7 @@ class _HomePageDrawer {
                           _ThemeOptionTile.build(
                             context: context,
                             title: l10n.darkTheme,
-                            subtitle: 'Koyu renkli görünüm',
+                            subtitle: l10n.darkTheme,
                             icon: Icons.dark_mode,
                             isSelected:
                                 appTheme.currentThemeMode == ThemeMode.dark,
@@ -149,7 +149,7 @@ class _HomePageDrawer {
                           _ThemeOptionTile.build(
                             context: context,
                             title: l10n.systemTheme,
-                            subtitle: 'Sistem ayarını takip eder',
+                            subtitle: l10n.systemTheme,
                             icon: Icons.settings_system_daydream,
                             isSelected:
                                 appTheme.currentThemeMode == ThemeMode.system,

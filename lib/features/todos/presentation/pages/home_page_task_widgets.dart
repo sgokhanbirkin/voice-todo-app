@@ -422,7 +422,7 @@ class _TaskCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              task.isStarred ? 'Yıldızı Kaldır' : 'Yıldızla',
+                              task.isStarred ? l10n.unstarTask : l10n.starTask,
                             ),
                           ],
                         ),
@@ -505,7 +505,7 @@ class _TaskCard extends StatelessWidget {
                   _buildStatusChip(context, task.status),
                   if (task.isOverdue)
                     Chip(
-                      label: const Text('Gecikmiş'),
+                      label: Text(l10n.overdue),
                       backgroundColor: AppColors.error.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color: AppColors.error,
@@ -520,7 +520,7 @@ class _TaskCard extends StatelessWidget {
                     ),
                   if (task.isStarred)
                     Chip(
-                      label: const Text('Yıldızlı'),
+                      label: Text(l10n.starred),
                       backgroundColor: AppColors.warning.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color: AppColors.warning,
@@ -588,7 +588,7 @@ class _TaskCard extends StatelessWidget {
         break;
       case TaskStatus.inProgress:
         color = AppColors.statusInProgress;
-        label = 'Devam Ediyor'; // TODO: Add to localization
+        label = l10n.taskStatusInProgress;
         break;
       case TaskStatus.completed:
         color = AppColors.statusCompleted;
@@ -596,7 +596,7 @@ class _TaskCard extends StatelessWidget {
         break;
       case TaskStatus.cancelled:
         color = AppColors.statusCancelled;
-        label = 'İptal Edildi'; // TODO: Add to localization
+        label = l10n.taskStatusCancelled;
         break;
     }
 

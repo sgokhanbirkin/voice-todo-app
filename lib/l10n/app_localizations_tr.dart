@@ -266,4 +266,79 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get systemTheme => 'Sistem';
+
+  @override
+  String get taskStatusInProgress => 'Devam Ediyor';
+
+  @override
+  String get taskStatusCancelled => 'İptal Edildi';
+
+  @override
+  String get starTask => 'Yıldızla';
+
+  @override
+  String get unstarTask => 'Yıldızı Kaldır';
+
+  @override
+  String get overdue => 'Gecikmiş';
+
+  @override
+  String get starred => 'Yıldızlı';
+
+  @override
+  String get analytics => 'Analitik';
+
+  @override
+  String get insights => 'Öngörüler';
+
+  @override
+  String get statistics => 'İstatistikler';
+
+  @override
+  String get audioRecordings => 'Ses Kayıtları';
+
+  @override
+  String get totalRecordings => 'Toplam Kayıt';
+
+  @override
+  String get recordingTime => 'Kayıt Süresi';
+
+  @override
+  String get taskCompletion => 'Görev Tamamlama';
+
+  @override
+  String get productivity => 'Verimlilik';
+
+  @override
+  String get weeklyProgress => 'Haftalık İlerleme';
+
+  @override
+  String get monthlyProgress => 'Aylık İlerleme';
+
+  @override
+  String get priorityDistribution => 'Öncelik Dağılımı';
+
+  @override
+  String get completionRate => 'Tamamlanma Oranı';
+
+  @override
+  String get averageCompletionTime => 'Ortalama Tamamlama Süresi';
+
+  @override
+  String get mostProductiveDay => 'En Verimli Gün';
+
+  @override
+  String get taskTrends => 'Görev Trendleri';
+
+  @override
+  String get audioInsights => 'Ses Analizi';
+
+  @override
+  String get totalDuration => 'Toplam Süre';
+
+  @override
+  String get averageLength => 'Ortalama Uzunluk';
+
+  @override
+  String get recordingQuality => 'Kayıt Kalitesi';
 }
