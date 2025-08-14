@@ -494,14 +494,60 @@ class HiveTaskRepository implements ITaskRepository {
   // TODO: Implement remaining interface methods
   @override
   Future<AppResult<TaskEntity>> completeTask(String id) async {
-    // TODO: Implement complete task
-    throw UnimplementedError('completeTask not implemented yet');
+    try {
+      if (!_database.isReady) {
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
+      }
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final completedTask = task.copyWith(
+        status: TaskStatus.completed,
+        completedAt: DateTime.now(),
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, completedTask);
+
+      _logger.info('Completed task: ${task.title}');
+      return AppResult.success(completedTask);
+    } catch (e) {
+      _logger.error('Failed to complete task: $e');
+      return AppResult.failure(DatabaseFailure('Failed to complete task: $e'));
+    }
   }
 
   @override
   Future<AppResult<TaskEntity>> uncompleteTask(String id) async {
-    // TODO: Implement uncomplete task
-    throw UnimplementedError('uncompleteTask not implemented yet');
+    try {
+      if (!_database.isReady) {
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
+      }
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final uncompletedTask = task.copyWith(
+        status: TaskStatus.pending,
+        completedAt: null,
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, uncompletedTask);
+
+      _logger.info('Uncompleted task: ${task.title}');
+      return AppResult.success(uncompletedTask);
+    } catch (e) {
+      _logger.error('Failed to uncomplete task: $e');
+      return AppResult.failure(DatabaseFailure('Failed to uncomplete task: $e'));
+    }
   }
 
   @override
@@ -512,14 +558,58 @@ class HiveTaskRepository implements ITaskRepository {
 
   @override
   Future<AppResult<TaskEntity>> starTask(String id) async {
-    // TODO: Implement star task
-    throw UnimplementedError('starTask not implemented yet');
+    try {
+      if (!_database.isReady) {
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
+      }
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final starredTask = task.copyWith(
+        isStarred: true,
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, starredTask);
+
+      _logger.info('Starred task: ${task.title}');
+      return AppResult.success(starredTask);
+    } catch (e) {
+      _logger.error('Failed to star task: $e');
+      return AppResult.failure(DatabaseFailure('Failed to star task: $e'));
+    }
   }
 
   @override
   Future<AppResult<TaskEntity>> unstarTask(String id) async {
-    // TODO: Implement unstar task
-    throw UnimplementedError('unstarTask not implemented yet');
+    try {
+      if (!_database.isReady) {
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
+      }
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final unstarredTask = task.copyWith(
+        isStarred: false,
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, unstarredTask);
+
+      _logger.info('Unstarred task: ${task.title}');
+      return AppResult.success(unstarredTask);
+    } catch (e) {
+      _logger.error('Failed to unstar task: $e');
+      return AppResult.failure(DatabaseFailure('Failed to unstar task: $e'));
+    }
   }
 
   @override

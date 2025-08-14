@@ -327,19 +327,19 @@ class HomePage extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-             builder: (context) => Obx(
-         () => AlertDialog(
-           contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
-           title: Row(
-             children: [
-               Icon(
-                 Icons.language,
-                 color: Theme.of(context).colorScheme.primary,
-               ),
-               SizedBox(width: 12.w),
-               Text(l10n.selectLanguage),
-             ],
-           ),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
+          title: Row(
+            children: [
+              Icon(
+                Icons.language,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              SizedBox(width: 12.w),
+              Text(l10n.selectLanguage),
+            ],
+          ),
           content: isChangingLanguage.value
               ? Container(
                   padding: EdgeInsets.all(24.w),
@@ -353,7 +353,9 @@ class HomePage extends StatelessWidget {
                       Text(
                         'Dil değiştiriliyor...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -389,7 +391,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-    Widget _buildLanguageOption(
+  Widget _buildLanguageOption(
     BuildContext context,
     String title,
     Locale value,
@@ -414,7 +416,9 @@ class HomePage extends StatelessWidget {
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    : Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -450,20 +454,28 @@ class HomePage extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: isSelected
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer
+                                  : Theme.of(context).colorScheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
                       ),
                       SizedBox(height: 2.h),
                       Text(
                         _getLanguageNativeName(value.languageCode),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7)
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                                    .withValues(alpha: 0.7)
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -523,19 +535,16 @@ class HomePage extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-             builder: (context) => Obx(
-         () => AlertDialog(
-           contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
-           title: Row(
-             children: [
-               Icon(
-                 Icons.palette,
-                 color: Theme.of(context).colorScheme.primary,
-               ),
-               SizedBox(width: 12.w),
-               Text(l10n.selectTheme),
-             ],
-           ),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 24.h),
+          title: Row(
+            children: [
+              Icon(Icons.palette, color: Theme.of(context).colorScheme.primary),
+              SizedBox(width: 12.w),
+              Text(l10n.selectTheme),
+            ],
+          ),
           content: isChangingTheme.value
               ? Container(
                   padding: EdgeInsets.all(24.w),
@@ -549,7 +558,9 @@ class HomePage extends StatelessWidget {
                       Text(
                         'Tema uygulanıyor...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -609,7 +620,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-    Widget _buildThemeOption(
+  Widget _buildThemeOption(
     BuildContext context,
     String title,
     ThemeMode value,
@@ -634,7 +645,9 @@ class HomePage extends StatelessWidget {
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    : Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -670,20 +683,28 @@ class HomePage extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: isSelected
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer
+                                  : Theme.of(context).colorScheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
                       ),
                       SizedBox(height: 2.h),
                       Text(
                         _getThemeDescription(value),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7)
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                                    .withValues(alpha: 0.7)
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -693,7 +714,9 @@ class HomePage extends StatelessWidget {
                   _getThemeIcon(value),
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 20.sp,
                 ),
               ],
