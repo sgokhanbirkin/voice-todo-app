@@ -188,165 +188,176 @@ class _HomePageState extends State<HomePage> {
               // Menu Items - Scrollable Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 16.h), // Bottom padding for scroll
+                  padding: EdgeInsets.only(
+                    bottom: 16.h,
+                  ), // Bottom padding for scroll
                   child: Column(
                     children: [
-                    _buildAnimatedMenuTile(
-                      context: context,
-                      icon: Icons.home,
-                      title: l10n.home,
-                      subtitle: 'Ana sayfa',
-                      onTap: () {
-                        _zoomDrawerController.toggle?.call();
-                      },
-                    ),
-
-                    SizedBox(height: 16.h),
-
-                    _buildExpandableMenuSection(
-                      context: context,
-                      icon: Icons.language,
-                      title: l10n.language,
-                      subtitle: localeController.getLocaleDisplayName(
-                        localeController.currentLocale,
-                      ),
-                      isExpanded: _isLanguageExpanded,
-                      onTap: () {
-                        setState(() {
-                          _isLanguageExpanded = !_isLanguageExpanded;
-                          if (_isLanguageExpanded) _isThemeExpanded = false;
-                        });
-                      },
-                      children: LocaleController.supportedLocales.map((locale) {
-                        final isSelected =
-                            locale.languageCode ==
-                            localeController.currentLocale.languageCode;
-                        return _buildLanguageOptionTile(
-                          context: context,
-                          title: localeController.getLocaleDisplayName(locale),
-                          subtitle: _getLanguageNativeName(locale.languageCode),
-                          isSelected: isSelected,
-                          onTap: () async {
-                            if (!isSelected) {
-                              localeController.changeLocale(locale);
-                              await Future.delayed(
-                                const Duration(milliseconds: 300),
-                              );
-                            }
-                            setState(() {
-                              _isLanguageExpanded = false;
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-
-                    SizedBox(height: 16.h),
-
-                    _buildExpandableMenuSection(
-                      context: context,
-                      icon: Icons.palette,
-                      title: l10n.theme,
-                      subtitle: _getThemeDisplayName(
-                        l10n,
-                        appTheme.currentThemeMode,
-                      ),
-                      isExpanded: _isThemeExpanded,
-                      onTap: () {
-                        setState(() {
-                          _isThemeExpanded = !_isThemeExpanded;
-                          if (_isThemeExpanded) _isLanguageExpanded = false;
-                        });
-                      },
-                      children: [
-                        _buildThemeOptionTile(
-                          context: context,
-                          title: l10n.lightTheme,
-                          subtitle: 'Açık renkli görünüm',
-                          icon: Icons.light_mode,
-                          isSelected:
-                              appTheme.currentThemeMode == ThemeMode.light,
-                          onTap: () async {
-                            if (appTheme.currentThemeMode != ThemeMode.light) {
-                              appTheme.switchToLight();
-                              await Future.delayed(
-                                const Duration(milliseconds: 300),
-                              );
-                            }
-                            setState(() {
-                              _isThemeExpanded = false;
-                            });
-                          },
-                        ),
-                        _buildThemeOptionTile(
-                          context: context,
-                          title: l10n.darkTheme,
-                          subtitle: 'Koyu renkli görünüm',
-                          icon: Icons.dark_mode,
-                          isSelected:
-                              appTheme.currentThemeMode == ThemeMode.dark,
-                          onTap: () async {
-                            if (appTheme.currentThemeMode != ThemeMode.dark) {
-                              appTheme.switchToDark();
-                              await Future.delayed(
-                                const Duration(milliseconds: 300),
-                              );
-                            }
-                            setState(() {
-                              _isThemeExpanded = false;
-                            });
-                          },
-                        ),
-                        _buildThemeOptionTile(
-                          context: context,
-                          title: l10n.systemTheme,
-                          subtitle: 'Sistem ayarını takip eder',
-                          icon: Icons.settings_system_daydream,
-                          isSelected:
-                              appTheme.currentThemeMode == ThemeMode.system,
-                          onTap: () async {
-                            if (appTheme.currentThemeMode != ThemeMode.system) {
-                              appTheme.switchToSystem();
-                              await Future.delayed(
-                                const Duration(milliseconds: 300),
-                              );
-                            }
-                            setState(() {
-                              _isThemeExpanded = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 24.h), // Extra space before logout
-
-                    // Logout Button
-                    Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.only(bottom: 16.h),
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
+                      _buildAnimatedMenuTile(
+                        context: context,
+                        icon: Icons.home,
+                        title: l10n.home,
+                        subtitle: 'Ana sayfa',
+                        onTap: () {
                           _zoomDrawerController.toggle?.call();
-                          await authController.signOut();
-                          if (context.mounted) {
-                            context.go('/');
-                          }
                         },
-                        icon: const Icon(Icons.logout),
-                        label: Text(l10n.logout),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.error,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onError,
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                      ),
+
+                      SizedBox(height: 16.h),
+
+                      _buildExpandableMenuSection(
+                        context: context,
+                        icon: Icons.language,
+                        title: l10n.language,
+                        subtitle: localeController.getLocaleDisplayName(
+                          localeController.currentLocale,
+                        ),
+                        isExpanded: _isLanguageExpanded,
+                        onTap: () {
+                          setState(() {
+                            _isLanguageExpanded = !_isLanguageExpanded;
+                            if (_isLanguageExpanded) _isThemeExpanded = false;
+                          });
+                        },
+                        children: LocaleController.supportedLocales.map((
+                          locale,
+                        ) {
+                          final isSelected =
+                              locale.languageCode ==
+                              localeController.currentLocale.languageCode;
+                          return _buildLanguageOptionTile(
+                            context: context,
+                            title: localeController.getLocaleDisplayName(
+                              locale,
+                            ),
+                            subtitle: _getLanguageNativeName(
+                              locale.languageCode,
+                            ),
+                            isSelected: isSelected,
+                            onTap: () async {
+                              if (!isSelected) {
+                                localeController.changeLocale(locale);
+                                await Future.delayed(
+                                  const Duration(milliseconds: 300),
+                                );
+                              }
+                              setState(() {
+                                _isLanguageExpanded = false;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+
+                      SizedBox(height: 16.h),
+
+                      _buildExpandableMenuSection(
+                        context: context,
+                        icon: Icons.palette,
+                        title: l10n.theme,
+                        subtitle: _getThemeDisplayName(
+                          l10n,
+                          appTheme.currentThemeMode,
+                        ),
+                        isExpanded: _isThemeExpanded,
+                        onTap: () {
+                          setState(() {
+                            _isThemeExpanded = !_isThemeExpanded;
+                            if (_isThemeExpanded) _isLanguageExpanded = false;
+                          });
+                        },
+                        children: [
+                          _buildThemeOptionTile(
+                            context: context,
+                            title: l10n.lightTheme,
+                            subtitle: 'Açık renkli görünüm',
+                            icon: Icons.light_mode,
+                            isSelected:
+                                appTheme.currentThemeMode == ThemeMode.light,
+                            onTap: () async {
+                              if (appTheme.currentThemeMode !=
+                                  ThemeMode.light) {
+                                appTheme.switchToLight();
+                                await Future.delayed(
+                                  const Duration(milliseconds: 300),
+                                );
+                              }
+                              setState(() {
+                                _isThemeExpanded = false;
+                              });
+                            },
+                          ),
+                          _buildThemeOptionTile(
+                            context: context,
+                            title: l10n.darkTheme,
+                            subtitle: 'Koyu renkli görünüm',
+                            icon: Icons.dark_mode,
+                            isSelected:
+                                appTheme.currentThemeMode == ThemeMode.dark,
+                            onTap: () async {
+                              if (appTheme.currentThemeMode != ThemeMode.dark) {
+                                appTheme.switchToDark();
+                                await Future.delayed(
+                                  const Duration(milliseconds: 300),
+                                );
+                              }
+                              setState(() {
+                                _isThemeExpanded = false;
+                              });
+                            },
+                          ),
+                          _buildThemeOptionTile(
+                            context: context,
+                            title: l10n.systemTheme,
+                            subtitle: 'Sistem ayarını takip eder',
+                            icon: Icons.settings_system_daydream,
+                            isSelected:
+                                appTheme.currentThemeMode == ThemeMode.system,
+                            onTap: () async {
+                              if (appTheme.currentThemeMode !=
+                                  ThemeMode.system) {
+                                appTheme.switchToSystem();
+                                await Future.delayed(
+                                  const Duration(milliseconds: 300),
+                                );
+                              }
+                              setState(() {
+                                _isThemeExpanded = false;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 24.h), // Extra space before logout
+                      // Logout Button
+                      Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.only(bottom: 16.h),
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            _zoomDrawerController.toggle?.call();
+                            await authController.signOut();
+                            if (context.mounted) {
+                              context.go('/');
+                            }
+                          },
+                          icon: const Icon(Icons.logout),
+                          label: Text(l10n.logout),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onError,
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     ],
                   ),
                 ),

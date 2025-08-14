@@ -9,6 +9,7 @@ import 'core/router/app_router.dart';
 import 'core/database/hive_database.dart';
 import 'core/bindings/app_bindings.dart';
 import 'product/theme/app_theme.dart';
+import 'product/localization/locale_controller.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -50,29 +51,31 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return GetMaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'Voice Todo App',
+        return Obx(() {
+          return GetMaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            title: 'Voice Todo App',
 
-          // Theme configuration
-          theme: AppTheme.instance.lightTheme,
-          darkTheme: AppTheme.instance.darkTheme,
-          themeMode: AppTheme.instance.currentThemeMode,
+            // Theme configuration - Now reactive!
+            theme: AppTheme.instance.lightTheme,
+            darkTheme: AppTheme.instance.darkTheme,
+            themeMode: AppTheme.instance.currentThemeMode,
 
-          // Localization configuration
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('tr'), // Default to Turkish
-          // Router configuration
-          routerDelegate: AppRouter.router.routerDelegate,
-          routeInformationParser: AppRouter.router.routeInformationParser,
-          routeInformationProvider: AppRouter.router.routeInformationProvider,
-        );
+            // Localization configuration
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: LocaleController.instance.currentLocale, // Reactive locale
+            // Router configuration
+            routerDelegate: AppRouter.router.routerDelegate,
+            routeInformationParser: AppRouter.router.routeInformationParser,
+            routeInformationProvider: AppRouter.router.routeInformationProvider,
+          );
+        });
       },
     );
   }
