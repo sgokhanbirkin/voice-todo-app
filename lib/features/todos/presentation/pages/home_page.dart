@@ -1041,60 +1041,16 @@ class _HomePageBody extends StatelessWidget {
     BuildContext context,
     TaskController controller,
   ) {
-    final pendingTasks = controller.filteredTasks
-        .where((task) => task.status != TaskStatus.completed)
-        .toList();
-    final completedTasks = controller.filteredTasks
-        .where((task) => task.status == TaskStatus.completed)
-        .toList();
+    return Obx(() {
+      final pendingTasks = controller.filteredTasks
+          .where((task) => task.status != TaskStatus.completed)
+          .toList();
+      final completedTasks = controller.filteredTasks
+          .where((task) => task.status == TaskStatus.completed)
+          .toList();
 
-    return ListView(
-      padding: Responsive.getResponsivePadding(context),
-      children: [
-        // Priority Filter Cards (at the top)
-        if (controller.tasks.isNotEmpty) ...[
-          _buildPriorityFilterCards(context, controller),
-          SizedBox(height: 24.h),
-        ],
-
-        // Pending Tasks Section
-        if (pendingTasks.isNotEmpty) ...[
-          _buildSectionHeader(context, l10n.pending, pendingTasks.length),
-          SizedBox(height: 12.h),
-          ...pendingTasks.map(
-            (task) => _buildTaskCard(context, task, controller),
-          ),
-          SizedBox(height: 24.h),
-        ],
-
-        // Completed Tasks Section
-        if (completedTasks.isNotEmpty) ...[
-          _buildSectionHeader(context, l10n.completed, completedTasks.length),
-          SizedBox(height: 12.h),
-          ...completedTasks.map(
-            (task) => _buildTaskCard(context, task, controller),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildCategorizedTaskGrid(
-    BuildContext context,
-    TaskController controller,
-    int crossAxisCount,
-  ) {
-    final pendingTasks = controller.filteredTasks
-        .where((task) => task.status != TaskStatus.completed)
-        .toList();
-    final completedTasks = controller.filteredTasks
-        .where((task) => task.status == TaskStatus.completed)
-        .toList();
-
-    return SingleChildScrollView(
-      padding: Responsive.getResponsivePadding(context),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      return ListView(
+        padding: Responsive.getResponsivePadding(context),
         children: [
           // Priority Filter Cards (at the top)
           if (controller.tasks.isNotEmpty) ...[
@@ -1102,51 +1058,131 @@ class _HomePageBody extends StatelessWidget {
             SizedBox(height: 24.h),
           ],
 
-          // Pending Tasks Section
-          if (pendingTasks.isNotEmpty) ...[
-            _buildSectionHeader(context, l10n.pending, pendingTasks.length),
-            SizedBox(height: 12.h),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 16.w,
-                mainAxisSpacing: 16.h,
-                childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
-              ),
-              itemCount: pendingTasks.length,
-              itemBuilder: (context, index) {
-                final task = pendingTasks[index];
-                return _buildTaskCard(context, task, controller);
-              },
-            ),
-            SizedBox(height: 32.h),
-          ],
+                     // Pending Tasks Section
+           if (pendingTasks.isNotEmpty) ...[
+             _buildSectionHeader(
+               context,
+               l10n.pending,
+               pendingTasks.length,
+               controller.isPendingExpanded.value,
+               controller.togglePendingExpansion,
+             ),
+             if (controller.isPendingExpanded.value) ...[
+               SizedBox(height: 12.h),
+               ...pendingTasks.map(
+                 (task) => _buildTaskCard(context, task, controller),
+               ),
+               SizedBox(height: 24.h),
+             ],
+           ],
 
-          // Completed Tasks Section
-          if (completedTasks.isNotEmpty) ...[
-            _buildSectionHeader(context, l10n.completed, completedTasks.length),
-            SizedBox(height: 12.h),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 16.w,
-                mainAxisSpacing: 16.h,
-                childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
-              ),
-              itemCount: completedTasks.length,
-              itemBuilder: (context, index) {
-                final task = completedTasks[index];
-                return _buildTaskCard(context, task, controller);
-              },
-            ),
-          ],
+           // Completed Tasks Section
+           if (completedTasks.isNotEmpty) ...[
+             _buildSectionHeader(
+               context,
+               l10n.completed,
+               completedTasks.length,
+               controller.isCompletedExpanded.value,
+               controller.toggleCompletedExpansion,
+             ),
+             if (controller.isCompletedExpanded.value) ...[
+               SizedBox(height: 12.h),
+               ...completedTasks.map(
+                 (task) => _buildTaskCard(context, task, controller),
+               ),
+             ],
+           ],
         ],
-      ),
-    );
+      );
+    });
+  }
+
+  Widget _buildCategorizedTaskGrid(
+    BuildContext context,
+    TaskController controller,
+    int crossAxisCount,
+  ) {
+    return Obx(() {
+      final pendingTasks = controller.filteredTasks
+          .where((task) => task.status != TaskStatus.completed)
+          .toList();
+      final completedTasks = controller.filteredTasks
+          .where((task) => task.status == TaskStatus.completed)
+          .toList();
+
+      return SingleChildScrollView(
+        padding: Responsive.getResponsivePadding(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Priority Filter Cards (at the top)
+            if (controller.tasks.isNotEmpty) ...[
+              _buildPriorityFilterCards(context, controller),
+              SizedBox(height: 24.h),
+            ],
+
+                         // Pending Tasks Section
+             if (pendingTasks.isNotEmpty) ...[
+               _buildSectionHeader(
+                 context,
+                 l10n.pending,
+                 pendingTasks.length,
+                 controller.isPendingExpanded.value,
+                 controller.togglePendingExpansion,
+               ),
+               if (controller.isPendingExpanded.value) ...[
+                 SizedBox(height: 12.h),
+                 GridView.builder(
+                   shrinkWrap: true,
+                   physics: const NeverScrollableScrollPhysics(),
+                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                     crossAxisCount: crossAxisCount,
+                     crossAxisSpacing: 16.w,
+                     mainAxisSpacing: 16.h,
+                     childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+                   ),
+                   itemCount: pendingTasks.length,
+                   itemBuilder: (context, index) {
+                     final task = pendingTasks[index];
+                     return _buildTaskCard(context, task, controller);
+                   },
+                 ),
+                 SizedBox(height: 32.h),
+               ],
+             ],
+
+             // Completed Tasks Section
+             if (completedTasks.isNotEmpty) ...[
+               _buildSectionHeader(
+                 context,
+                 l10n.completed,
+                 completedTasks.length,
+                 controller.isCompletedExpanded.value,
+                 controller.toggleCompletedExpansion,
+               ),
+               if (controller.isCompletedExpanded.value) ...[
+                 SizedBox(height: 12.h),
+                 GridView.builder(
+                   shrinkWrap: true,
+                   physics: const NeverScrollableScrollPhysics(),
+                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                     crossAxisCount: crossAxisCount,
+                     crossAxisSpacing: 16.w,
+                     mainAxisSpacing: 16.h,
+                     childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+                   ),
+                   itemCount: completedTasks.length,
+                   itemBuilder: (context, index) {
+                     final task = completedTasks[index];
+                     return _buildTaskCard(context, task, controller);
+                   },
+                 ),
+               ],
+             ],
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildPriorityFilterCards(
@@ -1252,43 +1288,65 @@ class _HomePageBody extends StatelessWidget {
     });
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, int count) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
-      child: Row(
-        children: [
-          Container(
-            width: 4.w,
-            height: 24.h,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.circular(2.r),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          SizedBox(width: 8.w),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              count.toString(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w500,
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    int count,
+    bool isExpanded,
+    VoidCallback onToggle,
+  ) {
+    return InkWell(
+      onTap: onToggle,
+      borderRadius: BorderRadius.circular(8.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
+        child: Row(
+          children: [
+            Container(
+              width: 4.w,
+              height: 24.h,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Text(
+                count.toString(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            AnimatedRotation(
+              turns: isExpanded ? 0.0 : -0.25, // 0° açık, -90° kapalı
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                size: 24.sp,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

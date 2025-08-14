@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
 import '../../../../core/validation/validators.dart';
-import '../../../../core/logger.dart';
 
 /// Task controller for managing task state and operations
 class TaskController extends GetxController {
@@ -41,6 +40,12 @@ class TaskController extends GetxController {
 
   /// Current filter priority
   final Rx<TaskPriority?> filterPriority = Rx<TaskPriority?>(null);
+
+  /// Whether pending tasks section is expanded
+  final RxBool isPendingExpanded = true.obs;
+
+  /// Whether completed tasks section is expanded
+  final RxBool isCompletedExpanded = true.obs;
 
   /// Current sort field
   final RxString sortBy = 'createdAt'.obs;
@@ -357,14 +362,10 @@ class TaskController extends GetxController {
 
   /// Sets the filter priority and updates filtered tasks
   void setFilterPriority(TaskPriority? priority) {
-    Logger.instance.debug(
-      '🔥 Filter changing from ${filterPriority.value} to $priority',
-    );
+    print('🔥 Filter changing from ${filterPriority.value} to $priority');
     filterPriority.value = priority;
     _updateFilteredTasks();
-    Logger.instance.debug(
-      '🔥 After filter: ${filteredTasks.length} tasks shown',
-    );
+    print('🔥 After filter: ${filteredTasks.length} tasks shown');
   }
 
   /// Sets the sort field and updates filtered tasks
@@ -377,6 +378,16 @@ class TaskController extends GetxController {
   void toggleSortDirection() {
     sortAscending.value = !sortAscending.value;
     _updateFilteredTasks();
+  }
+
+  /// Toggles pending tasks section expansion
+  void togglePendingExpansion() {
+    isPendingExpanded.value = !isPendingExpanded.value;
+  }
+
+  /// Toggles completed tasks section expansion
+  void toggleCompletedExpansion() {
+    isCompletedExpanded.value = !isCompletedExpanded.value;
   }
 
   /// Updates the filtered tasks based on current filters and search
