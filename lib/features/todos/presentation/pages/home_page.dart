@@ -41,11 +41,14 @@ class HomePage extends StatelessWidget {
     return AppScaffold(
       title: l10n.tasks,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: () => _showSettingsDialog(context, l10n, authController),
+        Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
         ),
       ],
+      endDrawer: _buildSettingsDrawer(context, l10n, authController),
       body: _HomePageBody(l10n: l10n),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTaskDialog(context, l10n, taskController),
@@ -63,12 +66,15 @@ class HomePage extends StatelessWidget {
     return AppScaffold(
       title: l10n.tasks,
       actions: [
-        TextButton.icon(
-          icon: const Icon(Icons.settings),
-          label: Text(l10n.settings),
-          onPressed: () => _showSettingsDialog(context, l10n, authController),
+        Builder(
+          builder: (context) => TextButton.icon(
+            icon: const Icon(Icons.settings),
+            label: Text(l10n.settings),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
         ),
       ],
+      endDrawer: _buildSettingsDrawer(context, l10n, authController),
       body: _HomePageBody(l10n: l10n),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddTaskDialog(context, l10n, taskController),
@@ -261,6 +267,142 @@ class HomePage extends StatelessWidget {
               child: Text(l10n.close),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsDrawer(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthController authController,
+  ) {
+    final localeController = Get.find<LocaleController>();
+    final appTheme = Get.find<AppTheme>();
+
+    return Drawer(
+      child: Obx(
+        () => SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(16.r),
+                    bottomRight: Radius.circular(16.r),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.settings,
+                      size: 32.sp,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      l10n.settings,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: 16.h),
+              
+              // Settings Options
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        Icons.language,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      title: Text(l10n.language),
+                      subtitle: Text(
+                        localeController.getLocaleDisplayName(
+                          localeController.currentLocale,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showLanguageDialog(context, l10n);
+                      },
+                    ),
+                    
+                    SizedBox(height: 8.h),
+                    
+                    ListTile(
+                      leading: Icon(
+                        Icons.palette,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      title: Text(l10n.theme),
+                      subtitle: Text(
+                        _getThemeDisplayName(l10n, appTheme.currentThemeMode),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showThemeDialog(context, l10n);
+                      },
+                    ),
+                    
+                    SizedBox(height: 16.h),
+                    
+                    Divider(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                    
+                    SizedBox(height: 16.h),
+                    
+                    ListTile(
+                      leading: Icon(
+                        Icons.logout,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      title: Text(
+                        l10n.logout,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await authController.signOut();
+                        if (context.mounted) {
+                          context.go('/');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Footer
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Text(
+                  'Voice Todo App',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
