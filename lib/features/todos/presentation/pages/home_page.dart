@@ -196,8 +196,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-
-
   void _showSettingsDialog(
     BuildContext context,
     AppLocalizations l10n,
@@ -957,9 +955,12 @@ class _HomePageBody extends StatelessWidget {
             // Categorized Task List
             Expanded(
               child: ResponsiveBuilder(
-                mobile: (context) => _buildCategorizedTaskList(context, controller),
-                tablet: (context) => _buildCategorizedTaskGrid(context, controller, 2),
-                desktop: (context) => _buildCategorizedTaskGrid(context, controller, 3),
+                mobile: (context) =>
+                    _buildCategorizedTaskList(context, controller),
+                tablet: (context) =>
+                    _buildCategorizedTaskGrid(context, controller, 2),
+                desktop: (context) =>
+                    _buildCategorizedTaskGrid(context, controller, 3),
               ),
             ),
           ],
@@ -1057,15 +1058,19 @@ class _HomePageBody extends StatelessWidget {
           // Priority Filter Cards
           _buildPriorityFilterCards(context, controller),
           SizedBox(height: 16.h),
-          ...pendingTasks.map((task) => _buildTaskCard(context, task, controller)),
+          ...pendingTasks.map(
+            (task) => _buildTaskCard(context, task, controller),
+          ),
           SizedBox(height: 24.h),
         ],
-        
+
         // Completed Tasks Section
         if (completedTasks.isNotEmpty) ...[
           _buildSectionHeader(context, l10n.completed, completedTasks.length),
           SizedBox(height: 12.h),
-          ...completedTasks.map((task) => _buildTaskCard(context, task, controller)),
+          ...completedTasks.map(
+            (task) => _buildTaskCard(context, task, controller),
+          ),
         ],
       ],
     );
@@ -1112,7 +1117,7 @@ class _HomePageBody extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
           ],
-          
+
           // Completed Tasks Section
           if (completedTasks.isNotEmpty) ...[
             _buildSectionHeader(context, l10n.completed, completedTasks.length),
@@ -1183,58 +1188,59 @@ class _HomePageBody extends StatelessWidget {
     String label,
     Color color,
   ) {
-    final isSelected = controller.filterPriority.value == priority;
-    
-    return Obx(() => GestureDetector(
-      onTap: () {
-        if (controller.filterPriority.value == priority) {
-          // Same priority clicked - clear filter
-          controller.setFilterPriority(null);
-        } else {
-          // Different priority clicked - set filter
-          controller.setFilterPriority(priority);
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? color.withValues(alpha: 0.2)
-              : Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: isSelected 
-                ? color
-                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-            width: isSelected ? 2 : 1,
+    return Obx(() {
+      final isSelected = controller.filterPriority.value == priority;
+
+      return GestureDetector(
+        onTap: () {
+          if (controller.filterPriority.value == priority) {
+            // Same priority clicked - clear filter
+            controller.setFilterPriority(null);
+          } else {
+            // Different priority clicked - set filter
+            controller.setFilterPriority(priority);
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? color.withValues(alpha: 0.2)
+                : Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: isSelected
+                  ? color
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.3),
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 8.w,
+                height: 8.w,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isSelected
+                      ? color
+                      : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 12.sp,
+                ),
+              ),
+            ],
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 8.w,
-              height: 8.w,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: isSelected 
-                    ? color
-                    : Theme.of(context).colorScheme.onSurface,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                fontSize: 12.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ));
+      );
+    });
   }
 
   Widget _buildSectionHeader(BuildContext context, String title, int count) {
@@ -1284,10 +1290,10 @@ class _HomePageBody extends StatelessWidget {
     TaskController controller,
   ) {
     final isCompleted = task.status == TaskStatus.completed;
-    
+
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      color: isCompleted 
+      color: isCompleted
           ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.5)
           : null,
       child: Opacity(
@@ -1297,128 +1303,132 @@ class _HomePageBody extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            // Task header with checkbox and menu
-            Row(
-              children: [
-                Checkbox(
-                  value: task.status == TaskStatus.completed,
-                  onChanged: (value) async {
-                    if (value == true) {
-                      await controller.completeTask(task.id);
-                    } else {
-                      await controller.uncompleteTask(task.id);
-                    }
-                  },
-                ),
-                Expanded(
-                  child: Text(
-                    task.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      decoration: task.status == TaskStatus.completed
-                          ? TextDecoration.lineThrough
-                          : null,
-                      fontSize: Responsive.getResponsiveFontSize(
-                        context,
-                        mobile: 16.sp,
-                        tablet: 18.sp,
-                        desktop: 20.sp,
+              // Task header with checkbox and menu
+              Row(
+                children: [
+                  Checkbox(
+                    value: task.status == TaskStatus.completed,
+                    onChanged: (value) async {
+                      if (value == true) {
+                        await controller.completeTask(task.id);
+                      } else {
+                        await controller.uncompleteTask(task.id);
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: Text(
+                      task.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        decoration: task.status == TaskStatus.completed
+                            ? TextDecoration.lineThrough
+                            : null,
+                        fontSize: Responsive.getResponsiveFontSize(
+                          context,
+                          mobile: 16.sp,
+                          tablet: 18.sp,
+                          desktop: 20.sp,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) async {
-                    switch (value) {
-                      case 'star':
-                        if (task.isStarred) {
-                          await controller.unstarTask(task.id);
-                        } else {
-                          await controller.starTask(task.id);
-                        }
-                        break;
-                      case 'delete':
-                        await controller.deleteTask(task.id);
-                        break;
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'star',
-                      child: Row(
-                        children: [
-                          Icon(task.isStarred ? Icons.star_border : Icons.star),
-                          SizedBox(width: 8.w),
-                          Text(task.isStarred ? 'Yıldızı Kaldır' : 'Yıldızla'),
-                        ],
+                  PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      switch (value) {
+                        case 'star':
+                          if (task.isStarred) {
+                            await controller.unstarTask(task.id);
+                          } else {
+                            await controller.starTask(task.id);
+                          }
+                          break;
+                        case 'delete':
+                          await controller.deleteTask(task.id);
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'star',
+                        child: Row(
+                          children: [
+                            Icon(
+                              task.isStarred ? Icons.star_border : Icons.star,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              task.isStarred ? 'Yıldızı Kaldır' : 'Yıldızla',
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, color: AppColors.error),
-                          SizedBox(width: 8.w),
-                          Text(
-                            l10n.delete,
-                            style: TextStyle(color: AppColors.error),
-                          ),
-                        ],
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: AppColors.error),
+                            SizedBox(width: 8.w),
+                            Text(
+                              l10n.delete,
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Task description
-            if (task.description != null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                task.description!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: Responsive.getResponsiveFontSize(
-                    context,
-                    mobile: 14.sp,
-                    tablet: 15.sp,
-                    desktop: 16.sp,
+                    ],
                   ),
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                ],
               ),
-            ],
 
-            SizedBox(height: 12.h),
-
-            // Task chips
-            Wrap(
-              spacing: 8.w,
-              runSpacing: 4.h,
-              children: [
-                _buildPriorityChip(context, task.priority),
-                _buildStatusChip(context, task.status),
-                if (task.isOverdue)
-                  Chip(
-                    label: Text('Gecikmiş'),
-                    backgroundColor: AppColors.error.withValues(alpha: 0.2),
-                    labelStyle: TextStyle(
-                      color: AppColors.error,
-                      fontSize: 12.sp,
+              // Task description
+              if (task.description != null) ...[
+                SizedBox(height: 8.h),
+                Text(
+                  task.description!,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: Responsive.getResponsiveFontSize(
+                      context,
+                      mobile: 14.sp,
+                      tablet: 15.sp,
+                      desktop: 16.sp,
                     ),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                if (task.isStarred)
-                  Chip(
-                    label: Text('Yıldızlı'),
-                    backgroundColor: AppColors.warning.withValues(alpha: 0.2),
-                    labelStyle: TextStyle(
-                      color: AppColors.warning,
-                      fontSize: 12.sp,
-                    ),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
-            ),
+
+              SizedBox(height: 12.h),
+
+              // Task chips
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 4.h,
+                children: [
+                  _buildPriorityChip(context, task.priority),
+                  _buildStatusChip(context, task.status),
+                  if (task.isOverdue)
+                    Chip(
+                      label: Text('Gecikmiş'),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.2),
+                      labelStyle: TextStyle(
+                        color: AppColors.error,
+                        fontSize: 12.sp,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  if (task.isStarred)
+                    Chip(
+                      label: Text('Yıldızlı'),
+                      backgroundColor: AppColors.warning.withValues(alpha: 0.2),
+                      labelStyle: TextStyle(
+                        color: AppColors.warning,
+                        fontSize: 12.sp,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                ],
+              ),
             ],
           ),
         ),
