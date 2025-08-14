@@ -398,9 +398,10 @@ class _HomePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<TaskController>(
-      builder: (controller) {
-        if (controller.isLoading.value) {
+    return Obx(() {
+      final controller = Get.find<TaskController>();
+      
+      if (controller.isLoading.value) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -539,8 +540,7 @@ class _HomePageBody extends StatelessWidget {
             ],
           ),
         );
-      },
-    );
+    });
   }
 
   Widget _buildTaskSummary(BuildContext context, TaskStatistics stats) {

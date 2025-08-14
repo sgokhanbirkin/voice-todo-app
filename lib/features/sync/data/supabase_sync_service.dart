@@ -27,7 +27,9 @@ class SupabaseSyncService implements ISyncService {
   @override
   Future<AppResult<SyncResult>> syncTasks() async {
     if (_isSyncing) {
-      return AppResult.failure(DatabaseFailure('Sync already in progress'));
+      return const AppResult.failure(
+        DatabaseFailure('Sync already in progress'),
+      );
     }
 
     try {
@@ -42,7 +44,9 @@ class SupabaseSyncService implements ISyncService {
       _logger.info('Starting task sync...');
 
       // Get pending tasks for sync
-      final pendingResult = await _taskRepository.getTasksBySyncStatus('pending');
+      final pendingResult = await _taskRepository.getTasksBySyncStatus(
+        'pending',
+      );
       if (!pendingResult.isSuccess) {
         return AppResult.failure(pendingResult.errorOrNull!);
       }
@@ -83,16 +87,20 @@ class SupabaseSyncService implements ISyncService {
             await _taskRepository.updateTask(syncedTask);
 
             syncedItems++;
-            operations.add(operation.copyWith(status: SyncOperationStatus.completed));
+            operations.add(
+              operation.copyWith(status: SyncOperationStatus.completed),
+            );
             _logger.info('Task synced successfully: ${task.id}');
           }
         } catch (e) {
           failedItems++;
           errors.add('Failed to sync task ${task.id}: $e');
-          operations.add(operations.last.copyWith(
-            status: SyncOperationStatus.failed,
-            error: e.toString(),
-          ));
+          operations.add(
+            operations.last.copyWith(
+              status: SyncOperationStatus.failed,
+              error: e.toString(),
+            ),
+          );
           _logger.error('Failed to sync task ${task.id}: $e');
         }
       }
@@ -125,7 +133,9 @@ class SupabaseSyncService implements ISyncService {
   @override
   Future<AppResult<SyncResult>> syncAudio() async {
     if (_isSyncing) {
-      return AppResult.failure(DatabaseFailure('Sync already in progress'));
+      return const AppResult.failure(
+        DatabaseFailure('Sync already in progress'),
+      );
     }
 
     try {
@@ -163,7 +173,7 @@ class SupabaseSyncService implements ISyncService {
           // Upload audio file to Supabase Storage
           final remotePath = 'audio/${audio.taskId}/${audio.fileName}';
           final file = File(audio.localPath);
-          
+
           await _supabaseService.uploadFile(
             bucketName: 'audio-files',
             filePath: remotePath,
@@ -174,15 +184,19 @@ class SupabaseSyncService implements ISyncService {
           await _audioRepository.markAsUploaded(audio.id, remotePath);
 
           syncedItems++;
-          operations.add(operation.copyWith(status: SyncOperationStatus.completed));
+          operations.add(
+            operation.copyWith(status: SyncOperationStatus.completed),
+          );
           _logger.info('Audio synced successfully: ${audio.id}');
         } catch (e) {
           failedItems++;
           errors.add('Failed to sync audio ${audio.id}: $e');
-          operations.add(operations.last.copyWith(
-            status: SyncOperationStatus.failed,
-            error: e.toString(),
-          ));
+          operations.add(
+            operations.last.copyWith(
+              status: SyncOperationStatus.failed,
+              error: e.toString(),
+            ),
+          );
           _logger.error('Failed to sync audio ${audio.id}: $e');
         }
       }
@@ -234,7 +248,9 @@ class SupabaseSyncService implements ISyncService {
         allOperations.addAll(taskSync.operations);
         allErrors.addAll(taskSync.errors);
       } else {
-        allErrors.add('Task sync failed: ${taskSyncResult.errorOrNull!.message}');
+        allErrors.add(
+          'Task sync failed: ${taskSyncResult.errorOrNull!.message}',
+        );
       }
 
       // Then sync audio
@@ -247,7 +263,9 @@ class SupabaseSyncService implements ISyncService {
         allOperations.addAll(audioSync.operations);
         allErrors.addAll(audioSync.errors);
       } else {
-        allErrors.add('Audio sync failed: ${audioSyncResult.errorOrNull!.message}');
+        allErrors.add(
+          'Audio sync failed: ${audioSyncResult.errorOrNull!.message}',
+        );
       }
 
       final endTime = DateTime.now();
@@ -287,7 +305,7 @@ class SupabaseSyncService implements ISyncService {
       // Get current user
       final currentUser = _supabaseService.currentUser;
       if (currentUser == null) {
-        return AppResult.failure(AuthFailure('User not authenticated'));
+        return const AppResult.failure(AuthFailure('User not authenticated'));
       }
 
       // Pull tasks from remote
@@ -300,14 +318,19 @@ class SupabaseSyncService implements ISyncService {
 
         for (final taskData in remoteTasks) {
           try {
-            final remoteTask = TaskEntity.fromJson(taskData as Map<String, dynamic>);
-            
+            final remoteTask = TaskEntity.fromJson(
+              taskData as Map<String, dynamic>,
+            );
+
             // Check if task exists locally
-            final localTaskResult = await _taskRepository.getTaskById(remoteTask.id);
-            
-            if (localTaskResult.isSuccess && localTaskResult.dataOrNull != null) {
+            final localTaskResult = await _taskRepository.getTaskById(
+              remoteTask.id,
+            );
+
+            if (localTaskResult.isSuccess &&
+                localTaskResult.dataOrNull != null) {
               final localTask = localTaskResult.dataOrNull!;
-              
+
               // Check for conflicts (compare timestamps)
               if (localTask.updatedAt.isAfter(remoteTask.updatedAt)) {
                 conflicts++;
@@ -324,13 +347,15 @@ class SupabaseSyncService implements ISyncService {
             await _taskRepository.updateTask(localTask);
 
             syncedItems++;
-            operations.add(SyncOperation(
-              itemType: SyncItemType.task,
-              itemId: remoteTask.id,
-              operationType: SyncOperationType.download,
-              status: SyncOperationStatus.completed,
-              timestamp: DateTime.now(),
-            ));
+            operations.add(
+              SyncOperation(
+                itemType: SyncItemType.task,
+                itemId: remoteTask.id,
+                operationType: SyncOperationType.download,
+                status: SyncOperationStatus.completed,
+                timestamp: DateTime.now(),
+              ),
+            );
           } catch (e) {
             failedItems++;
             errors.add('Failed to process remote task: $e');
@@ -373,14 +398,16 @@ class SupabaseSyncService implements ISyncService {
   Future<AppResult<List<ConflictResolution>>> resolveConflicts() async {
     try {
       final conflicts = <ConflictResolution>[];
-      
+
       // TODO: Implement conflict detection and resolution
       _logger.info('Conflict resolution not yet implemented');
-      
+
       return AppResult.success(conflicts);
     } catch (e) {
       _logger.error('Conflict resolution failed: $e');
-      return AppResult.failure(DatabaseFailure('Conflict resolution failed: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Conflict resolution failed: $e'),
+      );
     }
   }
 
@@ -388,9 +415,11 @@ class SupabaseSyncService implements ISyncService {
   Future<AppResult<SyncStatus>> getSyncStatus() async {
     try {
       // Get pending items count
-      final pendingTasksResult = await _taskRepository.getTasksBySyncStatus('pending');
+      final pendingTasksResult = await _taskRepository.getTasksBySyncStatus(
+        'pending',
+      );
       final pendingAudioResult = await _audioRepository.getPendingUploads();
-      
+
       int pendingItems = 0;
       if (pendingTasksResult.isSuccess) {
         pendingItems += pendingTasksResult.dataOrNull!.length;
@@ -412,7 +441,9 @@ class SupabaseSyncService implements ISyncService {
       return AppResult.success(status);
     } catch (e) {
       _logger.error('Failed to get sync status: $e');
-      return AppResult.failure(DatabaseFailure('Failed to get sync status: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to get sync status: $e'),
+      );
     }
   }
 
@@ -420,7 +451,7 @@ class SupabaseSyncService implements ISyncService {
   Future<AppResult<void>> setAutoSync(bool enabled) async {
     try {
       _autoSyncEnabled = enabled;
-      
+
       if (enabled) {
         await startBackgroundSync();
       } else {
@@ -428,7 +459,7 @@ class SupabaseSyncService implements ISyncService {
       }
 
       _logger.info('Auto sync ${enabled ? 'enabled' : 'disabled'}');
-      return AppResult.success(null);
+      return const AppResult.success(null);
     } catch (e) {
       _logger.error('Failed to set auto sync: $e');
       return AppResult.failure(DatabaseFailure('Failed to set auto sync: $e'));
@@ -457,11 +488,15 @@ class SupabaseSyncService implements ISyncService {
         },
       );
 
-      _logger.info('Background sync started (interval: ${_syncIntervalMinutes}min)');
-      return AppResult.success(null);
+      _logger.info(
+        'Background sync started (interval: ${_syncIntervalMinutes}min)',
+      );
+      return const AppResult.success(null);
     } catch (e) {
       _logger.error('Failed to start background sync: $e');
-      return AppResult.failure(DatabaseFailure('Failed to start background sync: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to start background sync: $e'),
+      );
     }
   }
 
@@ -470,12 +505,14 @@ class SupabaseSyncService implements ISyncService {
     try {
       _backgroundSyncTimer?.cancel();
       _backgroundSyncTimer = null;
-      
+
       _logger.info('Background sync stopped');
-      return AppResult.success(null);
+      return const AppResult.success(null);
     } catch (e) {
       _logger.error('Failed to stop background sync: $e');
-      return AppResult.failure(DatabaseFailure('Failed to stop background sync: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to stop background sync: $e'),
+      );
     }
   }
 
@@ -493,9 +530,11 @@ class SupabaseSyncService implements ISyncService {
   @override
   Future<AppResult<int>> getPendingSyncCount() async {
     try {
-      final pendingTasksResult = await _taskRepository.getTasksBySyncStatus('pending');
+      final pendingTasksResult = await _taskRepository.getTasksBySyncStatus(
+        'pending',
+      );
       final pendingAudioResult = await _audioRepository.getPendingUploads();
-      
+
       int pendingItems = 0;
       if (pendingTasksResult.isSuccess) {
         pendingItems += pendingTasksResult.dataOrNull!.length;
@@ -507,7 +546,9 @@ class SupabaseSyncService implements ISyncService {
       return AppResult.success(pendingItems);
     } catch (e) {
       _logger.error('Failed to get pending sync count: $e');
-      return AppResult.failure(DatabaseFailure('Failed to get pending sync count: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to get pending sync count: $e'),
+      );
     }
   }
 

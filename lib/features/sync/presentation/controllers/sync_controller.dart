@@ -129,10 +129,10 @@ class SyncController extends GetxController {
         (syncResult) {
           lastSyncResult.value = syncResult;
           syncProgress.value = 1.0;
-          
+
           if (syncResult.isSuccessful) {
             Get.snackbar(
-              'Success', 
+              'Success',
               'Sync completed: ${syncResult.syncedItems} items synced',
             );
           } else {
@@ -179,7 +179,7 @@ class SyncController extends GetxController {
         (syncResult) {
           if (syncResult.isSuccessful) {
             Get.snackbar(
-              'Success', 
+              'Success',
               'Tasks synced: ${syncResult.syncedItems} items',
             );
           } else {
@@ -220,7 +220,7 @@ class SyncController extends GetxController {
         (syncResult) {
           if (syncResult.isSuccessful) {
             Get.snackbar(
-              'Success', 
+              'Success',
               'Audio synced: ${syncResult.syncedItems} files',
             );
           } else {
@@ -261,7 +261,7 @@ class SyncController extends GetxController {
         (syncResult) {
           if (syncResult.isSuccessful) {
             Get.snackbar(
-              'Success', 
+              'Success',
               'Data pulled: ${syncResult.syncedItems} items updated',
             );
           } else {
@@ -295,12 +295,15 @@ class SyncController extends GetxController {
         (_) {
           autoSyncEnabled.value = newValue;
           Get.snackbar(
-            'Settings', 
+            'Settings',
             'Auto sync ${newValue ? 'enabled' : 'disabled'}',
           );
         },
         (failure) {
-          Get.snackbar('Error', 'Failed to toggle auto sync: ${failure.message}');
+          Get.snackbar(
+            'Error',
+            'Failed to toggle auto sync: ${failure.message}',
+          );
         },
       );
     } catch (e) {
@@ -324,10 +327,10 @@ class SyncController extends GetxController {
       result.fold(
         (syncResult) {
           lastSyncResult.value = syncResult;
-          
+
           if (syncResult.isSuccessful) {
             Get.snackbar(
-              'Success', 
+              'Success',
               'Force sync completed: ${syncResult.syncedItems} items synced',
             );
           } else {
@@ -364,7 +367,7 @@ class SyncController extends GetxController {
     if (lastSyncTime.value != null) {
       final now = DateTime.now();
       final diff = now.difference(lastSyncTime.value!);
-      
+
       if (diff.inMinutes < 1) {
         return 'Synced just now';
       } else if (diff.inHours < 1) {

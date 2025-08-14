@@ -67,6 +67,7 @@ class TaskController extends GetxController {
   void onInit() {
     super.onInit();
     loadTasks();
+    loadTaskStatistics();
   }
 
   /// Validates task title
