@@ -9,6 +9,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize AuthController if not already initialized
+    Get.put(AuthController());
     return AppScaffold(
       title: 'Ana Sayfa',
       actions: [
@@ -21,7 +23,7 @@ class HomePage extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.logout),
           onPressed: () async {
-            final authController = Get.find<AuthController>();
+            final authController = Get.put(AuthController());
             await authController.signOut();
             Get.offAllNamed('/'); // Navigate back to login
           },

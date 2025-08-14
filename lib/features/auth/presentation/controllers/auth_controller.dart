@@ -143,8 +143,6 @@ class AuthController extends GetxController {
     }
   }
 
-
-
   /// Resets user password
   Future<bool> resetPassword(String email) async {
     try {
