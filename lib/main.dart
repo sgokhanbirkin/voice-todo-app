@@ -4,6 +4,7 @@ import 'data/remote/supabase_service.dart';
 import 'core/logger.dart';
 import 'core/router/app_router.dart';
 import 'core/database/hive_database.dart';
+import 'core/bindings/app_bindings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,10 @@ void main() async {
   } catch (e) {
     Logger.instance.error('Failed to initialize Hive database in main: $e');
   }
+
+  // Initialize GetX bindings
+  AppBindings().dependencies();
+  Logger.instance.info('GetX dependencies initialized');
 
   runApp(const MyApp());
 }
