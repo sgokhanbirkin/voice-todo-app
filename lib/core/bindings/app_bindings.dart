@@ -14,14 +14,16 @@ import '../../features/sync/domain/i_sync_service.dart';
 import '../../features/sync/data/supabase_sync_service.dart';
 import '../../features/sync/presentation/controllers/sync_controller.dart';
 import '../../product/theme/app_theme.dart';
+import '../../product/localization/locale_controller.dart';
 
 /// Application-wide dependency injection bindings
 class AppBindings extends Bindings {
   @override
   void dependencies() {
-    // Register theme
+    // Register theme and localization
     Get.lazyPut<AppTheme>(() => AppTheme.instance, fenix: true);
-    
+    Get.lazyPut<LocaleController>(() => LocaleController.instance, fenix: true);
+
     // Register repositories
     Get.lazyPut<ITaskRepository>(() => HiveTaskRepository(), fenix: true);
     Get.lazyPut<IAudioRepository>(() => HiveAudioRepository(), fenix: true);

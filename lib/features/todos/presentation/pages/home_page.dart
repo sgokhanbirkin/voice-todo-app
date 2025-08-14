@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../product/widgets/app_scaffold.dart';
 import '../../../../product/responsive/responsive.dart';
 import '../../../../product/theme/app_theme.dart';
+import '../../../../product/localization/locale_controller.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../controllers/task_controller.dart';
 import '../../domain/task_entity.dart';
@@ -243,9 +244,12 @@ class HomePage extends StatelessWidget {
     AppLocalizations l10n,
     AuthController authController,
   ) {
+    final localeController = Get.find<LocaleController>();
+    final appTheme = Get.find<AppTheme>();
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => Obx(() => AlertDialog(
         title: Row(
           children: [
             const Icon(Icons.settings),
@@ -259,7 +263,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.language),
               title: Text(l10n.language),
-              subtitle: Text(l10n.currentLanguage),
+              subtitle: Text(localeController.getLocaleDisplayName(localeController.currentLocale)),
               onTap: () {
                 Navigator.pop(context);
                 _showLanguageDialog(context, l10n);
@@ -268,7 +272,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.palette),
               title: Text(l10n.theme),
-              subtitle: Text(l10n.currentTheme),
+              subtitle: Text(_getThemeDisplayName(l10n, appTheme.currentThemeMode)),
               onTap: () {
                 Navigator.pop(context);
                 _showThemeDialog(context, l10n);
@@ -293,105 +297,255 @@ class HomePage extends StatelessWidget {
             child: Text(l10n.close),
           ),
         ],
-      ),
+      )),
     );
   }
 
+  String _getThemeDisplayName(AppLocalizations l10n, ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return l10n.lightTheme;
+      case ThemeMode.dark:
+        return l10n.darkTheme;
+      case ThemeMode.system:
+        return l10n.systemTheme;
+    }
+  }
+
   void _showLanguageDialog(BuildContext context, AppLocalizations l10n) {
+    final localeController = Get.find<LocaleController>();
+    final RxBool isChangingLanguage = false.obs;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => Obx(() => AlertDialog(
         title: Text(l10n.selectLanguage),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Türkçe'),
-              leading: Radio<String>(
-                value: 'tr',
-                groupValue: Localizations.localeOf(context).languageCode,
-                onChanged: (value) {
-                  // TODO: Implement language change
-                  Navigator.pop(context);
-                },
+        content: isChangingLanguage.value
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  SizedBox(height: 16.h),
+                  Text(l10n.loading),
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: LocaleController.supportedLocales.map((locale) {
+                  return _buildLanguageOption(
+                    context,
+                    localeController.getLocaleDisplayName(locale),
+                    locale,
+                    localeController.currentLocale,
+                    () => _changeLanguage(localeController, locale, isChangingLanguage, context),
+                  );
+                }).toList(),
               ),
+        actions: isChangingLanguage.value
+            ? []
+            : [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+              ],
+      )),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String title,
+    Locale value,
+    Locale groupValue,
+    VoidCallback onTap,
+  ) {
+    final isSelected = value.languageCode == groupValue.languageCode;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          children: [
+            Radio<String>(
+              value: value.languageCode,
+              groupValue: groupValue.languageCode,
+              onChanged: (_) => onTap(),
             ),
-            ListTile(
-              title: const Text('English'),
-              leading: Radio<String>(
-                value: 'en',
-                groupValue: Localizations.localeOf(context).languageCode,
-                onChanged: (value) {
-                  // TODO: Implement language change
-                  Navigator.pop(context);
-                },
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : null,
+                    ),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-        ],
       ),
     );
   }
 
-  void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
-    final appTheme = Get.find<AppTheme>();
+  Future<void> _changeLanguage(
+    LocaleController localeController,
+    Locale locale,
+    RxBool isChangingLanguage,
+    BuildContext context,
+  ) async {
+    isChangingLanguage.value = true;
     
+    // Simulate language change delay for better UX
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    localeController.changeLocale(locale);
+    
+    // Wait a bit more to see the change
+    await Future.delayed(const Duration(milliseconds: 200));
+    
+    isChangingLanguage.value = false;
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+    void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
+    final appTheme = Get.find<AppTheme>();
+    final RxBool isChangingTheme = false.obs;
+ 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => Obx(() => AlertDialog(
         title: Text(l10n.selectTheme),
-        content: Obx(() => Column(
-          mainAxisSize: MainAxisSize.min,
+        content: isChangingTheme.value
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  SizedBox(height: 16.h),
+                  Text(l10n.loading),
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildThemeOption(
+                    context,
+                    l10n.lightTheme,
+                    ThemeMode.light,
+                    appTheme.currentThemeMode,
+                    () => _changeTheme(appTheme, ThemeMode.light, isChangingTheme, context),
+                  ),
+                  _buildThemeOption(
+                    context,
+                    l10n.darkTheme,
+                    ThemeMode.dark,
+                    appTheme.currentThemeMode,
+                    () => _changeTheme(appTheme, ThemeMode.dark, isChangingTheme, context),
+                  ),
+                  _buildThemeOption(
+                    context,
+                    l10n.systemTheme,
+                    ThemeMode.system,
+                    appTheme.currentThemeMode,
+                    () => _changeTheme(appTheme, ThemeMode.system, isChangingTheme, context),
+                  ),
+                ],
+              ),
+        actions: isChangingTheme.value
+            ? []
+            : [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+              ],
+      )),
+    );
+  }
+
+  Widget _buildThemeOption(
+    BuildContext context,
+    String title,
+    ThemeMode value,
+    ThemeMode groupValue,
+    VoidCallback onTap,
+  ) {
+    final isSelected = value == groupValue;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
           children: [
-            ListTile(
-              title: Text(l10n.lightTheme),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.light,
-                groupValue: appTheme.currentThemeMode,
-                onChanged: (value) {
-                  appTheme.switchToLight();
-                  Navigator.pop(context);
-                },
-              ),
+            Radio<ThemeMode>(
+              value: value,
+              groupValue: groupValue,
+              onChanged: (_) => onTap(),
             ),
-            ListTile(
-              title: Text(l10n.darkTheme),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.dark,
-                groupValue: appTheme.currentThemeMode,
-                onChanged: (value) {
-                  appTheme.switchToDark();
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            ListTile(
-              title: Text(l10n.systemTheme),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.system,
-                groupValue: appTheme.currentThemeMode,
-                onChanged: (value) {
-                  appTheme.switchToSystem();
-                  Navigator.pop(context);
-                },
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : null,
+                    ),
               ),
             ),
           ],
-        )),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-        ],
+        ),
       ),
     );
+  }
+
+  Future<void> _changeTheme(
+    AppTheme appTheme,
+    ThemeMode themeMode,
+    RxBool isChangingTheme,
+    BuildContext context,
+  ) async {
+    isChangingTheme.value = true;
+    
+    // Simulate theme change delay for better UX
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    switch (themeMode) {
+      case ThemeMode.light:
+        appTheme.switchToLight();
+        break;
+      case ThemeMode.dark:
+        appTheme.switchToDark();
+        break;
+      case ThemeMode.system:
+        appTheme.switchToSystem();
+        break;
+    }
+    
+    // Wait a bit more to see the change
+    await Future.delayed(const Duration(milliseconds: 200));
+    
+    isChangingTheme.value = false;
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
   }
 
   /// Shows add task dialog
