@@ -279,6 +279,12 @@ class HomePage extends StatelessWidget {
   ) {
     final localeController = Get.find<LocaleController>();
     final appTheme = Get.find<AppTheme>();
+    
+    // Local state for expanded sections
+    final RxBool isLanguageExpanded = false.obs;
+    final RxBool isThemeExpanded = false.obs;
+    final RxBool isChangingLanguage = false.obs;
+    final RxBool isChangingTheme = false.obs;
 
     return Drawer(
       child: Obx(
@@ -291,21 +297,42 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(16.r),
-                    bottomRight: Radius.circular(16.r),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primaryContainer,
+                      Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.8),
+                    ],
                   ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.r),
+                    bottomRight: Radius.circular(20.r),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.settings,
-                      size: 32.sp,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Icon(
+                        Icons.settings,
+                        size: 28.sp,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 12.h),
                     Text(
                       l10n.settings,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -313,92 +340,165 @@ class HomePage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Uygulamanızı kişiselleştirin',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              
-              SizedBox(height: 16.h),
-              
+
+              SizedBox(height: 20.h),
+
               // Settings Options
               Expanded(
                 child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
                   children: [
-                    ListTile(
-                      leading: Icon(
-                        Icons.language,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      title: Text(l10n.language),
-                      subtitle: Text(
-                        localeController.getLocaleDisplayName(
-                          localeController.currentLocale,
+                    // Language Section
+                    _buildExpandableSection(
+                      context: context,
+                      title: l10n.language,
+                      subtitle: localeController.getLocaleDisplayName(localeController.currentLocale),
+                      icon: Icons.language,
+                      isExpanded: isLanguageExpanded,
+                      isLoading: isChangingLanguage,
+                      children: [
+                        ...LocaleController.supportedLocales.map((locale) {
+                          final isSelected = locale.languageCode == localeController.currentLocale.languageCode;
+                          return _buildLanguageOptionInDrawer(
+                            context: context,
+                            title: localeController.getLocaleDisplayName(locale),
+                            subtitle: _getLanguageNativeName(locale.languageCode),
+                            isSelected: isSelected,
+                            onTap: () => _changeLanguageInDrawer(
+                              localeController,
+                              locale,
+                              isChangingLanguage,
+                              isLanguageExpanded,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+
+                    SizedBox(height: 12.h),
+
+                    // Theme Section
+                    _buildExpandableSection(
+                      context: context,
+                      title: l10n.theme,
+                      subtitle: _getThemeDisplayName(l10n, appTheme.currentThemeMode),
+                      icon: Icons.palette,
+                      isExpanded: isThemeExpanded,
+                      isLoading: isChangingTheme,
+                      children: [
+                        _buildThemeOptionInDrawer(
+                          context: context,
+                          title: l10n.lightTheme,
+                          subtitle: 'Açık renkli görünüm',
+                          icon: Icons.light_mode,
+                          isSelected: appTheme.currentThemeMode == ThemeMode.light,
+                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.light, isChangingTheme, isThemeExpanded),
+                        ),
+                        _buildThemeOptionInDrawer(
+                          context: context,
+                          title: l10n.darkTheme,
+                          subtitle: 'Koyu renkli görünüm',
+                          icon: Icons.dark_mode,
+                          isSelected: appTheme.currentThemeMode == ThemeMode.dark,
+                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.dark, isChangingTheme, isThemeExpanded),
+                        ),
+                        _buildThemeOptionInDrawer(
+                          context: context,
+                          title: l10n.systemTheme,
+                          subtitle: 'Sistem ayarını takip eder',
+                          icon: Icons.settings_system_daydream,
+                          isSelected: appTheme.currentThemeMode == ThemeMode.system,
+                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.system, isChangingTheme, isThemeExpanded),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    // Logout Section
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+                          width: 1,
                         ),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _showLanguageDialog(context, l10n);
-                      },
-                    ),
-                    
-                    SizedBox(height: 8.h),
-                    
-                    ListTile(
-                      leading: Icon(
-                        Icons.palette,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      title: Text(l10n.theme),
-                      subtitle: Text(
-                        _getThemeDisplayName(l10n, appTheme.currentThemeMode),
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _showThemeDialog(context, l10n);
-                      },
-                    ),
-                    
-                    SizedBox(height: 16.h),
-                    
-                    Divider(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
-                    
-                    SizedBox(height: 16.h),
-                    
-                    ListTile(
-                      leading: Icon(
-                        Icons.logout,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      title: Text(
-                        l10n.logout,
-                        style: TextStyle(
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.logout,
                           color: Theme.of(context).colorScheme.error,
                         ),
+                        title: Text(
+                          l10n.logout,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Hesabınızdan çıkış yapın',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.7),
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.exit_to_app,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await authController.signOut();
+                          if (context.mounted) {
+                            context.go('/');
+                          }
+                        },
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        await authController.signOut();
-                        if (context.mounted) {
-                          context.go('/');
-                        }
-                      },
                     ),
                   ],
                 ),
               ),
-              
+
               // Footer
-              Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Text(
-                  'Voice Todo App',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.r),
+                    topRight: Radius.circular(20.r),
                   ),
-                  textAlign: TextAlign.center,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.favorite,
+                      size: 16.sp,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Voice Todo App',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -1719,5 +1819,308 @@ class _HomePageBody extends StatelessWidget {
       ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
+  }
+
+  // Helper methods for drawer
+  Widget _buildExpandableSection({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required RxBool isExpanded,
+    required RxBool isLoading,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 4.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20.sp,
+              ),
+            ),
+            title: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+            trailing: AnimatedRotation(
+              turns: isExpanded.value ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            onTap: () => isExpanded.value = !isExpanded.value,
+          ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            height: isExpanded.value ? null : 0,
+            child: isExpanded.value
+                ? Column(
+                    children: [
+                      Divider(
+                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                        height: 1,
+                        indent: 16.w,
+                        endIndent: 16.w,
+                      ),
+                      if (isLoading.value)
+                        Padding(
+                          padding: EdgeInsets.all(20.w),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20.w,
+                                height: 20.w,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Text(
+                                'Uygulanıyor...',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ...children,
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOptionInDrawer({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Container(
+              width: 20.w,
+              height: 20.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+              ),
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      size: 14.sp,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    )
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.language,
+                color: Theme.of(context).colorScheme.primary,
+                size: 18.sp,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOptionInDrawer({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Container(
+              width: 20.w,
+              height: 20.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+              ),
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      size: 14.sp,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    )
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            Container(
+              padding: EdgeInsets.all(6.w),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(
+                icon,
+                size: 16.sp,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _changeLanguageInDrawer(
+    LocaleController localeController,
+    Locale locale,
+    RxBool isChangingLanguage,
+    RxBool isLanguageExpanded,
+  ) async {
+    if (locale.languageCode == localeController.currentLocale.languageCode) return;
+    
+    isChangingLanguage.value = true;
+    await Future.delayed(const Duration(milliseconds: 500));
+    localeController.changeLocale(locale);
+    await Future.delayed(const Duration(milliseconds: 300));
+    isChangingLanguage.value = false;
+    isLanguageExpanded.value = false;
+  }
+
+  Future<void> _changeThemeInDrawer(
+    AppTheme appTheme,
+    ThemeMode themeMode,
+    RxBool isChangingTheme,
+    RxBool isThemeExpanded,
+  ) async {
+    if (themeMode == appTheme.currentThemeMode) return;
+    
+    isChangingTheme.value = true;
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    switch (themeMode) {
+      case ThemeMode.light:
+        appTheme.switchToLight();
+        break;
+      case ThemeMode.dark:
+        appTheme.switchToDark();
+        break;
+      case ThemeMode.system:
+        appTheme.switchToSystem();
+        break;
+    }
+    
+    await Future.delayed(const Duration(milliseconds: 300));
+    isChangingTheme.value = false;
+    isThemeExpanded.value = false;
   }
 }
