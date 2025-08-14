@@ -76,5 +76,13 @@
   "goToSettings": "Go to Settings",
   "ok": "OK",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "close": "Close",
+  "currentLanguage": "English",
+  "currentTheme": "System",
+  "selectLanguage": "Select Language",
+  "selectTheme": "Select Theme",
+  "lightTheme": "Light",
+  "darkTheme": "Dark",
+  "systemTheme": "System"
 }

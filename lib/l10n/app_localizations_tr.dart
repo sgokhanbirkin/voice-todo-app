@@ -242,4 +242,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get no => 'Hayır';
+
+  @override
+  String get close => 'Kapat';
+
+  @override
+  String get currentLanguage => 'Türkçe';
+
+  @override
+  String get currentTheme => 'Sistem';
+
+  @override
+  String get selectLanguage => 'Dil Seçin';
+
+  @override
+  String get selectTheme => 'Tema Seçin';
+
+  @override
+  String get lightTheme => 'Açık';
+
+  @override
+  String get darkTheme => 'Koyu';
+
+  @override
+  String get systemTheme => 'Sistem';
 }

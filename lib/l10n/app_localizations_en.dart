@@ -241,4 +241,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get currentLanguage => 'English';
+
+  @override
+  String get currentTheme => 'System';
+
+  @override
+  String get selectLanguage => 'Select Language';
+
+  @override
+  String get selectTheme => 'Select Theme';
+
+  @override
+  String get lightTheme => 'Light';
+
+  @override
+  String get darkTheme => 'Dark';
+
+  @override
+  String get systemTheme => 'System';
 }

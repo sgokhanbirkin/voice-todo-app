@@ -571,6 +571,7 @@ feat(architecture): complete modular architecture skeleton
 - Ensure successful APK build
 ```
 
+Bir kaç değişiklik istiyorum App bardan 3 noktayı kaldır ayarlar butonuna basınca dil değiştirme theme değiştirme ve çıkış yapma gözüksün, Mavi cardda alt row olmasın 2 bekleyen 0 geciken kısmı. Taskları tamamladım diye işaretleyebilelim. Taska tıklayınca ayrıntısına gidebilelim. Bu sayfada ayrıntının ilk satırı gözüksün. Ayrıca sıralama kısmını değiştirebilelim ayrıca filtreleme de olsun önceliğe göre tamamlanma durumuna göre falan. Plan çıkar @PROJECT_ROADMAP.md dosyamızada yaz. Todolar olarak yap
 ---
 
 *📝 Bu doküman her prompt tamamlandığında güncellenir ve proje ilerlemesi takip edilir.*

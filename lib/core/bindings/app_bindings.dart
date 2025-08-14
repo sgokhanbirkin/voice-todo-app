@@ -13,11 +13,15 @@ import '../../features/audio/presentation/controllers/audio_controller.dart';
 import '../../features/sync/domain/i_sync_service.dart';
 import '../../features/sync/data/supabase_sync_service.dart';
 import '../../features/sync/presentation/controllers/sync_controller.dart';
+import '../../product/theme/app_theme.dart';
 
 /// Application-wide dependency injection bindings
 class AppBindings extends Bindings {
   @override
   void dependencies() {
+    // Register theme
+    Get.lazyPut<AppTheme>(() => AppTheme.instance, fenix: true);
+    
     // Register repositories
     Get.lazyPut<ITaskRepository>(() => HiveTaskRepository(), fenix: true);
     Get.lazyPut<IAudioRepository>(() => HiveAudioRepository(), fenix: true);

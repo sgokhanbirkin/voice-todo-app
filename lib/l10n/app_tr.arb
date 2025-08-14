@@ -76,5 +76,13 @@
   "goToSettings": "Ayarlara Git",
   "ok": "Tamam",
   "yes": "Evet",
-  "no": "Hayır"
+  "no": "Hayır",
+  "close": "Kapat",
+  "currentLanguage": "Türkçe",
+  "currentTheme": "Sistem",
+  "selectLanguage": "Dil Seçin",
+  "selectTheme": "Tema Seçin",
+  "lightTheme": "Açık",
+  "darkTheme": "Koyu",
+  "systemTheme": "Sistem"
 }

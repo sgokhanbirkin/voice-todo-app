@@ -46,31 +46,7 @@ class HomePage extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.settings),
-          onPressed: () {
-            // TODO: Navigate to settings
-          },
-        ),
-        PopupMenuButton<String>(
-          onSelected: (value) async {
-            if (value == 'logout') {
-              await authController.signOut();
-              if (context.mounted) {
-                context.go('/');
-              }
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'logout',
-              child: Row(
-                children: [
-                  const Icon(Icons.logout),
-                  SizedBox(width: 8.w),
-                  Text(l10n.logout),
-                ],
-              ),
-            ),
-          ],
+          onPressed: () => _showSettingsDialog(context, l10n, authController),
         ),
       ],
       body: _HomePageBody(l10n: l10n),
@@ -99,20 +75,7 @@ class HomePage extends StatelessWidget {
         TextButton.icon(
           icon: const Icon(Icons.settings),
           label: Text(l10n.settings),
-          onPressed: () {
-            // TODO: Navigate to settings
-          },
-        ),
-        SizedBox(width: 8.w),
-        TextButton.icon(
-          icon: const Icon(Icons.logout),
-          label: Text(l10n.logout),
-          onPressed: () async {
-            await authController.signOut();
-            if (context.mounted) {
-              context.go('/');
-            }
-          },
+          onPressed: () => _showSettingsDialog(context, l10n, authController),
         ),
       ],
       body: _HomePageBody(l10n: l10n),
@@ -136,7 +99,7 @@ class HomePage extends StatelessWidget {
           // Sidebar
           Container(
             width: 280.w,
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             child: _buildSidebar(context, l10n, authController, taskController),
           ),
           // Main content
@@ -191,7 +154,7 @@ class HomePage extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: Text(l10n.settings),
-                onTap: () {},
+                onTap: () => _showSettingsDialog(context, l10n, authController),
               ),
             ],
           ),
@@ -268,6 +231,162 @@ class HomePage extends StatelessWidget {
               taskController.setSearchQuery('');
               Navigator.pop(context);
             },
+            child: Text(l10n.cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSettingsDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthController authController,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.settings),
+            SizedBox(width: 8.w),
+            Text(l10n.settings),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: Text(l10n.language),
+              subtitle: Text(l10n.currentLanguage),
+              onTap: () {
+                Navigator.pop(context);
+                _showLanguageDialog(context, l10n);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.palette),
+              title: Text(l10n.theme),
+              subtitle: Text(l10n.currentTheme),
+              onTap: () {
+                Navigator.pop(context);
+                _showThemeDialog(context, l10n);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(l10n.logout),
+              onTap: () async {
+                Navigator.pop(context);
+                await authController.signOut();
+                if (context.mounted) {
+                  context.go('/');
+                }
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.close),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.selectLanguage),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Türkçe'),
+              leading: Radio<String>(
+                value: 'tr',
+                groupValue: Localizations.localeOf(context).languageCode,
+                onChanged: (value) {
+                  // TODO: Implement language change
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text('English'),
+              leading: Radio<String>(
+                value: 'en',
+                groupValue: Localizations.localeOf(context).languageCode,
+                onChanged: (value) {
+                  // TODO: Implement language change
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
+    final appTheme = Get.find<AppTheme>();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.selectTheme),
+        content: Obx(() => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(l10n.lightTheme),
+              leading: Radio<ThemeMode>(
+                value: ThemeMode.light,
+                groupValue: appTheme.currentThemeMode,
+                onChanged: (value) {
+                  appTheme.switchToLight();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(l10n.darkTheme),
+              leading: Radio<ThemeMode>(
+                value: ThemeMode.dark,
+                groupValue: appTheme.currentThemeMode,
+                onChanged: (value) {
+                  appTheme.switchToDark();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            ListTile(
+              title: Text(l10n.systemTheme),
+              leading: Radio<ThemeMode>(
+                value: ThemeMode.system,
+                groupValue: appTheme.currentThemeMode,
+                onChanged: (value) {
+                  appTheme.switchToSystem();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
             child: Text(l10n.cancel),
           ),
         ],
@@ -545,34 +664,14 @@ class _HomePageBody extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: ResponsiveBuilder(
-        mobile: (context) => Column(
+        mobile: (context) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(context, 'Toplam', stats.totalTasks.toString()),
-                _buildStatItem(
-                  context,
-                  l10n.completed,
-                  stats.completedTasks.toString(),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  context,
-                  l10n.pending,
-                  stats.pendingTasks.toString(),
-                ),
-                _buildStatItem(
-                  context,
-                  'Geciken',
-                  stats.overdueTasks.toString(),
-                ),
-              ],
+            _buildStatItem(context, 'Toplam', stats.totalTasks.toString()),
+            _buildStatItem(
+              context,
+              l10n.completed,
+              stats.completedTasks.toString(),
             ),
           ],
         ),
@@ -585,12 +684,6 @@ class _HomePageBody extends StatelessWidget {
               l10n.completed,
               stats.completedTasks.toString(),
             ),
-            _buildStatItem(
-              context,
-              l10n.pending,
-              stats.pendingTasks.toString(),
-            ),
-            _buildStatItem(context, 'Geciken', stats.overdueTasks.toString()),
           ],
         ),
       ),
