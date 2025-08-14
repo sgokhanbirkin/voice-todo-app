@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../product/widgets/app_scaffold.dart';
+
 import '../../../../product/responsive/responsive.dart';
 import '../../../../product/theme/app_theme.dart';
 import '../../../../product/localization/locale_controller.dart';
@@ -13,8 +14,15 @@ import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
 
 /// Home page widget
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ZoomDrawerController _zoomDrawerController = ZoomDrawerController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,32 +31,51 @@ class HomePage extends StatelessWidget {
     final taskController = Get.find<TaskController>();
 
     return ResponsiveBuilder(
-      mobile: (context) =>
-          _buildMobileLayout(context, l10n, authController, taskController),
-      tablet: (context) =>
-          _buildTabletLayout(context, l10n, authController, taskController),
+      mobile: (context) => _buildZoomDrawer(context, l10n, authController, taskController),
+      tablet: (context) => _buildZoomDrawer(context, l10n, authController, taskController),
       desktop: (context) =>
           _buildDesktopLayout(context, l10n, authController, taskController),
     );
   }
 
-  Widget _buildMobileLayout(
+  Widget _buildZoomDrawer(
     BuildContext context,
     AppLocalizations l10n,
     AuthController authController,
     TaskController taskController,
   ) {
-    return AppScaffold(
-      title: l10n.tasks,
-      actions: [
-        Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-          ),
+    return ZoomDrawer(
+      controller: _zoomDrawerController,
+      menuBackgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      shadowLayer1Color: Theme.of(context).colorScheme.surface,
+      shadowLayer2Color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+      borderRadius: 24.r,
+      showShadow: true,
+      angle: -12.0,
+      slideWidth: MediaQuery.of(context).size.width * 0.8,
+      openCurve: Curves.fastOutSlowIn,
+      closeCurve: Curves.bounceIn,
+      mainScreen: _buildMainScreen(context, l10n, taskController),
+      menuScreen: _buildAnimatedMenuScreen(context, l10n, authController),
+    );
+  }
+
+  Widget _buildMainScreen(
+    BuildContext context,
+    AppLocalizations l10n,
+    TaskController taskController,
+  ) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.tasks),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => _zoomDrawerController.toggle?.call(),
         ),
-      ],
-      endDrawer: _buildSettingsDrawer(context, l10n, authController),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+      ),
       body: _HomePageBody(l10n: l10n),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTaskDialog(context, l10n, taskController),
@@ -57,32 +84,238 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTabletLayout(
+  Widget _buildAnimatedMenuScreen(
     BuildContext context,
     AppLocalizations l10n,
     AuthController authController,
-    TaskController taskController,
   ) {
-    return AppScaffold(
-      title: l10n.tasks,
-      actions: [
-        Builder(
-          builder: (context) => TextButton.icon(
-            icon: const Icon(Icons.settings),
-            label: Text(l10n.settings),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+    final localeController = Get.find<LocaleController>();
+    final appTheme = Get.find<AppTheme>();
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Close Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.settings,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => _zoomDrawerController.toggle?.call(),
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      size: 28.sp,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 32.h),
+
+              // User Profile Section
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30.r,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: Icon(
+                        Icons.person,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: 32.sp,
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Kullanıcı',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            'Voice Todo App',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 32.h),
+
+              // Menu Items
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildAnimatedMenuTile(
+                      context: context,
+                      icon: Icons.home,
+                      title: l10n.home,
+                      subtitle: 'Ana sayfa',
+                      onTap: () {
+                        _zoomDrawerController.toggle?.call();
+                      },
+                    ),
+                    
+                    SizedBox(height: 16.h),
+                    
+                    _buildAnimatedMenuTile(
+                      context: context,
+                      icon: Icons.language,
+                      title: l10n.language,
+                      subtitle: localeController.getLocaleDisplayName(localeController.currentLocale),
+                      onTap: () {
+                        _zoomDrawerController.toggle?.call();
+                        _showLanguageDialog(context, l10n);
+                      },
+                    ),
+                    
+                    SizedBox(height: 16.h),
+                    
+                    _buildAnimatedMenuTile(
+                      context: context,
+                      icon: Icons.palette,
+                      title: l10n.theme,
+                      subtitle: _getThemeDisplayName(l10n, appTheme.currentThemeMode),
+                      onTap: () {
+                        _zoomDrawerController.toggle?.call();
+                        _showThemeDialog(context, l10n);
+                      },
+                    ),
+
+                    const Spacer(),
+
+                    // Logout Button
+                    Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.only(bottom: 20.h),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          _zoomDrawerController.toggle?.call();
+                          await authController.signOut();
+                          if (context.mounted) {
+                            context.go('/');
+                          }
+                        },
+                        icon: const Icon(Icons.logout),
+                        label: Text(l10n.logout),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onError,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-      ],
-      endDrawer: _buildSettingsDrawer(context, l10n, authController),
-      body: _HomePageBody(l10n: l10n),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddTaskDialog(context, l10n, taskController),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addTask),
       ),
     );
   }
+
+  Widget _buildAnimatedMenuTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  size: 24.sp,
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.5),
+                size: 16.sp,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
 
   Widget _buildDesktopLayout(
     BuildContext context,
@@ -272,241 +505,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsDrawer(
-    BuildContext context,
-    AppLocalizations l10n,
-    AuthController authController,
-  ) {
-    final localeController = Get.find<LocaleController>();
-    final appTheme = Get.find<AppTheme>();
-    
-    // Local state for expanded sections
-    final RxBool isLanguageExpanded = false.obs;
-    final RxBool isThemeExpanded = false.obs;
-    final RxBool isChangingLanguage = false.obs;
-    final RxBool isChangingTheme = false.obs;
 
-    return Drawer(
-      child: Obx(
-        () => SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(24.w),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primaryContainer,
-                      Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.r),
-                    bottomRight: Radius.circular(20.r),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8.w),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Icon(
-                        Icons.settings,
-                        size: 28.sp,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      l10n.settings,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      'Uygulamanızı kişiselleştirin',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20.h),
-
-              // Settings Options
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  children: [
-                    // Language Section
-                    _buildExpandableSection(
-                      context: context,
-                      title: l10n.language,
-                      subtitle: localeController.getLocaleDisplayName(localeController.currentLocale),
-                      icon: Icons.language,
-                      isExpanded: isLanguageExpanded,
-                      isLoading: isChangingLanguage,
-                      children: [
-                        ...LocaleController.supportedLocales.map((locale) {
-                          final isSelected = locale.languageCode == localeController.currentLocale.languageCode;
-                          return _buildLanguageOptionInDrawer(
-                            context: context,
-                            title: localeController.getLocaleDisplayName(locale),
-                            subtitle: _getLanguageNativeName(locale.languageCode),
-                            isSelected: isSelected,
-                            onTap: () => _changeLanguageInDrawer(
-                              localeController,
-                              locale,
-                              isChangingLanguage,
-                              isLanguageExpanded,
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-
-                    SizedBox(height: 12.h),
-
-                    // Theme Section
-                    _buildExpandableSection(
-                      context: context,
-                      title: l10n.theme,
-                      subtitle: _getThemeDisplayName(l10n, appTheme.currentThemeMode),
-                      icon: Icons.palette,
-                      isExpanded: isThemeExpanded,
-                      isLoading: isChangingTheme,
-                      children: [
-                        _buildThemeOptionInDrawer(
-                          context: context,
-                          title: l10n.lightTheme,
-                          subtitle: 'Açık renkli görünüm',
-                          icon: Icons.light_mode,
-                          isSelected: appTheme.currentThemeMode == ThemeMode.light,
-                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.light, isChangingTheme, isThemeExpanded),
-                        ),
-                        _buildThemeOptionInDrawer(
-                          context: context,
-                          title: l10n.darkTheme,
-                          subtitle: 'Koyu renkli görünüm',
-                          icon: Icons.dark_mode,
-                          isSelected: appTheme.currentThemeMode == ThemeMode.dark,
-                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.dark, isChangingTheme, isThemeExpanded),
-                        ),
-                        _buildThemeOptionInDrawer(
-                          context: context,
-                          title: l10n.systemTheme,
-                          subtitle: 'Sistem ayarını takip eder',
-                          icon: Icons.settings_system_daydream,
-                          isSelected: appTheme.currentThemeMode == ThemeMode.system,
-                          onTap: () => _changeThemeInDrawer(appTheme, ThemeMode.system, isChangingTheme, isThemeExpanded),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 20.h),
-
-                    // Logout Section
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 4.w),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
-                          width: 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.logout,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        title: Text(
-                          l10n.logout,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        subtitle: Text(
-                          'Hesabınızdan çıkış yapın',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.7),
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                        trailing: Icon(
-                          Icons.exit_to_app,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          await authController.signOut();
-                          if (context.mounted) {
-                            context.go('/');
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Footer
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.r),
-                    topRight: Radius.circular(20.r),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.favorite,
-                      size: 16.sp,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      'Voice Todo App',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   String _getThemeDisplayName(AppLocalizations l10n, ThemeMode themeMode) {
     switch (themeMode) {
@@ -1093,6 +1092,8 @@ class HomePage extends StatelessWidget {
         return l10n.taskPriorityHigh;
     }
   }
+
+
 }
 
 /// Home page body content
@@ -1819,308 +1820,5 @@ class _HomePageBody extends StatelessWidget {
       ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
-  }
-
-  // Helper methods for drawer
-  Widget _buildExpandableSection({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required RxBool isExpanded,
-    required RxBool isLoading,
-    required List<Widget> children,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20.sp,
-              ),
-            ),
-            title: Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            subtitle: Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-            trailing: AnimatedRotation(
-              turns: isExpanded.value ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                Icons.keyboard_arrow_down,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-            onTap: () => isExpanded.value = !isExpanded.value,
-          ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            height: isExpanded.value ? null : 0,
-            child: isExpanded.value
-                ? Column(
-                    children: [
-                      Divider(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-                        height: 1,
-                        indent: 16.w,
-                        endIndent: 16.w,
-                      ),
-                      if (isLoading.value)
-                        Padding(
-                          padding: EdgeInsets.all(20.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 20.w,
-                                height: 20.w,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Text(
-                                'Uygulanıyor...',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        ...children,
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageOptionInDrawer({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Row(
-          children: [
-            Container(
-              width: 20.w,
-              height: 20.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.outline,
-                  width: 2,
-                ),
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.transparent,
-              ),
-              child: isSelected
-                  ? Icon(
-                      Icons.check,
-                      size: 14.sp,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    )
-                  : null,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                Icons.language,
-                color: Theme.of(context).colorScheme.primary,
-                size: 18.sp,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildThemeOptionInDrawer({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Row(
-          children: [
-            Container(
-              width: 20.w,
-              height: 20.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.outline,
-                  width: 2,
-                ),
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.transparent,
-              ),
-              child: isSelected
-                  ? Icon(
-                      Icons.check,
-                      size: 14.sp,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    )
-                  : null,
-            ),
-            SizedBox(width: 12.w),
-            Container(
-              padding: EdgeInsets.all(6.w),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Icon(
-                icon,
-                size: 16.sp,
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _changeLanguageInDrawer(
-    LocaleController localeController,
-    Locale locale,
-    RxBool isChangingLanguage,
-    RxBool isLanguageExpanded,
-  ) async {
-    if (locale.languageCode == localeController.currentLocale.languageCode) return;
-    
-    isChangingLanguage.value = true;
-    await Future.delayed(const Duration(milliseconds: 500));
-    localeController.changeLocale(locale);
-    await Future.delayed(const Duration(milliseconds: 300));
-    isChangingLanguage.value = false;
-    isLanguageExpanded.value = false;
-  }
-
-  Future<void> _changeThemeInDrawer(
-    AppTheme appTheme,
-    ThemeMode themeMode,
-    RxBool isChangingTheme,
-    RxBool isThemeExpanded,
-  ) async {
-    if (themeMode == appTheme.currentThemeMode) return;
-    
-    isChangingTheme.value = true;
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    switch (themeMode) {
-      case ThemeMode.light:
-        appTheme.switchToLight();
-        break;
-      case ThemeMode.dark:
-        appTheme.switchToDark();
-        break;
-      case ThemeMode.system:
-        appTheme.switchToSystem();
-        break;
-    }
-    
-    await Future.delayed(const Duration(milliseconds: 300));
-    isChangingTheme.value = false;
-    isThemeExpanded.value = false;
   }
 }
