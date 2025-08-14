@@ -546,7 +546,9 @@ class HiveTaskRepository implements ITaskRepository {
       return AppResult.success(uncompletedTask);
     } catch (e) {
       _logger.error('Failed to uncomplete task: $e');
-      return AppResult.failure(DatabaseFailure('Failed to uncomplete task: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to uncomplete task: $e'),
+      );
     }
   }
 

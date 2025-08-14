@@ -42,10 +42,6 @@ class HomePage extends StatelessWidget {
       title: l10n.tasks,
       actions: [
         IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () => _showSearchDialog(context, l10n, taskController),
-        ),
-        IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => _showSettingsDialog(context, l10n, authController),
         ),
@@ -67,12 +63,6 @@ class HomePage extends StatelessWidget {
     return AppScaffold(
       title: l10n.tasks,
       actions: [
-        TextButton.icon(
-          icon: const Icon(Icons.search),
-          label: Text(l10n.searchTasks),
-          onPressed: () => _showSearchDialog(context, l10n, taskController),
-        ),
-        SizedBox(width: 8.w),
         TextButton.icon(
           icon: const Icon(Icons.settings),
           label: Text(l10n.settings),
@@ -195,11 +185,7 @@ class HomePage extends StatelessWidget {
         children: [
           Text(l10n.tasks, style: Theme.of(context).textTheme.headlineSmall),
           const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => _showSearchDialog(context, l10n, taskController),
-          ),
-          SizedBox(width: 8.w),
+
           ElevatedButton.icon(
             onPressed: () => _showAddTaskDialog(context, l10n, taskController),
             icon: const Icon(Icons.add),
@@ -210,34 +196,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showSearchDialog(
-    BuildContext context,
-    AppLocalizations l10n,
-    TaskController taskController,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.searchTasks),
-        content: TextField(
-          decoration: InputDecoration(
-            hintText: l10n.searchTasks,
-            prefixIcon: const Icon(Icons.search),
-          ),
-          onChanged: (query) => taskController.setSearchQuery(query),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              taskController.setSearchQuery('');
-              Navigator.pop(context);
-            },
-            child: Text(l10n.cancel),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   void _showSettingsDialog(
     BuildContext context,
@@ -995,45 +954,12 @@ class _HomePageBody extends StatelessWidget {
             if (controller.taskStatistics.value != null)
               _buildTaskSummary(context, controller.taskStatistics.value!),
 
-            // Task List
+            // Categorized Task List
             Expanded(
               child: ResponsiveBuilder(
-                mobile: (context) => ListView.builder(
-                  padding: Responsive.getResponsivePadding(context),
-                  itemCount: controller.filteredTasks.length,
-                  itemBuilder: (context, index) {
-                    final task = controller.filteredTasks[index];
-                    return _buildTaskCard(context, task, controller);
-                  },
-                ),
-                tablet: (context) => GridView.builder(
-                  padding: Responsive.getResponsivePadding(context),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16.w,
-                    mainAxisSpacing: 16.h,
-                    childAspectRatio: 2.5,
-                  ),
-                  itemCount: controller.filteredTasks.length,
-                  itemBuilder: (context, index) {
-                    final task = controller.filteredTasks[index];
-                    return _buildTaskCard(context, task, controller);
-                  },
-                ),
-                desktop: (context) => GridView.builder(
-                  padding: Responsive.getResponsivePadding(context),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 16.w,
-                    mainAxisSpacing: 16.h,
-                    childAspectRatio: 2.2,
-                  ),
-                  itemCount: controller.filteredTasks.length,
-                  itemBuilder: (context, index) {
-                    final task = controller.filteredTasks[index];
-                    return _buildTaskCard(context, task, controller);
-                  },
-                ),
+                mobile: (context) => _buildCategorizedTaskList(context, controller),
+                tablet: (context) => _buildCategorizedTaskGrid(context, controller, 2),
+                desktop: (context) => _buildCategorizedTaskGrid(context, controller, 3),
               ),
             ),
           ],
@@ -1110,18 +1036,267 @@ class _HomePageBody extends StatelessWidget {
     );
   }
 
+  Widget _buildCategorizedTaskList(
+    BuildContext context,
+    TaskController controller,
+  ) {
+    final pendingTasks = controller.filteredTasks
+        .where((task) => task.status != TaskStatus.completed)
+        .toList();
+    final completedTasks = controller.filteredTasks
+        .where((task) => task.status == TaskStatus.completed)
+        .toList();
+
+    return ListView(
+      padding: Responsive.getResponsivePadding(context),
+      children: [
+        // Pending Tasks Section
+        if (pendingTasks.isNotEmpty) ...[
+          _buildSectionHeader(context, l10n.pending, pendingTasks.length),
+          SizedBox(height: 12.h),
+          // Priority Filter Cards
+          _buildPriorityFilterCards(context, controller),
+          SizedBox(height: 16.h),
+          ...pendingTasks.map((task) => _buildTaskCard(context, task, controller)),
+          SizedBox(height: 24.h),
+        ],
+        
+        // Completed Tasks Section
+        if (completedTasks.isNotEmpty) ...[
+          _buildSectionHeader(context, l10n.completed, completedTasks.length),
+          SizedBox(height: 12.h),
+          ...completedTasks.map((task) => _buildTaskCard(context, task, controller)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCategorizedTaskGrid(
+    BuildContext context,
+    TaskController controller,
+    int crossAxisCount,
+  ) {
+    final pendingTasks = controller.filteredTasks
+        .where((task) => task.status != TaskStatus.completed)
+        .toList();
+    final completedTasks = controller.filteredTasks
+        .where((task) => task.status == TaskStatus.completed)
+        .toList();
+
+    return SingleChildScrollView(
+      padding: Responsive.getResponsivePadding(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pending Tasks Section
+          if (pendingTasks.isNotEmpty) ...[
+            _buildSectionHeader(context, l10n.pending, pendingTasks.length),
+            SizedBox(height: 12.h),
+            // Priority Filter Cards
+            _buildPriorityFilterCards(context, controller),
+            SizedBox(height: 16.h),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 16.w,
+                mainAxisSpacing: 16.h,
+                childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+              ),
+              itemCount: pendingTasks.length,
+              itemBuilder: (context, index) {
+                final task = pendingTasks[index];
+                return _buildTaskCard(context, task, controller);
+              },
+            ),
+            SizedBox(height: 32.h),
+          ],
+          
+          // Completed Tasks Section
+          if (completedTasks.isNotEmpty) ...[
+            _buildSectionHeader(context, l10n.completed, completedTasks.length),
+            SizedBox(height: 12.h),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 16.w,
+                mainAxisSpacing: 16.h,
+                childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+              ),
+              itemCount: completedTasks.length,
+              itemBuilder: (context, index) {
+                final task = completedTasks[index];
+                return _buildTaskCard(context, task, controller);
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriorityFilterCards(
+    BuildContext context,
+    TaskController controller,
+  ) {
+    return SizedBox(
+      height: 40.h,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        children: [
+          _buildPriorityFilterCard(
+            context,
+            controller,
+            TaskPriority.high,
+            l10n.taskPriorityHigh,
+            AppColors.priorityHigh,
+          ),
+          SizedBox(width: 8.w),
+          _buildPriorityFilterCard(
+            context,
+            controller,
+            TaskPriority.medium,
+            l10n.taskPriorityMedium,
+            AppColors.priorityMedium,
+          ),
+          SizedBox(width: 8.w),
+          _buildPriorityFilterCard(
+            context,
+            controller,
+            TaskPriority.low,
+            l10n.taskPriorityLow,
+            AppColors.priorityLow,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriorityFilterCard(
+    BuildContext context,
+    TaskController controller,
+    TaskPriority priority,
+    String label,
+    Color color,
+  ) {
+    final isSelected = controller.filterPriority.value == priority;
+    
+    return Obx(() => GestureDetector(
+      onTap: () {
+        if (controller.filterPriority.value == priority) {
+          // Same priority clicked - clear filter
+          controller.setFilterPriority(null);
+        } else {
+          // Different priority clicked - set filter
+          controller.setFilterPriority(priority);
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? color.withValues(alpha: 0.2)
+              : Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isSelected 
+                ? color
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 8.w,
+              height: 8.w,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: isSelected 
+                    ? color
+                    : Theme.of(context).colorScheme.onSurface,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 12.sp,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title, int count) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
+      child: Row(
+        children: [
+          Container(
+            width: 4.w,
+            height: 24.h,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(2.r),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Text(
+              count.toString(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTaskCard(
     BuildContext context,
     TaskEntity task,
     TaskController controller,
   ) {
+    final isCompleted = task.status == TaskStatus.completed;
+    
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      child: Padding(
-        padding: EdgeInsets.all(12.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      color: isCompleted 
+          ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.5)
+          : null,
+      child: Opacity(
+        opacity: isCompleted ? 0.7 : 1.0,
+        child: Padding(
+          padding: EdgeInsets.all(12.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Task header with checkbox and menu
             Row(
               children: [
@@ -1244,7 +1419,8 @@ class _HomePageBody extends StatelessWidget {
                   ),
               ],
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
