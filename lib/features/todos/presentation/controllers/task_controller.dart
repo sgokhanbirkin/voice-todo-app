@@ -78,8 +78,8 @@ class TaskController extends GetxController {
         Get.snackbar(
           title,
           message,
-          backgroundColor: isError 
-              ? Colors.red.withValues(alpha: 0.9) 
+          backgroundColor: isError
+              ? Colors.red.withValues(alpha: 0.9)
               : Colors.green.withValues(alpha: 0.9),
           colorText: Colors.white,
           duration: const Duration(seconds: 3),
@@ -159,7 +159,11 @@ class TaskController extends GetxController {
           _showSnackbar('Success', 'Task created successfully');
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to create task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to create task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -187,7 +191,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to update task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to update task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -212,7 +220,11 @@ class TaskController extends GetxController {
           _showSnackbar('Success', 'Task deleted successfully');
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to delete task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to delete task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -237,7 +249,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to complete task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to complete task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -287,7 +303,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to star task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to star task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -310,7 +330,11 @@ class TaskController extends GetxController {
           }
         },
         (failure) {
-          _showSnackbar('Error', 'Failed to unstar task: ${failure.message}', isError: true);
+          _showSnackbar(
+            'Error',
+            'Failed to unstar task: ${failure.message}',
+            isError: true,
+          );
         },
       );
     } catch (e) {
@@ -332,8 +356,10 @@ class TaskController extends GetxController {
 
   /// Sets the filter priority and updates filtered tasks
   void setFilterPriority(TaskPriority? priority) {
+    Logger.instance.debug('🔥 Filter changing from ${filterPriority.value} to $priority');
     filterPriority.value = priority;
     _updateFilteredTasks();
+    Logger.instance.debug('🔥 After filter: ${filteredTasks.length} tasks shown');
   }
 
   /// Sets the sort field and updates filtered tasks
@@ -410,10 +436,7 @@ class TaskController extends GetxController {
       return sortAscending.value ? comparison : -comparison;
     });
 
-    filteredTasks.value = filtered;
-    
-    // Force UI update for reactive widgets
-    update();
+    filteredTasks.assignAll(filtered);
   }
 
   /// Updates categorized task lists
