@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../product/widgets/app_scaffold.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 
@@ -10,7 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize AuthController if not already initialized
-    Get.put(AuthController());
+    final authController = Get.put(AuthController());
     return AppScaffold(
       title: 'Ana Sayfa',
       actions: [
@@ -23,9 +24,11 @@ class HomePage extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.logout),
           onPressed: () async {
-            final authController = Get.put(AuthController());
             await authController.signOut();
-            Get.offAllNamed('/'); // Navigate back to login
+            // Use GoRouter navigation instead of GetX
+            if (context.mounted) {
+              context.go('/');
+            }
           },
         ),
       ],
