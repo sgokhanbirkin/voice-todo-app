@@ -187,7 +187,10 @@ class _HomePageDrawer {
   }
 
   /// Get theme display name
-  static String _getThemeDisplayName(AppLocalizations l10n, ThemeMode themeMode) {
+  static String _getThemeDisplayName(
+    AppLocalizations l10n,
+    ThemeMode themeMode,
+  ) {
     switch (themeMode) {
       case ThemeMode.light:
         return l10n.lightTheme;

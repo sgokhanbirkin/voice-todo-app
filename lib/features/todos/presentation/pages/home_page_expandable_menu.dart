@@ -21,7 +21,9 @@ class _ExpandableMenuSection {
             child: Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
                   color: Theme.of(
@@ -50,19 +52,24 @@ class _ExpandableMenuSection {
                       children: [
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                         SizedBox(height: 4.h),
                         Text(
                           subtitle,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                    .withValues(alpha: 0.7),
+                              ),
                         ),
                       ],
                     ),
@@ -92,10 +99,14 @@ class _ExpandableMenuSection {
                   margin: EdgeInsets.only(top: 8.h),
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Column(children: children),
@@ -125,13 +136,15 @@ class _LanguageOptionTile {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
           margin: EdgeInsets.only(bottom: 4.h),
           decoration: BoxDecoration(
-            color: isSelected 
+            color: isSelected
                 ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8.r),
-            border: isSelected 
+            border: isSelected
                 ? Border.all(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.3),
                     width: 1,
                   )
                 : null,
@@ -146,7 +159,8 @@ class _LanguageOptionTile {
                   border: Border.all(
                     color: isSelected
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.3),
+                        : Theme.of(context).colorScheme.onPrimaryContainer
+                              .withValues(alpha: 0.3),
                     width: 2,
                   ),
                   color: isSelected
@@ -172,7 +186,9 @@ class _LanguageOptionTile {
                         color: isSelected
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
                     if (subtitle.isNotEmpty) ...[
@@ -180,7 +196,10 @@ class _LanguageOptionTile {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -214,13 +233,15 @@ class _ThemeOptionTile {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
           margin: EdgeInsets.only(bottom: 4.h),
           decoration: BoxDecoration(
-            color: isSelected 
+            color: isSelected
                 ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8.r),
-            border: isSelected 
+            border: isSelected
                 ? Border.all(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.3),
                     width: 1,
                   )
                 : null,
@@ -235,7 +256,8 @@ class _ThemeOptionTile {
                   border: Border.all(
                     color: isSelected
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.3),
+                        : Theme.of(context).colorScheme.onPrimaryContainer
+                              .withValues(alpha: 0.3),
                     width: 2,
                   ),
                   color: isSelected
@@ -255,8 +277,12 @@ class _ThemeOptionTile {
                 padding: EdgeInsets.all(6.w),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
-                      : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2)
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Icon(
@@ -264,7 +290,9 @@ class _ThemeOptionTile {
                   size: 16.sp,
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
                 ),
               ),
               SizedBox(width: 12.w),
@@ -278,14 +306,18 @@ class _ThemeOptionTile {
                         color: isSelected
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
                       ),
                     ),
                   ],

@@ -10,12 +10,15 @@ import '../../../../product/localization/locale_controller.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../controllers/task_controller.dart';
 import '../../domain/task_entity.dart';
+import '../../domain/i_task_repository.dart';
 
 // Part files for better code organization (SOLID principles)
 part 'home_page_drawer.dart';
 part 'home_page_drawer_widgets.dart';
 part 'home_page_expandable_menu.dart';
 part 'home_page_dialogs.dart';
+part 'home_page_body.dart';
+part 'home_page_task_widgets.dart';
 
 /// Home page widget - Refactored to follow SOLID principles
 /// Split into multiple files to maintain <250 lines per file
@@ -100,7 +103,8 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _HomePageBody(l10n: l10n),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _HomePageDialogs.showAddTaskDialog(context, l10n, taskController),
+        onPressed: () =>
+            _HomePageDialogs.showAddTaskDialog(context, l10n, taskController),
         child: const Icon(Icons.add),
       ),
     );
@@ -218,111 +222,16 @@ class _HomePageState extends State<HomePage> {
           Text(l10n.tasks, style: Theme.of(context).textTheme.headlineSmall),
           const Spacer(),
           ElevatedButton.icon(
-            onPressed: () => _HomePageDialogs.showAddTaskDialog(context, l10n, taskController),
+            onPressed: () => _HomePageDialogs.showAddTaskDialog(
+              context,
+              l10n,
+              taskController,
+            ),
             icon: const Icon(Icons.add),
             label: Text(l10n.addTask),
           ),
         ],
       ),
     );
-  }
-}
-
-/// Home page body content - This will be moved to a separate file
-class _HomePageBody extends StatelessWidget {
-  final AppLocalizations l10n;
-
-  const _HomePageBody({required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final controller = Get.find<TaskController>();
-
-      if (controller.isLoading.value) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              SizedBox(height: 16.h),
-              Text(l10n.loading, style: Theme.of(context).textTheme.bodyLarge),
-            ],
-          ),
-        );
-      }
-
-      if (controller.hasError.value) {
-        return Center(
-          child: Padding(
-            padding: Responsive.getResponsivePadding(context),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 64.sp, color: AppColors.error),
-                SizedBox(height: 16.h),
-                Text(
-                  l10n.error,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineSmall?.copyWith(color: AppColors.error),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  controller.errorMessage.value,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                SizedBox(height: 16.h),
-                ElevatedButton(
-                  onPressed: () => controller.loadTasks(),
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      if (controller.tasks.isEmpty) {
-        return Center(
-          child: Padding(
-            padding: Responsive.getResponsivePadding(context),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.task_alt,
-                  size: 80.sp,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.5),
-                ),
-                SizedBox(height: 24.h),
-                Text(
-                  l10n.noTasks,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  l10n.noTasksDescription,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      // TODO: Task list will be implemented in separate body file
-      return const Center(
-        child: Text('Task list will be implemented here'),
-      );
-    });
   }
 }
