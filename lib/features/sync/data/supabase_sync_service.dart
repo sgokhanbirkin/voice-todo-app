@@ -78,20 +78,18 @@ class SupabaseSyncService implements ISyncService {
               .select()
               .single();
 
-          if (result != null) {
-            // Mark task as synced locally
-            final syncedTask = task.copyWith(
-              syncStatus: 'synced',
-              localUpdatedAt: DateTime.now(),
-            );
-            await _taskRepository.updateTask(syncedTask);
+          // Mark task as synced locally
+          final syncedTask = task.copyWith(
+            syncStatus: 'synced',
+            localUpdatedAt: DateTime.now(),
+          );
+          await _taskRepository.updateTask(syncedTask);
 
-            syncedItems++;
-            operations.add(
-              operation.copyWith(status: SyncOperationStatus.completed),
-            );
-            _logger.info('Task synced successfully: ${task.id}');
-          }
+          syncedItems++;
+          operations.add(
+            operation.copyWith(status: SyncOperationStatus.completed),
+          );
+          _logger.info('Task synced successfully: ${task.id}');
         } catch (e) {
           failedItems++;
           errors.add('Failed to sync task ${task.id}: $e');

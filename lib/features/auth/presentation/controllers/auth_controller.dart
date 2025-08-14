@@ -83,7 +83,7 @@ class AuthController extends GetxController {
         return AppResult.success(response.user!);
       } else {
         errorMessage.value = 'Authentication failed: Invalid response';
-        return AppResult.failure(
+        return const AppResult.failure(
           AuthFailure('Authentication failed: Invalid response'),
         );
       }

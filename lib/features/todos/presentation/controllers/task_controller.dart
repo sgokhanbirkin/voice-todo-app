@@ -411,6 +411,9 @@ class TaskController extends GetxController {
     });
 
     filteredTasks.value = filtered;
+    
+    // Force UI update for reactive widgets
+    update();
   }
 
   /// Updates categorized task lists

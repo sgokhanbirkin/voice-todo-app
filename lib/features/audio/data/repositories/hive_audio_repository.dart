@@ -18,7 +18,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<AudioEntity>> saveAudioMetadata(AudioEntity audio) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       await _audioBox.put(audio.id, audio);
@@ -36,7 +36,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<AudioEntity?>> getAudioById(String id) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final audio = _audioBox.get(id) as AudioEntity?;
@@ -54,7 +54,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> getAudioByTaskId(String taskId) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final allAudio = _audioBox.values.cast<AudioEntity>().toList();
@@ -78,7 +78,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> getAllAudio() async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final audio = _audioBox.values.cast<AudioEntity>().toList();
@@ -94,7 +94,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<AudioEntity>> updateAudioMetadata(AudioEntity audio) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final updatedAudio = audio.copyWith(updatedAt: DateTime.now());
@@ -114,7 +114,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<void>> deleteAudio(String id) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       // Get audio metadata first
@@ -133,7 +133,7 @@ class HiveAudioRepository implements IAudioRepository {
       }
 
       _logger.info('Audio deleted: $id');
-      return AppResult.success(null);
+      return const AppResult.success(null);
     } catch (e) {
       _logger.error('Failed to delete audio: $e');
       return AppResult.failure(DatabaseFailure('Failed to delete audio: $e'));
@@ -147,7 +147,7 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final audio = _audioBox.get(id) as AudioEntity?;
@@ -181,7 +181,7 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final audio = _audioBox.get(id) as AudioEntity?;
@@ -211,7 +211,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> getPendingUploads() async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final allAudio = _audioBox.values.cast<AudioEntity>().toList();
@@ -235,7 +235,7 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final allAudio = _audioBox.values.cast<AudioEntity>().toList();
@@ -259,7 +259,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> searchAudio(String query) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       if (query.isEmpty) {
@@ -286,7 +286,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<AudioStatistics>> getAudioStatistics() async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final allAudio = _audioBox.values.cast<AudioEntity>().toList();
@@ -302,7 +302,7 @@ class HiveAudioRepository implements IAudioRepository {
           audioPerTask: 0.0,
           mostCommonFormat: 'none',
         );
-        return AppResult.success(emptyStats);
+        return const AppResult.success(emptyStats);
       }
 
       // Calculate statistics
@@ -364,7 +364,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<String>> exportAudioMetadata(String format) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       final allAudio = _audioBox.values.cast<AudioEntity>().toList();
@@ -396,12 +396,14 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       // TODO: Implement audio metadata import
       _logger.info('Audio metadata import not yet implemented');
-      return AppResult.failure(DatabaseFailure('Import not yet implemented'));
+      return const AppResult.failure(
+        DatabaseFailure('Import not yet implemented'),
+      );
     } catch (e) {
       _logger.error('Failed to import audio metadata: $e');
       return AppResult.failure(
@@ -414,7 +416,7 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<void>> clearAllAudio() async {
     try {
       if (!_database.isReady) {
-        return AppResult.failure(DatabaseFailure('Database not ready'));
+        return const AppResult.failure(DatabaseFailure('Database not ready'));
       }
 
       // Get all audio files for cleanup
@@ -434,7 +436,7 @@ class HiveAudioRepository implements IAudioRepository {
       await _audioBox.clear();
 
       _logger.info('All audio data cleared successfully');
-      return AppResult.success(null);
+      return const AppResult.success(null);
     } catch (e) {
       _logger.error('Failed to clear all audio: $e');
       return AppResult.failure(

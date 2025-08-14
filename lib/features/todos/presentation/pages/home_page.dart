@@ -1197,24 +1197,16 @@ class _HomePageBody extends StatelessWidget {
     return Obx(() {
       final isSelected = controller.filterPriority.value == priority;
 
-             return GestureDetector(
-         onTap: () {
-           print('🔥 Filter tapped: $priority');
-           print('🔥 Current filter: ${controller.filterPriority.value}');
-           print('🔥 Total tasks: ${controller.tasks.length}');
-           
-           if (controller.filterPriority.value == priority) {
-             // Same priority clicked - clear filter
-             print('🔥 Clearing filter');
-             controller.setFilterPriority(null);
-           } else {
-             // Different priority clicked - set filter
-             print('🔥 Setting filter to: $priority');
-             controller.setFilterPriority(priority);
-           }
-           
-           print('🔥 Filtered tasks after: ${controller.filteredTasks.length}');
-         },
+      return GestureDetector(
+        onTap: () {
+          if (controller.filterPriority.value == priority) {
+            // Same priority clicked - clear filter
+            controller.setFilterPriority(null);
+          } else {
+            // Different priority clicked - set filter
+            controller.setFilterPriority(priority);
+          }
+        },
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
@@ -1380,11 +1372,11 @@ class _HomePageBody extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, color: AppColors.error),
+                            const Icon(Icons.delete, color: AppColors.error),
                             SizedBox(width: 8.w),
                             Text(
                               l10n.delete,
-                              style: TextStyle(color: AppColors.error),
+                              style: const TextStyle(color: AppColors.error),
                             ),
                           ],
                         ),
@@ -1423,7 +1415,7 @@ class _HomePageBody extends StatelessWidget {
                   _buildStatusChip(context, task.status),
                   if (task.isOverdue)
                     Chip(
-                      label: Text('Gecikmiş'),
+                      label: const Text('Gecikmiş'),
                       backgroundColor: AppColors.error.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color: AppColors.error,
@@ -1433,7 +1425,7 @@ class _HomePageBody extends StatelessWidget {
                     ),
                   if (task.isStarred)
                     Chip(
-                      label: Text('Yıldızlı'),
+                      label: const Text('Yıldızlı'),
                       backgroundColor: AppColors.warning.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color: AppColors.warning,
