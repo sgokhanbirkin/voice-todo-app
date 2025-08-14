@@ -207,7 +207,7 @@ class _HomePageDrawer {
       case 'en':
         return 'English (US)';
       case 'tr':
-        return 'Türkiye Türkçesi';
+        return 'Türkçe';
       default:
         return languageCode.toUpperCase();
     }

@@ -56,16 +56,15 @@ class _HomePageBody extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircularProgressIndicator(),
-          SizedBox(height: Responsive.getResponsiveSpacing(
-            context,
-            mobile: 16,
-            tablet: 20,
-            desktop: 24,
-          )),
-          Text(
-            l10n.loading,
-            style: Theme.of(context).textTheme.bodyLarge,
+          SizedBox(
+            height: Responsive.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 20,
+              desktop: 24,
+            ),
           ),
+          Text(l10n.loading, style: Theme.of(context).textTheme.bodyLarge),
         ],
       ),
     );
@@ -89,35 +88,41 @@ class _HomePageBody extends StatelessWidget {
               ),
               color: AppColors.error,
             ),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 16,
-              tablet: 20,
-              desktop: 24,
-            )),
-            Text(
-              l10n.error,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.error,
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
               ),
             ),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 8,
-              tablet: 12,
-              desktop: 16,
-            )),
+            Text(
+              l10n.error,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: AppColors.error),
+            ),
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 12,
+                desktop: 16,
+              ),
+            ),
             Text(
               controller.errorMessage.value,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 16,
-              tablet: 20,
-              desktop: 24,
-            )),
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
+              ),
+            ),
             ElevatedButton(
               onPressed: () => controller.loadTasks(),
               child: Text(l10n.retry),
@@ -144,28 +149,36 @@ class _HomePageBody extends StatelessWidget {
                 tablet: 100,
                 desktop: 120,
               ),
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.5),
             ),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 24,
-              tablet: 32,
-              desktop: 40,
-            )),
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 24,
+                tablet: 32,
+                desktop: 40,
+              ),
+            ),
             Text(
               l10n.noTasks,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 8,
-              tablet: 12,
-              desktop: 16,
-            )),
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 12,
+                desktop: 16,
+              ),
+            ),
             Text(
               l10n.noTasksDescription,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -189,23 +202,43 @@ class _HomePageBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem(context, l10n.tasks, stats.totalTasks.toString()),
-            _buildStatItem(context, l10n.completed, stats.completedTasks.toString()),
+            _buildStatItem(
+              context,
+              l10n.completed,
+              stats.completedTasks.toString(),
+            ),
           ],
         ),
         tablet: (context) => Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem(context, l10n.tasks, stats.totalTasks.toString()),
-            _buildStatItem(context, l10n.pending, stats.pendingTasks.toString()),
-            _buildStatItem(context, l10n.completed, stats.completedTasks.toString()),
+            _buildStatItem(
+              context,
+              l10n.pending,
+              stats.pendingTasks.toString(),
+            ),
+            _buildStatItem(
+              context,
+              l10n.completed,
+              stats.completedTasks.toString(),
+            ),
           ],
         ),
         desktop: (context) => Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem(context, l10n.tasks, stats.totalTasks.toString()),
-            _buildStatItem(context, l10n.pending, stats.pendingTasks.toString()),
-            _buildStatItem(context, l10n.completed, stats.completedTasks.toString()),
+            _buildStatItem(
+              context,
+              l10n.pending,
+              stats.pendingTasks.toString(),
+            ),
+            _buildStatItem(
+              context,
+              l10n.completed,
+              stats.completedTasks.toString(),
+            ),
             _buildStatItem(context, 'Overdue', stats.overdueTasks.toString()),
           ],
         ),
@@ -248,7 +281,10 @@ class _HomePageBody extends StatelessWidget {
   }
 
   /// Build categorized task list for mobile
-  Widget _buildCategorizedTaskList(BuildContext context, TaskController controller) {
+  Widget _buildCategorizedTaskList(
+    BuildContext context,
+    TaskController controller,
+  ) {
     return Obx(() {
       final pendingTasks = controller.filteredTasks
           .where((task) => task.status != TaskStatus.completed)
@@ -263,12 +299,14 @@ class _HomePageBody extends StatelessWidget {
           // Priority Filter Cards
           if (controller.tasks.isNotEmpty) ...[
             _TaskPriorityFilters(l10n: l10n, controller: controller),
-            SizedBox(height: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 24,
-              tablet: 32,
-              desktop: 40,
-            )),
+            SizedBox(
+              height: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 24,
+                tablet: 32,
+                desktop: 40,
+              ),
+            ),
           ],
 
           // Pending Tasks Section
@@ -280,23 +318,26 @@ class _HomePageBody extends StatelessWidget {
               onToggle: controller.togglePendingExpansion,
             ),
             if (controller.isPendingExpanded.value) ...[
-              SizedBox(height: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 12,
-                tablet: 16,
-                desktop: 20,
-              )),
-              ...pendingTasks.map((task) => _TaskCard(
-                task: task,
-                l10n: l10n,
-                controller: controller,
-              )),
-              SizedBox(height: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 24,
-                tablet: 32,
-                desktop: 40,
-              )),
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 12,
+                  tablet: 16,
+                  desktop: 20,
+                ),
+              ),
+              ...pendingTasks.map(
+                (task) =>
+                    _TaskCard(task: task, l10n: l10n, controller: controller),
+              ),
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 24,
+                  tablet: 32,
+                  desktop: 40,
+                ),
+              ),
             ],
           ],
 
@@ -309,17 +350,18 @@ class _HomePageBody extends StatelessWidget {
               onToggle: controller.toggleCompletedExpansion,
             ),
             if (controller.isCompletedExpanded.value) ...[
-              SizedBox(height: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 12,
-                tablet: 16,
-                desktop: 20,
-              )),
-              ...completedTasks.map((task) => _TaskCard(
-                task: task,
-                l10n: l10n,
-                controller: controller,
-              )),
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 12,
+                  tablet: 16,
+                  desktop: 20,
+                ),
+              ),
+              ...completedTasks.map(
+                (task) =>
+                    _TaskCard(task: task, l10n: l10n, controller: controller),
+              ),
             ],
           ],
         ],
@@ -349,12 +391,14 @@ class _HomePageBody extends StatelessWidget {
             // Priority Filter Cards
             if (controller.tasks.isNotEmpty) ...[
               _TaskPriorityFilters(l10n: l10n, controller: controller),
-              SizedBox(height: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 24,
-                tablet: 32,
-                desktop: 40,
-              )),
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 24,
+                  tablet: 32,
+                  desktop: 40,
+                ),
+              ),
             ],
 
             // Pending Tasks Section
@@ -366,12 +410,14 @@ class _HomePageBody extends StatelessWidget {
                 onToggle: controller.togglePendingExpansion,
               ),
               if (controller.isPendingExpanded.value) ...[
-                SizedBox(height: Responsive.getResponsiveSpacing(
-                  context,
-                  mobile: 12,
-                  tablet: 16,
-                  desktop: 20,
-                )),
+                SizedBox(
+                  height: Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 12,
+                    tablet: 16,
+                    desktop: 20,
+                  ),
+                ),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -401,12 +447,14 @@ class _HomePageBody extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: Responsive.getResponsiveSpacing(
-                  context,
-                  mobile: 32,
-                  tablet: 40,
-                  desktop: 48,
-                )),
+                SizedBox(
+                  height: Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 32,
+                    tablet: 40,
+                    desktop: 48,
+                  ),
+                ),
               ],
             ],
 
@@ -419,12 +467,14 @@ class _HomePageBody extends StatelessWidget {
                 onToggle: controller.toggleCompletedExpansion,
               ),
               if (controller.isCompletedExpanded.value) ...[
-                SizedBox(height: Responsive.getResponsiveSpacing(
-                  context,
-                  mobile: 12,
-                  tablet: 16,
-                  desktop: 20,
-                )),
+                SizedBox(
+                  height: Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 12,
+                    tablet: 16,
+                    desktop: 20,
+                  ),
+                ),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

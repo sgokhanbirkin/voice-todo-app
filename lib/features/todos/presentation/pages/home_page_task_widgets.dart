@@ -5,10 +5,7 @@ class _TaskPriorityFilters extends StatelessWidget {
   final AppLocalizations l10n;
   final TaskController controller;
 
-  const _TaskPriorityFilters({
-    required this.l10n,
-    required this.controller,
-  });
+  const _TaskPriorityFilters({required this.l10n, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -36,24 +33,28 @@ class _TaskPriorityFilters extends StatelessWidget {
             l10n.taskPriorityHigh,
             AppColors.priorityHigh,
           ),
-          SizedBox(width: Responsive.getResponsiveSpacing(
-            context,
-            mobile: 8,
-            tablet: 12,
-            desktop: 16,
-          )),
+          SizedBox(
+            width: Responsive.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 12,
+              desktop: 16,
+            ),
+          ),
           _buildPriorityFilterCard(
             context,
             TaskPriority.medium,
             l10n.taskPriorityMedium,
             AppColors.priorityMedium,
           ),
-          SizedBox(width: Responsive.getResponsiveSpacing(
-            context,
-            mobile: 8,
-            tablet: 12,
-            desktop: 16,
-          )),
+          SizedBox(
+            width: Responsive.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 12,
+              desktop: 16,
+            ),
+          ),
           _buildPriorityFilterCard(
             context,
             TaskPriority.low,
@@ -114,7 +115,9 @@ class _TaskPriorityFilters extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? color
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.3),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -134,17 +137,16 @@ class _TaskPriorityFilters extends StatelessWidget {
                   tablet: 10,
                   desktop: 12,
                 ),
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              SizedBox(
+                width: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
                 ),
               ),
-              SizedBox(width: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 8,
-                tablet: 10,
-                desktop: 12,
-              )),
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -222,12 +224,14 @@ class _TaskSectionHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(width: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 12,
-              tablet: 16,
-              desktop: 20,
-            )),
+            SizedBox(
+              width: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
+            ),
             Expanded(
               child: Text(
                 title,
@@ -243,12 +247,14 @@ class _TaskSectionHeader extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 8,
-              tablet: 12,
-              desktop: 16,
-            )),
+            SizedBox(
+              width: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 12,
+                desktop: 16,
+              ),
+            ),
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: Responsive.getResponsiveSpacing(
@@ -282,18 +288,22 @@ class _TaskSectionHeader extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: Responsive.getResponsiveSpacing(
-              context,
-              mobile: 8,
-              tablet: 12,
-              desktop: 16,
-            )),
+            SizedBox(
+              width: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 8,
+                tablet: 12,
+                desktop: 16,
+              ),
+            ),
             AnimatedRotation(
               turns: isExpanded ? 0.0 : -0.25, // 0° open, -90° closed
               duration: AppTheme.shortAnimation,
               child: Icon(
                 Icons.keyboard_arrow_down,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: Responsive.getResponsiveSpacing(
                   context,
                   mobile: 24,
@@ -403,12 +413,14 @@ class _TaskCard extends StatelessWidget {
                             Icon(
                               task.isStarred ? Icons.star_border : Icons.star,
                             ),
-                            SizedBox(width: Responsive.getResponsiveSpacing(
-                              context,
-                              mobile: 8,
-                              tablet: 10,
-                              desktop: 12,
-                            )),
+                            SizedBox(
+                              width: Responsive.getResponsiveSpacing(
+                                context,
+                                mobile: 8,
+                                tablet: 10,
+                                desktop: 12,
+                              ),
+                            ),
                             Text(
                               task.isStarred ? 'Yıldızı Kaldır' : 'Yıldızla',
                             ),
@@ -420,12 +432,14 @@ class _TaskCard extends StatelessWidget {
                         child: Row(
                           children: [
                             const Icon(Icons.delete, color: AppColors.error),
-                            SizedBox(width: Responsive.getResponsiveSpacing(
-                              context,
-                              mobile: 8,
-                              tablet: 10,
-                              desktop: 12,
-                            )),
+                            SizedBox(
+                              width: Responsive.getResponsiveSpacing(
+                                context,
+                                mobile: 8,
+                                tablet: 10,
+                                desktop: 12,
+                              ),
+                            ),
                             Text(
                               l10n.delete,
                               style: const TextStyle(color: AppColors.error),
@@ -440,12 +454,14 @@ class _TaskCard extends StatelessWidget {
 
               // Task description
               if (task.description != null) ...[
-                SizedBox(height: Responsive.getResponsiveSpacing(
-                  context,
-                  mobile: 8,
-                  tablet: 10,
-                  desktop: 12,
-                )),
+                SizedBox(
+                  height: Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 8,
+                    tablet: 10,
+                    desktop: 12,
+                  ),
+                ),
                 Text(
                   task.description!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -461,12 +477,14 @@ class _TaskCard extends StatelessWidget {
                 ),
               ],
 
-              SizedBox(height: Responsive.getResponsiveSpacing(
-                context,
-                mobile: 12,
-                tablet: 16,
-                desktop: 20,
-              )),
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 12,
+                  tablet: 16,
+                  desktop: 20,
+                ),
+              ),
 
               // Task chips
               Wrap(
