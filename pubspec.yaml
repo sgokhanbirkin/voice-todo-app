@@ -45,6 +45,7 @@ dependencies:
   supabase_flutter: ^2.9.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  path_provider: ^2.1.4
 
   # Audio
   record: ^6.0.0

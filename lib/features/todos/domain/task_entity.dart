@@ -58,7 +58,19 @@ class TaskEntity {
   final String? audioPath;
 
   /// Audio duration in seconds (optional)
-  final int? audioDuration;
+  final Duration? audioDuration;
+
+  /// User ID who owns this task
+  final String? userId;
+
+  /// Local creation timestamp for sync
+  final DateTime? localCreatedAt;
+
+  /// Local update timestamp for sync
+  final DateTime? localUpdatedAt;
+
+  /// Sync status (pending, synced, failed)
+  final String? syncStatus;
 
   /// Tags for categorizing the task (optional)
   final List<String> tags;
@@ -92,6 +104,10 @@ class TaskEntity {
     this.isStarred = false,
     this.subtasks = const [],
     this.parentTaskId,
+    this.userId,
+    this.localCreatedAt,
+    this.localUpdatedAt,
+    this.syncStatus,
   });
 
   /// Creates a copy of this task with updated values
@@ -106,12 +122,16 @@ class TaskEntity {
     DateTime? updatedAt,
     DateTime? completedAt,
     String? audioPath,
-    int? audioDuration,
+    Duration? audioDuration,
     List<String>? tags,
     bool? isArchived,
     bool? isStarred,
     List<TaskEntity>? subtasks,
     String? parentTaskId,
+    String? userId,
+    DateTime? localCreatedAt,
+    DateTime? localUpdatedAt,
+    String? syncStatus,
   }) {
     return TaskEntity(
       id: id ?? this.id,
@@ -130,6 +150,10 @@ class TaskEntity {
       isStarred: isStarred ?? this.isStarred,
       subtasks: subtasks ?? this.subtasks,
       parentTaskId: parentTaskId ?? this.parentTaskId,
+      userId: userId ?? this.userId,
+      localCreatedAt: localCreatedAt ?? this.localCreatedAt,
+      localUpdatedAt: localUpdatedAt ?? this.localUpdatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -156,7 +180,9 @@ class TaskEntity {
           ? DateTime.parse(json['completedAt'] as String)
           : null,
       audioPath: json['audioPath'] as String?,
-      audioDuration: json['audioDuration'] as int?,
+      audioDuration: json['audioDuration'] != null
+          ? Duration(seconds: json['audioDuration'] as int)
+          : null,
       tags: List<String>.from(json['tags'] ?? []),
       isArchived: json['isArchived'] as bool? ?? false,
       isStarred: json['isStarred'] as bool? ?? false,
@@ -166,6 +192,14 @@ class TaskEntity {
               .toList() ??
           [],
       parentTaskId: json['parentTaskId'] as String?,
+      userId: json['userId'] as String?,
+      localCreatedAt: json['localCreatedAt'] != null
+          ? DateTime.parse(json['localCreatedAt'] as String)
+          : null,
+      localUpdatedAt: json['localUpdatedAt'] != null
+          ? DateTime.parse(json['localUpdatedAt'] as String)
+          : null,
+      syncStatus: json['syncStatus'] as String?,
     );
   }
 
@@ -182,12 +216,16 @@ class TaskEntity {
       'updatedAt': updatedAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
       'audioPath': audioPath,
-      'audioDuration': audioDuration,
+      'audioDuration': audioDuration?.inSeconds,
       'tags': tags,
       'isArchived': isArchived,
       'isStarred': isStarred,
       'subtasks': subtasks.map((e) => e.toJson()).toList(),
       'parentTaskId': parentTaskId,
+      'userId': userId,
+      'localCreatedAt': localCreatedAt?.toIso8601String(),
+      'localUpdatedAt': localUpdatedAt?.toIso8601String(),
+      'syncStatus': syncStatus,
     };
   }
 

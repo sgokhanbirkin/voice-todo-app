@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'data/remote/supabase_service.dart';
 import 'core/logger.dart';
 import 'core/router/app_router.dart';
+import 'core/database/hive_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,14 @@ void main() async {
     Logger.instance.info('Supabase initialized successfully in main');
   } catch (e) {
     Logger.instance.error('Failed to initialize Supabase in main: $e');
+  }
+
+  // Initialize Hive Database
+  try {
+    await HiveDatabase.instance.initialize();
+    Logger.instance.info('Hive database initialized successfully in main');
+  } catch (e) {
+    Logger.instance.error('Failed to initialize Hive database in main: $e');
   }
 
   runApp(const MyApp());
