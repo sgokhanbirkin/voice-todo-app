@@ -1051,13 +1051,16 @@ class _HomePageBody extends StatelessWidget {
     return ListView(
       padding: Responsive.getResponsivePadding(context),
       children: [
+        // Priority Filter Cards (at the top)
+        if (controller.tasks.isNotEmpty) ...[
+          _buildPriorityFilterCards(context, controller),
+          SizedBox(height: 24.h),
+        ],
+
         // Pending Tasks Section
         if (pendingTasks.isNotEmpty) ...[
           _buildSectionHeader(context, l10n.pending, pendingTasks.length),
           SizedBox(height: 12.h),
-          // Priority Filter Cards
-          _buildPriorityFilterCards(context, controller),
-          SizedBox(height: 16.h),
           ...pendingTasks.map(
             (task) => _buildTaskCard(context, task, controller),
           ),
@@ -1093,13 +1096,16 @@ class _HomePageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Priority Filter Cards (at the top)
+          if (controller.tasks.isNotEmpty) ...[
+            _buildPriorityFilterCards(context, controller),
+            SizedBox(height: 24.h),
+          ],
+
           // Pending Tasks Section
           if (pendingTasks.isNotEmpty) ...[
             _buildSectionHeader(context, l10n.pending, pendingTasks.length),
             SizedBox(height: 12.h),
-            // Priority Filter Cards
-            _buildPriorityFilterCards(context, controller),
-            SizedBox(height: 16.h),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -1191,16 +1197,24 @@ class _HomePageBody extends StatelessWidget {
     return Obx(() {
       final isSelected = controller.filterPriority.value == priority;
 
-      return GestureDetector(
-        onTap: () {
-          if (controller.filterPriority.value == priority) {
-            // Same priority clicked - clear filter
-            controller.setFilterPriority(null);
-          } else {
-            // Different priority clicked - set filter
-            controller.setFilterPriority(priority);
-          }
-        },
+             return GestureDetector(
+         onTap: () {
+           print('🔥 Filter tapped: $priority');
+           print('🔥 Current filter: ${controller.filterPriority.value}');
+           print('🔥 Total tasks: ${controller.tasks.length}');
+           
+           if (controller.filterPriority.value == priority) {
+             // Same priority clicked - clear filter
+             print('🔥 Clearing filter');
+             controller.setFilterPriority(null);
+           } else {
+             // Different priority clicked - set filter
+             print('🔥 Setting filter to: $priority');
+             controller.setFilterPriority(priority);
+           }
+           
+           print('🔥 Filtered tasks after: ${controller.filteredTasks.length}');
+         },
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
