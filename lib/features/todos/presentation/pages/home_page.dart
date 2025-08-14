@@ -1058,40 +1058,40 @@ class _HomePageBody extends StatelessWidget {
             SizedBox(height: 24.h),
           ],
 
-                     // Pending Tasks Section
-           if (pendingTasks.isNotEmpty) ...[
-             _buildSectionHeader(
-               context,
-               l10n.pending,
-               pendingTasks.length,
-               controller.isPendingExpanded.value,
-               controller.togglePendingExpansion,
-             ),
-             if (controller.isPendingExpanded.value) ...[
-               SizedBox(height: 12.h),
-               ...pendingTasks.map(
-                 (task) => _buildTaskCard(context, task, controller),
-               ),
-               SizedBox(height: 24.h),
-             ],
-           ],
+          // Pending Tasks Section
+          if (pendingTasks.isNotEmpty) ...[
+            _buildSectionHeader(
+              context,
+              l10n.pending,
+              pendingTasks.length,
+              controller.isPendingExpanded.value,
+              controller.togglePendingExpansion,
+            ),
+            if (controller.isPendingExpanded.value) ...[
+              SizedBox(height: 12.h),
+              ...pendingTasks.map(
+                (task) => _buildTaskCard(context, task, controller),
+              ),
+              SizedBox(height: 24.h),
+            ],
+          ],
 
-           // Completed Tasks Section
-           if (completedTasks.isNotEmpty) ...[
-             _buildSectionHeader(
-               context,
-               l10n.completed,
-               completedTasks.length,
-               controller.isCompletedExpanded.value,
-               controller.toggleCompletedExpansion,
-             ),
-             if (controller.isCompletedExpanded.value) ...[
-               SizedBox(height: 12.h),
-               ...completedTasks.map(
-                 (task) => _buildTaskCard(context, task, controller),
-               ),
-             ],
-           ],
+          // Completed Tasks Section
+          if (completedTasks.isNotEmpty) ...[
+            _buildSectionHeader(
+              context,
+              l10n.completed,
+              completedTasks.length,
+              controller.isCompletedExpanded.value,
+              controller.toggleCompletedExpansion,
+            ),
+            if (controller.isCompletedExpanded.value) ...[
+              SizedBox(height: 12.h),
+              ...completedTasks.map(
+                (task) => _buildTaskCard(context, task, controller),
+              ),
+            ],
+          ],
         ],
       );
     });
@@ -1121,64 +1121,64 @@ class _HomePageBody extends StatelessWidget {
               SizedBox(height: 24.h),
             ],
 
-                         // Pending Tasks Section
-             if (pendingTasks.isNotEmpty) ...[
-               _buildSectionHeader(
-                 context,
-                 l10n.pending,
-                 pendingTasks.length,
-                 controller.isPendingExpanded.value,
-                 controller.togglePendingExpansion,
-               ),
-               if (controller.isPendingExpanded.value) ...[
-                 SizedBox(height: 12.h),
-                 GridView.builder(
-                   shrinkWrap: true,
-                   physics: const NeverScrollableScrollPhysics(),
-                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                     crossAxisCount: crossAxisCount,
-                     crossAxisSpacing: 16.w,
-                     mainAxisSpacing: 16.h,
-                     childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
-                   ),
-                   itemCount: pendingTasks.length,
-                   itemBuilder: (context, index) {
-                     final task = pendingTasks[index];
-                     return _buildTaskCard(context, task, controller);
-                   },
-                 ),
-                 SizedBox(height: 32.h),
-               ],
-             ],
+            // Pending Tasks Section
+            if (pendingTasks.isNotEmpty) ...[
+              _buildSectionHeader(
+                context,
+                l10n.pending,
+                pendingTasks.length,
+                controller.isPendingExpanded.value,
+                controller.togglePendingExpansion,
+              ),
+              if (controller.isPendingExpanded.value) ...[
+                SizedBox(height: 12.h),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+                  ),
+                  itemCount: pendingTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = pendingTasks[index];
+                    return _buildTaskCard(context, task, controller);
+                  },
+                ),
+                SizedBox(height: 32.h),
+              ],
+            ],
 
-             // Completed Tasks Section
-             if (completedTasks.isNotEmpty) ...[
-               _buildSectionHeader(
-                 context,
-                 l10n.completed,
-                 completedTasks.length,
-                 controller.isCompletedExpanded.value,
-                 controller.toggleCompletedExpansion,
-               ),
-               if (controller.isCompletedExpanded.value) ...[
-                 SizedBox(height: 12.h),
-                 GridView.builder(
-                   shrinkWrap: true,
-                   physics: const NeverScrollableScrollPhysics(),
-                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                     crossAxisCount: crossAxisCount,
-                     crossAxisSpacing: 16.w,
-                     mainAxisSpacing: 16.h,
-                     childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
-                   ),
-                   itemCount: completedTasks.length,
-                   itemBuilder: (context, index) {
-                     final task = completedTasks[index];
-                     return _buildTaskCard(context, task, controller);
-                   },
-                 ),
-               ],
-             ],
+            // Completed Tasks Section
+            if (completedTasks.isNotEmpty) ...[
+              _buildSectionHeader(
+                context,
+                l10n.completed,
+                completedTasks.length,
+                controller.isCompletedExpanded.value,
+                controller.toggleCompletedExpansion,
+              ),
+              if (controller.isCompletedExpanded.value) ...[
+                SizedBox(height: 12.h),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: crossAxisCount == 2 ? 2.5 : 2.2,
+                  ),
+                  itemCount: completedTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = completedTasks[index];
+                    return _buildTaskCard(context, task, controller);
+                  },
+                ),
+              ],
+            ],
           ],
         ),
       );
@@ -1341,7 +1341,9 @@ class _HomePageBody extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               child: Icon(
                 Icons.keyboard_arrow_down,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24.sp,
               ),
             ),
