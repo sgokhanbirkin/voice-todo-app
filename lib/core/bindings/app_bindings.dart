@@ -9,10 +9,7 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     // Register repositories
-    Get.lazyPut<ITaskRepository>(
-      () => HiveTaskRepository(),
-      fenix: true,
-    );
+    Get.lazyPut<ITaskRepository>(() => HiveTaskRepository(), fenix: true);
 
     // Register controllers
     Get.lazyPut<TaskController>(
@@ -20,9 +17,6 @@ class AppBindings extends Bindings {
       fenix: true,
     );
 
-    Get.lazyPut<AuthController>(
-      () => AuthController(),
-      fenix: true,
-    );
+    Get.lazyPut<AuthController>(() => AuthController(), fenix: true);
   }
 }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'data/remote/supabase_service.dart';
 import 'core/logger.dart';
 import 'core/router/app_router.dart';
 import 'core/database/hive_database.dart';
 import 'core/bindings/app_bindings.dart';
+import 'product/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,13 +45,36 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Voice Todo App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      routerConfig: AppRouter.router,
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), // iPhone X design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return GetMaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: 'Voice Todo App',
+          
+          // Theme configuration
+          theme: AppTheme.instance.lightTheme,
+          darkTheme: AppTheme.instance.darkTheme,
+          themeMode: AppTheme.instance.currentThemeMode,
+          
+          // Localization configuration
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('tr'), // Default to Turkish
+          
+          // Router configuration
+          routerDelegate: AppRouter.router.routerDelegate,
+          routeInformationParser: AppRouter.router.routeInformationParser,
+          routeInformationProvider: AppRouter.router.routeInformationProvider,
+        );
+      },
     );
   }
 }
