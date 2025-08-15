@@ -1,31 +1,35 @@
 part of 'home_page.dart';
 
 /// Main content widget for home page body with task lists
-class _HomePageBodyContent extends StatefulWidget {
+class HomePageBodyContent extends StatefulWidget {
   final AppLocalizations l10n;
   final TaskController controller;
 
-  const _HomePageBodyContent({
+  const HomePageBodyContent({
+    super.key,
     required this.l10n,
     required this.controller,
   });
 
   @override
-  State<_HomePageBodyContent> createState() => _HomePageBodyContentState();
+  State<HomePageBodyContent> createState() => _HomePageBodyContentState();
 }
 
-class _HomePageBodyContentState extends State<_HomePageBodyContent> {
+class _HomePageBodyContentState extends State<HomePageBodyContent> {
   bool _isPendingExpanded = true;
   bool _isCompletedExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => widget.controller.refresh(),
+      onRefresh: () async => await widget.controller.refresh(),
       child: Column(
         children: [
           // Task Statistics Card
-          _HomePageBodyStatistics(l10n: widget.l10n, controller: widget.controller),
+          HomePageBodyStatistics(
+            l10n: widget.l10n,
+            controller: widget.controller,
+          ),
 
           ResponsiveWidgets.verticalSpace(
             context,
@@ -35,7 +39,7 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
           ),
 
           // Priority Filters
-          _TaskPriorityFilters(l10n: widget.l10n, controller: widget.controller),
+          TaskPriorityFilters(l10n: widget.l10n, controller: widget.controller),
 
           ResponsiveWidgets.verticalSpace(
             context,
@@ -54,13 +58,20 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
   Widget _buildTaskLists(BuildContext context) {
     return Obx(() {
       final filteredTasks = widget.controller.filteredTasks;
-      final pendingTasks = filteredTasks.where((task) => task.status != TaskStatus.completed).toList();
-      final completedTasks = filteredTasks.where((task) => task.status == TaskStatus.completed).toList();
+      final pendingTasks = filteredTasks
+          .where((task) => task.status != TaskStatus.completed)
+          .toList();
+      final completedTasks = filteredTasks
+          .where((task) => task.status == TaskStatus.completed)
+          .toList();
 
       return ResponsiveBuilder(
-        mobile: (context) => _buildMobileTaskList(context, pendingTasks, completedTasks),
-        tablet: (context) => _buildTabletTaskList(context, pendingTasks, completedTasks),
-        desktop: (context) => _buildDesktopTaskList(context, pendingTasks, completedTasks),
+        mobile: (context) =>
+            _buildMobileTaskList(context, pendingTasks, completedTasks),
+        tablet: (context) =>
+            _buildTabletTaskList(context, pendingTasks, completedTasks),
+        desktop: (context) =>
+            _buildDesktopTaskList(context, pendingTasks, completedTasks),
       );
     });
   }
@@ -72,42 +83,65 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
   ) {
     return SingleChildScrollView(
       padding: ResponsiveWidgets.responsivePadding(context),
+      physics:
+          const ClampingScrollPhysics(), // Android'de daha iyi scroll davranışı
       child: Column(
         children: [
           // Pending Tasks Section
           if (pendingTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.pending,
               count: pendingTasks.length,
               isExpanded: _isPendingExpanded,
-              onToggle: () => setState(() => _isPendingExpanded = !_isPendingExpanded),
+              onToggle: () =>
+                  setState(() => _isPendingExpanded = !_isPendingExpanded),
             ),
             if (_isPendingExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-              ...pendingTasks.map((task) => _TaskCard(
-                task: task,
-                l10n: widget.l10n,
-                controller: widget.controller,
-              )),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
+              ...pendingTasks.map(
+                (task) => TaskCard(
+                  task: task,
+                  l10n: widget.l10n,
+                  controller: widget.controller,
+                ),
+              ),
             ],
-            ResponsiveWidgets.verticalSpace(context, mobile: 24, tablet: 32, desktop: 40),
+            ResponsiveWidgets.verticalSpace(
+              context,
+              mobile: 24,
+              tablet: 32,
+              desktop: 40,
+            ),
           ],
 
           // Completed Tasks Section
           if (completedTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.completed,
               count: completedTasks.length,
               isExpanded: _isCompletedExpanded,
-              onToggle: () => setState(() => _isCompletedExpanded = !_isCompletedExpanded),
+              onToggle: () =>
+                  setState(() => _isCompletedExpanded = !_isCompletedExpanded),
             ),
             if (_isCompletedExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-              ...completedTasks.map((task) => _TaskCard(
-                task: task,
-                l10n: widget.l10n,
-                controller: widget.controller,
-              )),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
+              ...completedTasks.map(
+                (task) => TaskCard(
+                  task: task,
+                  l10n: widget.l10n,
+                  controller: widget.controller,
+                ),
+              ),
             ],
           ],
         ],
@@ -122,18 +156,26 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
   ) {
     return SingleChildScrollView(
       padding: ResponsiveWidgets.responsivePadding(context),
+      physics:
+          const ClampingScrollPhysics(), // Android'de daha iyi scroll davranışı
       child: Column(
         children: [
           // Pending Tasks Section
           if (pendingTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.pending,
               count: pendingTasks.length,
               isExpanded: _isPendingExpanded,
-              onToggle: () => setState(() => _isPendingExpanded = !_isPendingExpanded),
+              onToggle: () =>
+                  setState(() => _isPendingExpanded = !_isPendingExpanded),
             ),
             if (_isPendingExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -144,26 +186,37 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
                   mainAxisSpacing: 16,
                 ),
                 itemCount: pendingTasks.length,
-                itemBuilder: (context, index) => _TaskCard(
+                itemBuilder: (context, index) => TaskCard(
                   task: pendingTasks[index],
                   l10n: widget.l10n,
                   controller: widget.controller,
                 ),
               ),
             ],
-            ResponsiveWidgets.verticalSpace(context, mobile: 24, tablet: 32, desktop: 40),
+            ResponsiveWidgets.verticalSpace(
+              context,
+              mobile: 24,
+              tablet: 32,
+              desktop: 40,
+            ),
           ],
 
           // Completed Tasks Section
           if (completedTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.completed,
               count: completedTasks.length,
               isExpanded: _isCompletedExpanded,
-              onToggle: () => setState(() => _isCompletedExpanded = !_isCompletedExpanded),
+              onToggle: () =>
+                  setState(() => _isCompletedExpanded = !_isCompletedExpanded),
             ),
             if (_isCompletedExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -174,7 +227,7 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
                   mainAxisSpacing: 16,
                 ),
                 itemCount: completedTasks.length,
-                itemBuilder: (context, index) => _TaskCard(
+                itemBuilder: (context, index) => TaskCard(
                   task: completedTasks[index],
                   l10n: widget.l10n,
                   controller: widget.controller,
@@ -194,18 +247,26 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
   ) {
     return SingleChildScrollView(
       padding: ResponsiveWidgets.responsivePadding(context),
+      physics:
+          const ClampingScrollPhysics(), // Android'de daha iyi scroll davranışı
       child: Column(
         children: [
           // Pending Tasks Section
           if (pendingTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.pending,
               count: pendingTasks.length,
               isExpanded: _isPendingExpanded,
-              onToggle: () => setState(() => _isPendingExpanded = !_isPendingExpanded),
+              onToggle: () =>
+                  setState(() => _isPendingExpanded = !_isPendingExpanded),
             ),
             if (_isPendingExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -216,26 +277,37 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
                   mainAxisSpacing: 20,
                 ),
                 itemCount: pendingTasks.length,
-                itemBuilder: (context, index) => _TaskCard(
+                itemBuilder: (context, index) => TaskCard(
                   task: pendingTasks[index],
                   l10n: widget.l10n,
                   controller: widget.controller,
                 ),
               ),
             ],
-            ResponsiveWidgets.verticalSpace(context, mobile: 24, tablet: 32, desktop: 40),
+            ResponsiveWidgets.verticalSpace(
+              context,
+              mobile: 24,
+              tablet: 32,
+              desktop: 40,
+            ),
           ],
 
           // Completed Tasks Section
           if (completedTasks.isNotEmpty) ...[
-            _TaskSectionHeader(
+            TaskSectionHeader(
               title: widget.l10n.completed,
               count: completedTasks.length,
               isExpanded: _isCompletedExpanded,
-              onToggle: () => setState(() => _isCompletedExpanded = !_isCompletedExpanded),
+              onToggle: () =>
+                  setState(() => _isCompletedExpanded = !_isCompletedExpanded),
             ),
             if (_isCompletedExpanded) ...[
-              ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 12,
+                tablet: 16,
+                desktop: 20,
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -246,7 +318,7 @@ class _HomePageBodyContentState extends State<_HomePageBodyContent> {
                   mainAxisSpacing: 20,
                 ),
                 itemCount: completedTasks.length,
-                itemBuilder: (context, index) => _TaskCard(
+                itemBuilder: (context, index) => TaskCard(
                   task: completedTasks[index],
                   l10n: widget.l10n,
                   controller: widget.controller,

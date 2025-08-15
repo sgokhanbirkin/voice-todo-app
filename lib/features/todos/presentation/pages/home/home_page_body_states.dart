@@ -1,7 +1,12 @@
-part of 'home_page.dart';
+import 'package:flutter/material.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../product/responsive/responsive.dart';
+import '../../../../../product/theme/app_theme.dart';
+import '../../controllers/task_controller.dart';
 
+// TODO LOCALIZATION
 /// Loading, error, and empty states for home page body
-class _HomePageBodyStates {
+class HomePageBodyStates {
   /// Build loading state with circular progress indicator
   static Widget buildLoadingState(BuildContext context) {
     return Center(
@@ -29,7 +34,10 @@ class _HomePageBodyStates {
   }
 
   /// Build error state with retry button
-  static Widget buildErrorState(BuildContext context, TaskController controller) {
+  static Widget buildErrorState(
+    BuildContext context,
+    TaskController controller,
+  ) {
     return Center(
       child: ResponsiveWidgets.responsiveContainer(
         context,
@@ -105,7 +113,9 @@ class _HomePageBodyStates {
     return Center(
       child: ResponsiveWidgets.responsiveContainer(
         context,
-        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+        color: Theme.of(
+          context,
+        ).colorScheme.primaryContainer.withValues(alpha: 0.3),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -129,9 +139,9 @@ class _HomePageBodyStates {
               mobileFontSize: 20,
               tabletFontSize: 22,
               desktopFontSize: 24,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             ResponsiveWidgets.verticalSpace(
               context,

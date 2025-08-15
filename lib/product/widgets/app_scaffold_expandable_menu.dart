@@ -1,7 +1,7 @@
-part of 'home_page.dart';
+part of 'app_scaffold.dart';
 
 /// Expandable menu section component
-class _ExpandableMenuSection {
+class _AppScaffoldExpandableMenuSection {
   static Widget build({
     required BuildContext context,
     required IconData icon,
@@ -119,7 +119,7 @@ class _ExpandableMenuSection {
 }
 
 /// Language option tile component
-class _LanguageOptionTile {
+class _AppScaffoldLanguageOptionTile {
   static Widget build({
     required BuildContext context,
     required String title,
@@ -215,7 +215,7 @@ class _LanguageOptionTile {
 }
 
 /// Theme option tile component
-class _ThemeOptionTile {
+class _AppScaffoldThemeOptionTile {
   static Widget build({
     required BuildContext context,
     required String title,

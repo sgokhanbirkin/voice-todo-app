@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:voice_todo/features/todos/presentation/pages/home/home_page_body_states.dart';
+
+import 'package:voice_todo/features/todos/presentation/pages/home/home_page_task_section_header.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../product/responsive/responsive.dart';
 import '../../../../../product/theme/app_theme.dart';
-import '../../../../../product/localization/locale_controller.dart';
+import '../../../../../product/widgets/app_scaffold.dart';
 import '../../../../auth/presentation/controllers/auth_controller.dart';
 import '../../controllers/task_controller.dart';
 import '../../../domain/task_entity.dart';
-import '../../../domain/i_task_repository.dart';
+
+import 'home_page_body_statistics.dart';
 
 // Part files for better code organization (SOLID principles)
-part 'home_page_drawer.dart';
-part 'home_page_drawer_widgets.dart';
-part 'home_page_expandable_menu.dart';
-part 'home_page_dialogs.dart';
+
+part 'home_page_body_content.dart';
 part 'home_page_body.dart';
-part 'home_page_task_widgets.dart';
+part 'home_page_task_card.dart';
+part 'home_page_task_filters.dart';
 
 /// Home page widget - Refactored to follow SOLID principles
 /// Split into multiple files to maintain <250 lines per file
@@ -30,10 +32,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ZoomDrawerController _zoomDrawerController = ZoomDrawerController();
-  bool _isLanguageExpanded = false;
-  bool _isThemeExpanded = false;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -42,44 +40,32 @@ class _HomePageState extends State<HomePage> {
 
     return ResponsiveBuilder(
       mobile: (context) =>
-          _buildZoomDrawer(context, l10n, authController, taskController),
+          _buildAppScaffold(context, l10n, authController, taskController),
       tablet: (context) =>
-          _buildZoomDrawer(context, l10n, authController, taskController),
+          _buildAppScaffold(context, l10n, authController, taskController),
       desktop: (context) =>
           _buildDesktopLayout(context, l10n, authController, taskController),
     );
   }
 
-  /// Build ZoomDrawer for mobile and tablet layouts
-  Widget _buildZoomDrawer(
+  /// Build AppScaffold for mobile and tablet layouts
+  Widget _buildAppScaffold(
     BuildContext context,
     AppLocalizations l10n,
     AuthController authController,
     TaskController taskController,
   ) {
-    return ZoomDrawer(
-      controller: _zoomDrawerController,
-      menuBackgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      shadowLayer1Color: Theme.of(context).colorScheme.surface,
-      shadowLayer2Color: Theme.of(
-        context,
-      ).colorScheme.primary.withValues(alpha: 0.2),
-      borderRadius: 24.r,
-      showShadow: true,
-      angle: -12.0,
-      slideWidth: MediaQuery.of(context).size.width * 0.8,
-      openCurve: Curves.fastOutSlowIn,
-      closeCurve: Curves.bounceIn,
-      mainScreen: _buildMainScreen(context, l10n, taskController),
-      menuScreen: _HomePageDrawer.buildAnimatedMenuScreen(
-        context,
-        l10n,
-        authController,
-        _zoomDrawerController,
-        _isLanguageExpanded,
-        _isThemeExpanded,
-        (value) => setState(() => _isLanguageExpanded = value),
-        (value) => setState(() => _isThemeExpanded = value),
+    return AppScaffold(
+      title: l10n.home,
+      showDrawerButton: true,
+      useAnimatedDrawer: true,
+      showDrawerSettings: true,
+      body: _buildMainScreen(context, l10n, taskController),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/add-task'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -90,23 +76,11 @@ class _HomePageState extends State<HomePage> {
     AppLocalizations l10n,
     TaskController taskController,
   ) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.tasks),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => _zoomDrawerController.toggle?.call(),
-        ),
-        elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-      ),
-      body: _HomePageBody(l10n: l10n),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            _HomePageDialogs.showAddTaskDialog(context, l10n, taskController),
-        child: const Icon(Icons.add),
-      ),
+    return Column(
+      children: [
+        // Body content
+        Expanded(child: HomePageBody(l10n: l10n)),
+      ],
     );
   }
 
@@ -133,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 // Top bar
                 _buildTopBar(context, l10n, taskController),
                 // Content
-                Expanded(child: _HomePageBody(l10n: l10n)),
+                Expanded(child: HomePageBody(l10n: l10n)),
               ],
             ),
           ),
@@ -222,11 +196,7 @@ class _HomePageState extends State<HomePage> {
           Text(l10n.tasks, style: Theme.of(context).textTheme.headlineSmall),
           const Spacer(),
           ElevatedButton.icon(
-            onPressed: () => _HomePageDialogs.showAddTaskDialog(
-              context,
-              l10n,
-              taskController,
-            ),
+            onPressed: () => context.go('/add-task'),
             icon: const Icon(Icons.add),
             label: Text(l10n.addTask),
           ),

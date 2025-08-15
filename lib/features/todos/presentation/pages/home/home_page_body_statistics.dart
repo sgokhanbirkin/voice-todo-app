@@ -1,11 +1,18 @@
-part of 'home_page.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../product/responsive/responsive.dart';
+import '../../../../../product/theme/app_theme.dart';
+import '../../controllers/task_controller.dart';
+import '../../../domain/i_task_repository.dart';
 
 /// Task statistics card widget for home page
-class _HomePageBodyStatistics extends StatelessWidget {
+class HomePageBodyStatistics extends StatelessWidget {
   final AppLocalizations l10n;
   final TaskController controller;
 
-  const _HomePageBodyStatistics({
+  const HomePageBodyStatistics({
+    super.key,
     required this.l10n,
     required this.controller,
   });
@@ -16,9 +23,11 @@ class _HomePageBodyStatistics extends StatelessWidget {
       final stats = controller.taskStatistics.value;
       if (stats == null) return const SizedBox.shrink();
 
-      return ResponsiveWidgets.responsiveContainer(
+      return ResponsiveWidgets.responsiveCard(
         context,
-        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primaryContainer.withValues(alpha: 0.3),
         child: ResponsiveBuilder(
           mobile: (context) => _buildMobileStatistics(context, stats),
           tablet: (context) => _buildTabletStatistics(context, stats),
@@ -29,53 +38,74 @@ class _HomePageBodyStatistics extends StatelessWidget {
   }
 
   Widget _buildMobileStatistics(BuildContext context, TaskStatistics stats) {
-    return Column(
+    return Row(
       children: [
-        Row(
-          children: [
-            ResponsiveWidgets.responsiveIcon(
-              context,
-              icon: Icons.analytics,
-              color: Theme.of(context).colorScheme.primary,
-              mobileSize: 24,
-              tabletSize: 28,
-              desktopSize: 32,
-            ),
-            ResponsiveWidgets.horizontalSpace(
-              context,
-              mobile: 12,
-              tablet: 16,
-              desktop: 20,
-            ),
-            Expanded(
-              child: ResponsiveWidgets.responsiveText(
-                context,
-                text: l10n.statistics,
-                mobileFontSize: 18,
-                tabletFontSize: 20,
-                desktopFontSize: 22,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        ResponsiveWidgets.responsiveIcon(
+          context,
+          icon: Icons.analytics,
+          color: Theme.of(context).colorScheme.primary,
+          mobileSize: 24,
+          tabletSize: 28,
+          desktopSize: 32,
         ),
-        ResponsiveWidgets.verticalSpace(context, mobile: 16, tablet: 20, desktop: 24),
-        Row(
-          children: [
-            Expanded(child: _buildStatItem(context, l10n.tasks, stats.totalTasks.toString(), AppColors.primaryBlue)),
-            ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-            Expanded(child: _buildStatItem(context, l10n.completed, stats.completedTasks.toString(), AppColors.success)),
-          ],
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
         ),
-        ResponsiveWidgets.verticalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-        Row(
-          children: [
-            Expanded(child: _buildStatItem(context, l10n.pending, stats.pendingTasks.toString(), AppColors.warning)),
-            ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-            Expanded(child: _buildStatItem(context, l10n.overdue, stats.overdueTasks.toString(), AppColors.error)),
-          ],
+        ResponsiveWidgets.responsiveText(
+          context,
+          text: l10n.statistics,
+          mobileFontSize: 18,
+          tabletFontSize: 20,
+          desktopFontSize: 22,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        const Spacer(),
+        _buildStatItem(
+          context,
+          l10n.tasks,
+          stats.totalTasks.toString(),
+          AppColors.primaryBlue,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 8,
+          tablet: 12,
+          desktop: 16,
+        ),
+        _buildStatItem(
+          context,
+          l10n.completed,
+          stats.completedTasks.toString(),
+          AppColors.success,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 8,
+          tablet: 12,
+          desktop: 16,
+        ),
+        _buildStatItem(
+          context,
+          l10n.pending,
+          stats.pendingTasks.toString(),
+          AppColors.warning,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 8,
+          tablet: 12,
+          desktop: 16,
+        ),
+        _buildStatItem(
+          context,
+          l10n.overdue,
+          stats.overdueTasks.toString(),
+          AppColors.error,
         ),
       ],
     );
@@ -92,7 +122,12 @@ class _HomePageBodyStatistics extends StatelessWidget {
           tabletSize: 28,
           desktopSize: 32,
         ),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
+        ),
         Expanded(
           child: ResponsiveWidgets.responsiveText(
             context,
@@ -100,19 +135,59 @@ class _HomePageBodyStatistics extends StatelessWidget {
             mobileFontSize: 18,
             tabletFontSize: 20,
             desktopFontSize: 22,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 16, tablet: 20, desktop: 24),
-        _buildStatItem(context, l10n.tasks, stats.totalTasks.toString(), AppColors.primaryBlue),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-        _buildStatItem(context, l10n.completed, stats.completedTasks.toString(), AppColors.success),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-        _buildStatItem(context, l10n.pending, stats.pendingTasks.toString(), AppColors.warning),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
-        _buildStatItem(context, l10n.overdue, stats.overdueTasks.toString(), AppColors.error),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 16,
+          tablet: 20,
+          desktop: 24,
+        ),
+        _buildStatItem(
+          context,
+          l10n.tasks,
+          stats.totalTasks.toString(),
+          AppColors.primaryBlue,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
+        ),
+        _buildStatItem(
+          context,
+          l10n.completed,
+          stats.completedTasks.toString(),
+          AppColors.success,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
+        ),
+        _buildStatItem(
+          context,
+          l10n.pending,
+          stats.pendingTasks.toString(),
+          AppColors.warning,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
+        ),
+        _buildStatItem(
+          context,
+          l10n.overdue,
+          stats.overdueTasks.toString(),
+          AppColors.error,
+        ),
       ],
     );
   }
@@ -128,7 +203,12 @@ class _HomePageBodyStatistics extends StatelessWidget {
           tabletSize: 28,
           desktopSize: 32,
         ),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 12, tablet: 16, desktop: 20),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 12,
+          tablet: 16,
+          desktop: 20,
+        ),
         Expanded(
           child: ResponsiveWidgets.responsiveText(
             context,
@@ -136,24 +216,69 @@ class _HomePageBodyStatistics extends StatelessWidget {
             mobileFontSize: 18,
             tabletFontSize: 20,
             desktopFontSize: 22,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 20, tablet: 24, desktop: 28),
-        _buildStatItem(context, l10n.tasks, stats.totalTasks.toString(), AppColors.primaryBlue),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 16, tablet: 20, desktop: 24),
-        _buildStatItem(context, l10n.completed, stats.completedTasks.toString(), AppColors.success),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 16, tablet: 20, desktop: 24),
-        _buildStatItem(context, l10n.pending, stats.pendingTasks.toString(), AppColors.warning),
-        ResponsiveWidgets.horizontalSpace(context, mobile: 16, tablet: 20, desktop: 24),
-        _buildStatItem(context, l10n.overdue, stats.overdueTasks.toString(), AppColors.error),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 20,
+          tablet: 24,
+          desktop: 28,
+        ),
+        _buildStatItem(
+          context,
+          l10n.tasks,
+          stats.totalTasks.toString(),
+          AppColors.primaryBlue,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 16,
+          tablet: 20,
+          desktop: 24,
+        ),
+        _buildStatItem(
+          context,
+          l10n.completed,
+          stats.completedTasks.toString(),
+          AppColors.success,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 16,
+          tablet: 20,
+          desktop: 24,
+        ),
+        _buildStatItem(
+          context,
+          l10n.pending,
+          stats.pendingTasks.toString(),
+          AppColors.warning,
+        ),
+        ResponsiveWidgets.horizontalSpace(
+          context,
+          mobile: 16,
+          tablet: 20,
+          desktop: 24,
+        ),
+        _buildStatItem(
+          context,
+          l10n.overdue,
+          stats.overdueTasks.toString(),
+          AppColors.error,
+        ),
       ],
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value, Color color) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -163,12 +288,14 @@ class _HomePageBodyStatistics extends StatelessWidget {
           mobileFontSize: 20,
           tabletFontSize: 24,
           desktopFontSize: 28,
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
-        ResponsiveWidgets.verticalSpace(context, mobile: 4, tablet: 6, desktop: 8),
+        ResponsiveWidgets.verticalSpace(
+          context,
+          mobile: 4,
+          tablet: 6,
+          desktop: 8,
+        ),
         ResponsiveWidgets.responsiveText(
           context,
           text: label,

@@ -1,12 +1,13 @@
 part of 'home_page.dart';
 
 /// Individual task card widget
-class _TaskCard extends StatelessWidget {
+class TaskCard extends StatelessWidget {
   final TaskEntity task;
   final AppLocalizations l10n;
   final TaskController controller;
 
-  const _TaskCard({
+  const TaskCard({
+    super.key,
     required this.task,
     required this.l10n,
     required this.controller,
@@ -16,22 +17,39 @@ class _TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isCompleted = task.status == TaskStatus.completed;
 
-    return Card(
-      margin: EdgeInsets.only(
-        bottom: Responsive.getResponsiveSpacing(
-          context,
-          mobile: 12,
-          tablet: 16,
-          desktop: 20,
+    // Get priority color for enhanced card
+    Color? priorityColor;
+    switch (task.priority) {
+      case TaskPriority.high:
+        priorityColor = AppColors.priorityHigh;
+        break;
+      case TaskPriority.medium:
+        priorityColor = AppColors.priorityMedium;
+        break;
+      case TaskPriority.low:
+        priorityColor = AppColors.priorityLow;
+        break;
+    }
+
+    return InkWell(
+      onTap: () {
+        context.push('/task-detail/${task.id}');
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: ResponsiveWidgets.enhancedTaskCard(
+        context,
+        isCompleted: isCompleted,
+        priorityColor: priorityColor,
+        margin: EdgeInsets.only(
+          bottom: Responsive.getResponsiveSpacing(
+            context,
+            mobile: 12,
+            tablet: 16,
+            desktop: 20,
+          ),
         ),
-      ),
-      color: isCompleted
-          ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.5)
-          : null,
-      child: Opacity(
-        opacity: isCompleted ? 0.7 : 1.0,
-        child: ResponsiveWidgets.responsiveContainer(
-          context,
+        child: Opacity(
+          opacity: isCompleted ? 0.8 : 1.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -86,6 +104,15 @@ class _TaskCard extends StatelessWidget {
                 ),
               ],
 
+              // Task dates
+              ResponsiveWidgets.verticalSpace(
+                context,
+                mobile: 8,
+                tablet: 10,
+                desktop: 12,
+              ),
+              _buildTaskDates(context),
+
               ResponsiveWidgets.verticalSpace(
                 context,
                 mobile: 12,
@@ -123,18 +150,14 @@ class _TaskCard extends StatelessWidget {
           value: 'star',
           child: Row(
             children: [
-              Icon(
-                task.isStarred ? Icons.star_border : Icons.star,
-              ),
+              Icon(task.isStarred ? Icons.star_border : Icons.star),
               ResponsiveWidgets.horizontalSpace(
                 context,
                 mobile: 8,
                 tablet: 10,
                 desktop: 12,
               ),
-              Text(
-                task.isStarred ? l10n.unstarTask : l10n.starTask,
-              ),
+              Text(task.isStarred ? l10n.unstarTask : l10n.starTask),
             ],
           ),
         ),
@@ -149,15 +172,115 @@ class _TaskCard extends StatelessWidget {
                 tablet: 10,
                 desktop: 12,
               ),
-              Text(
-                l10n.delete,
-                style: const TextStyle(color: AppColors.error),
-              ),
+              Text(l10n.delete, style: const TextStyle(color: AppColors.error)),
             ],
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildTaskDates(BuildContext context) {
+    return Row(
+      children: [
+        // Created date
+        ...[
+          Icon(
+            Icons.schedule,
+            size: Responsive.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 18,
+              desktop: 20,
+            ),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+          ResponsiveWidgets.horizontalSpace(
+            context,
+            mobile: 4,
+            tablet: 6,
+            desktop: 8,
+          ),
+          ResponsiveWidgets.responsiveText(
+            context,
+            text: _formatDate(task.createdAt),
+            mobileFontSize: 12,
+            tabletFontSize: 13,
+            desktopFontSize: 14,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+
+        // Due date
+        if (task.dueDate != null) ...[
+          ResponsiveWidgets.horizontalSpace(
+            context,
+            mobile: 16,
+            tablet: 20,
+            desktop: 24,
+          ),
+          Icon(
+            Icons.event,
+            size: Responsive.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 18,
+              desktop: 20,
+            ),
+            color: task.dueDate!.isBefore(DateTime.now())
+                ? AppColors.error
+                : Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+          ResponsiveWidgets.horizontalSpace(
+            context,
+            mobile: 4,
+            tablet: 6,
+            desktop: 8,
+          ),
+          ResponsiveWidgets.responsiveText(
+            context,
+            text: _formatDate(task.dueDate!),
+            mobileFontSize: 12,
+            tabletFontSize: 13,
+            desktopFontSize: 14,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: task.dueDate!.isBefore(DateTime.now())
+                  ? AppColors.error
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final tomorrow = today.add(const Duration(days: 1));
+    final taskDate = DateTime(date.year, date.month, date.day);
+
+    if (taskDate == today) {
+      return 'Bugün';
+    } else if (taskDate == yesterday) {
+      return 'Dün';
+    } else if (taskDate == tomorrow) {
+      return 'Yarın';
+    } else {
+      // Diğer tarihler için normal format
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 
   Widget _buildTaskChips(BuildContext context) {
@@ -243,14 +366,15 @@ class _TaskCard extends StatelessWidget {
     return Chip(
       label: Text(label),
       backgroundColor: color.withValues(alpha: 0.2),
-      labelStyle: ResponsiveWidgets.responsiveText(
-        context,
-        text: '',
-        mobileFontSize: 12,
-        tabletFontSize: 13,
-        desktopFontSize: 14,
-        style: TextStyle(color: color),
-      ).style,
+      labelStyle: TextStyle(
+        color: color,
+        fontSize: Responsive.getResponsiveFontSize(
+          context,
+          mobile: 12,
+          tablet: 13,
+          desktop: 14,
+        ),
+      ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }

@@ -1,7 +1,7 @@
-part of 'home_page.dart';
+part of 'app_scaffold.dart';
 
 /// Drawer header component
-class _DrawerHeader {
+class _AppScaffoldDrawerHeader {
   static Widget build(
     BuildContext context,
     AppLocalizations l10n,
@@ -31,14 +31,12 @@ class _DrawerHeader {
 }
 
 /// User profile section component
-class _UserProfileSection {
+class _AppScaffoldUserProfileSection {
   static Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.primary.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Row(
@@ -59,24 +57,19 @@ class _UserProfileSection {
               children: [
                 Text(
                   'Kullanıcı',
-                  style: Theme.of(context).textTheme.titleLarge
-                      ?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   'Voice Todo App',
-                  style: Theme.of(context).textTheme.bodyMedium
-                      ?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onPrimaryContainer
-                            .withValues(alpha: 0.7),
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                  ),
                 ),
               ],
             ),
@@ -88,7 +81,7 @@ class _UserProfileSection {
 }
 
 /// Menu tile component
-class _MenuTile {
+class _AppScaffoldMenuTile {
   static Widget buildAnimated({
     required BuildContext context,
     required IconData icon,
@@ -166,7 +159,7 @@ class _MenuTile {
 }
 
 /// Logout button component
-class _LogoutButton {
+class _AppScaffoldLogoutButton {
   static Widget build(
     BuildContext context,
     AppLocalizations l10n,
@@ -187,12 +180,8 @@ class _LogoutButton {
         icon: const Icon(Icons.logout),
         label: Text(l10n.logout),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.error,
-          foregroundColor: Theme.of(
-            context,
-          ).colorScheme.onError,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          foregroundColor: Theme.of(context).colorScheme.onError,
           padding: EdgeInsets.symmetric(vertical: 16.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
