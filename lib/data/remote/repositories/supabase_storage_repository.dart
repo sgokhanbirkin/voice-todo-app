@@ -1,9 +1,10 @@
 import 'dart:io';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as path;
-import '../../../core/result.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/errors.dart';
+import '../../../core/result.dart';
 
 /// Supabase storage repository for audio files
 class SupabaseStorageRepository {
@@ -25,17 +26,17 @@ class SupabaseStorageRepository {
 
       // Generate unique filename
       final fileName =
-          '${DateTime.now().millisecondsSinceEpoch}_${path.basename(localFilePath)}';
+          '${DateTime.now().millisecondsSinceEpoch}_${localFilePath.split('/').last}';
       final filePath = 'tasks/$fileName';
 
       debugPrint('SupabaseStorageRepository: Generated file path: $filePath');
 
       // Upload file to Supabase Storage
-      final response = await _supabase.storage
+      await _supabase.storage
           .from(_audioBucket)
           .upload(filePath, file);
 
-      debugPrint('SupabaseStorageRepository: Upload response: $response');
+      debugPrint('SupabaseStorageRepository: File uploaded successfully');
 
       // Get public URL
       final publicUrl = _supabase.storage
@@ -59,13 +60,13 @@ class SupabaseStorageRepository {
     try {
       debugPrint('SupabaseStorageRepository: Downloading audio: $storagePath');
 
-      final response = await _supabase.storage
+      final fileBytes = await _supabase.storage
           .from(_audioBucket)
           .download(storagePath);
 
       // Save to local file
       final file = File(localPath);
-      await file.writeAsBytes(response);
+      await file.writeAsBytes(fileBytes);
 
       debugPrint('SupabaseStorageRepository: Downloaded to: $localPath');
       return AppResult.success(localPath);

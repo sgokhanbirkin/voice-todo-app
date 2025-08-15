@@ -16,7 +16,7 @@ class ConnectivityService {
       // First check if device has network connectivity
       final connectivityResult = await _connectivity.checkConnectivity();
 
-      if (connectivityResult == ConnectivityResult.none) {
+      if (connectivityResult.contains(ConnectivityResult.none)) {
         debugPrint('ConnectivityService: No network connectivity');
         return false;
       }
@@ -29,7 +29,7 @@ class ConnectivityService {
 
         debugPrint('ConnectivityService: Internet check result: $hasInternet');
         return hasInternet;
-      } on SocketException catch (_) {
+      } on SocketException {
         debugPrint('ConnectivityService: Socket exception - no internet');
         return false;
       }
