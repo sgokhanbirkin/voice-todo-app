@@ -24,10 +24,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get tasks => 'Görevler';
 
   @override
-  String get completed => 'Tamamlanan';
+  String get completed => 'Tamamlandı';
 
   @override
-  String get pending => 'Bekleyen';
+  String get pending => 'Bekliyor';
 
   @override
   String get recordVoice => 'Ses Kaydet';
@@ -127,7 +127,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sortByDate => 'Tarih';
 
   @override
-  String get sortByPriority => 'Öncelik';
+  String get sortByPriority => 'Önceliğe Göre';
 
   @override
   String get sortByTitle => 'Başlık';
@@ -341,4 +341,166 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get recordingQuality => 'Kayıt Kalitesi';
+
+  @override
+  String get taskCreatedSuccessfully => 'Görev başarıyla oluşturuldu!';
+
+  @override
+  String get taskTitleHint => 'Görev başlığını girin...';
+
+  @override
+  String get taskDescriptionHint =>
+      'Görev açıklamasını girin (isteğe bağlı)...';
+
+  @override
+  String get selectDueDateHint => 'Bitiş tarihini seçin (isteğe bağlı)';
+
+  @override
+  String get recordingInProgress => 'Kayıt devam ediyor...';
+
+  @override
+  String get audioRecordedSuccessfully => 'Ses başarıyla kaydedildi';
+
+  @override
+  String get failedToStartRecording => 'Kayıt başlatılamadı';
+
+  @override
+  String get failedToStopRecording => 'Kayıt durdurulamadı';
+
+  @override
+  String get failedToPlayAudio => 'Ses oynatılamadı';
+
+  @override
+  String get failedToPauseAudio => 'Ses duraklatılamadı';
+
+  @override
+  String get failedToCreateTask => 'Görev oluşturulamadı';
+
+  @override
+  String get filter => 'Filtrele';
+
+  @override
+  String get filtersActive => 'Filtreler Aktif';
+
+  @override
+  String get clearAllFilters => 'Tüm Filtreleri Temizle';
+
+  @override
+  String get filtering => 'Filtreleme';
+
+  @override
+  String get sorting => 'Sıralama';
+
+  @override
+  String get audioFilter => 'Ses Kaydı Var';
+
+  @override
+  String get completedFilter => 'Tamamlanan';
+
+  @override
+  String get pendingFilter => 'Bekleyen';
+
+  @override
+  String get overdueFilter => 'Gecikmiş';
+
+  @override
+  String get sortByDateAscending => 'Tarihe Göre (Eski → Yeni)';
+
+  @override
+  String get sortByDateDescending => 'Tarihe Göre (Yeni → Eski)';
+
+  @override
+  String get sortByAlphabetical => 'Alfabetik';
+
+  @override
+  String get taskNotFound => 'Görev Bulunamadı';
+
+  @override
+  String get taskNotFoundDescription => 'İstenen görev bulunamadı';
+
+  @override
+  String get goBack => 'Geri Dön';
+
+  @override
+  String get task => 'Görev';
+
+  @override
+  String get title => 'Başlık';
+
+  @override
+  String get titleRequired => 'Başlık gerekli';
+
+  @override
+  String get description => 'Açıklama (Opsiyonel)';
+
+  @override
+  String get priority => 'Öncelik';
+
+  @override
+  String get status => 'Durum';
+
+  @override
+  String get createdAt => 'Oluşturulma';
+
+  @override
+  String get dueDate => 'Bitiş Tarihi';
+
+  @override
+  String get audioRecording => 'Ses Kaydı';
+
+  @override
+  String get audioFileAvailable => 'Ses dosyası mevcut';
+
+  @override
+  String get selectDate => 'Tarih seçin';
+
+  @override
+  String get clear => 'Temizle';
+
+  @override
+  String get undo => 'Geri Al';
+
+  @override
+  String get complete => 'Tamamla';
+
+  @override
+  String get high => 'Yüksek';
+
+  @override
+  String get medium => 'Orta';
+
+  @override
+  String get low => 'Düşük';
+
+  @override
+  String get taskDelete => 'Görevi Sil';
+
+  @override
+  String get taskDeleteConfirmation =>
+      'Bu görevi silmek istediğinizden emin misiniz?';
+
+  @override
+  String get taskLoadError => 'Görev yüklenirken hata oluştu';
+
+  @override
+  String get taskUpdateError => 'Görev güncellenirken hata oluştu';
+
+  @override
+  String get taskStatusUpdateError => 'Görev durumu güncellenirken hata oluştu';
+
+  @override
+  String get taskStarUpdateError =>
+      'Görev yıldız durumu güncellenirken hata oluştu';
+
+  @override
+  String get taskDeleteError => 'Görev silinirken hata oluştu';
+
+  @override
+  String get taskUpdatedSuccessfully => 'Görev başarıyla güncellendi!';
+
+  @override
+  String get today => 'Bugün';
+
+  @override
+  String get yesterday => 'Dün';
 }

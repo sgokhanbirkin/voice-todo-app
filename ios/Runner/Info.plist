@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Voice tasks için ses kaydı gerekir.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Voice commands için konuşma tanıma gerekir.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Voice commands için konuşma tanıma gerekir.</string>
 </dict>
 </plist>

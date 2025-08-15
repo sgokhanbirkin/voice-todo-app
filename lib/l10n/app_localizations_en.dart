@@ -340,4 +340,164 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordingQuality => 'Recording Quality';
+
+  @override
+  String get taskCreatedSuccessfully => 'Task created successfully!';
+
+  @override
+  String get taskTitleHint => 'Enter task title...';
+
+  @override
+  String get taskDescriptionHint => 'Enter task description (optional)...';
+
+  @override
+  String get selectDueDateHint => 'Select due date (optional)';
+
+  @override
+  String get recordingInProgress => 'Recording in progress...';
+
+  @override
+  String get audioRecordedSuccessfully => 'Audio recorded successfully';
+
+  @override
+  String get failedToStartRecording => 'Failed to start recording';
+
+  @override
+  String get failedToStopRecording => 'Failed to stop recording';
+
+  @override
+  String get failedToPlayAudio => 'Failed to play audio';
+
+  @override
+  String get failedToPauseAudio => 'Failed to pause audio';
+
+  @override
+  String get failedToCreateTask => 'Failed to create task';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get filtersActive => 'Filters Active';
+
+  @override
+  String get clearAllFilters => 'Clear All Filters';
+
+  @override
+  String get filtering => 'Filtering';
+
+  @override
+  String get sorting => 'Sorting';
+
+  @override
+  String get audioFilter => 'Has Audio';
+
+  @override
+  String get completedFilter => 'Completed';
+
+  @override
+  String get pendingFilter => 'Pending';
+
+  @override
+  String get overdueFilter => 'Overdue';
+
+  @override
+  String get sortByDateAscending => 'Date (Old → New)';
+
+  @override
+  String get sortByDateDescending => 'Date (New → Old)';
+
+  @override
+  String get sortByAlphabetical => 'Alphabetical';
+
+  @override
+  String get taskNotFound => 'Task Not Found';
+
+  @override
+  String get taskNotFoundDescription => 'The requested task could not be found';
+
+  @override
+  String get goBack => 'Go Back';
+
+  @override
+  String get task => 'Task';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get titleRequired => 'Title is required';
+
+  @override
+  String get description => 'Description (Optional)';
+
+  @override
+  String get priority => 'Priority';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get createdAt => 'Created';
+
+  @override
+  String get dueDate => 'Due Date';
+
+  @override
+  String get audioRecording => 'Audio Recording';
+
+  @override
+  String get audioFileAvailable => 'Audio file available';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get high => 'High';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get low => 'Low';
+
+  @override
+  String get taskDelete => 'Delete Task';
+
+  @override
+  String get taskDeleteConfirmation =>
+      'Are you sure you want to delete this task?';
+
+  @override
+  String get taskLoadError => 'Error loading task';
+
+  @override
+  String get taskUpdateError => 'Error updating task';
+
+  @override
+  String get taskStatusUpdateError => 'Error updating task status';
+
+  @override
+  String get taskStarUpdateError => 'Error updating task star status';
+
+  @override
+  String get taskDeleteError => 'Error deleting task';
+
+  @override
+  String get taskUpdatedSuccessfully => 'Task updated successfully!';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
 }

@@ -6,7 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'data/remote/supabase_service.dart';
 import 'core/logger.dart';
 import 'core/router/app_router.dart';
-import 'core/database/hive_database.dart';
+import 'data/local/hive_database_manager.dart';
 import 'core/bindings/app_bindings.dart';
 import 'product/theme/app_theme.dart';
 import 'product/localization/locale_controller.dart';
@@ -26,12 +26,33 @@ void main() async {
     Logger.instance.error('Failed to initialize Supabase in main: $e');
   }
 
-  // Initialize Hive Database
+  // Initialize Hive Database Manager
   try {
-    await HiveDatabase.instance.initialize();
-    Logger.instance.info('Hive database initialized successfully in main');
+    await HiveDatabaseManager.instance.initialize();
+    Logger.instance.info(
+      'Hive database manager initialized successfully in main',
+    );
   } catch (e) {
-    Logger.instance.error('Failed to initialize Hive database in main: $e');
+    Logger.instance.error(
+      'Failed to initialize Hive database manager in main: $e',
+    );
+
+    // If it's a TypeId error, try to force clear and reinitialize
+    if (e.toString().contains('unknown typeId')) {
+      Logger.instance.warning('Attempting to force clear database...');
+      try {
+        await HiveDatabaseManager.instance.deleteAll();
+        await HiveDatabaseManager.instance.initialize();
+        Logger.instance.info(
+          'Hive database manager reinitialized successfully after clearing',
+        );
+      } catch (clearError) {
+        Logger.instance.error(
+          'Failed to clear and reinitialize database manager: $clearError',
+        );
+        // Continue with app initialization even if database fails
+      }
+    }
   }
 
   // Initialize GetX bindings

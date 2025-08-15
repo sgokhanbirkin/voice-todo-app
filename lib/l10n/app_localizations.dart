@@ -757,6 +757,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recording Quality'**
   String get recordingQuality;
+
+  /// No description provided for @taskCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Task created successfully!'**
+  String get taskCreatedSuccessfully;
+
+  /// No description provided for @taskTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter task title...'**
+  String get taskTitleHint;
+
+  /// No description provided for @taskDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter task description (optional)...'**
+  String get taskDescriptionHint;
+
+  /// No description provided for @selectDueDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select due date (optional)'**
+  String get selectDueDateHint;
+
+  /// No description provided for @recordingInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording in progress...'**
+  String get recordingInProgress;
+
+  /// No description provided for @audioRecordedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio recorded successfully'**
+  String get audioRecordedSuccessfully;
+
+  /// No description provided for @failedToStartRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to start recording'**
+  String get failedToStartRecording;
+
+  /// No description provided for @failedToStopRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to stop recording'**
+  String get failedToStopRecording;
+
+  /// No description provided for @failedToPlayAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to play audio'**
+  String get failedToPlayAudio;
+
+  /// No description provided for @failedToPauseAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pause audio'**
+  String get failedToPauseAudio;
+
+  /// No description provided for @failedToCreateTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create task'**
+  String get failedToCreateTask;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @filtersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters Active'**
+  String get filtersActive;
+
+  /// No description provided for @clearAllFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Filters'**
+  String get clearAllFilters;
+
+  /// No description provided for @filtering.
+  ///
+  /// In en, this message translates to:
+  /// **'Filtering'**
+  String get filtering;
+
+  /// No description provided for @sorting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorting'**
+  String get sorting;
+
+  /// No description provided for @audioFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Has Audio'**
+  String get audioFilter;
+
+  /// No description provided for @completedFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedFilter;
+
+  /// No description provided for @pendingFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pendingFilter;
+
+  /// No description provided for @overdueFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdueFilter;
+
+  /// No description provided for @sortByDateAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (Old → New)'**
+  String get sortByDateAscending;
+
+  /// No description provided for @sortByDateDescending.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (New → Old)'**
+  String get sortByDateDescending;
+
+  /// No description provided for @sortByAlphabetical.
+  ///
+  /// In en, this message translates to:
+  /// **'Alphabetical'**
+  String get sortByAlphabetical;
+
+  /// No description provided for @taskNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Not Found'**
+  String get taskNotFound;
+
+  /// No description provided for @taskNotFoundDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The requested task could not be found'**
+  String get taskNotFoundDescription;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// No description provided for @task.
+  ///
+  /// In en, this message translates to:
+  /// **'Task'**
+  String get task;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @titleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get titleRequired;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (Optional)'**
+  String get description;
+
+  /// No description provided for @priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get priority;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @createdAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get createdAt;
+
+  /// No description provided for @dueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Date'**
+  String get dueDate;
+
+  /// No description provided for @audioRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Recording'**
+  String get audioRecording;
+
+  /// No description provided for @audioFileAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio file available'**
+  String get audioFileAvailable;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// No description provided for @high.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get high;
+
+  /// No description provided for @medium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get medium;
+
+  /// No description provided for @low.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get low;
+
+  /// No description provided for @taskDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Task'**
+  String get taskDelete;
+
+  /// No description provided for @taskDeleteConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this task?'**
+  String get taskDeleteConfirmation;
+
+  /// No description provided for @taskLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading task'**
+  String get taskLoadError;
+
+  /// No description provided for @taskUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating task'**
+  String get taskUpdateError;
+
+  /// No description provided for @taskStatusUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating task status'**
+  String get taskStatusUpdateError;
+
+  /// No description provided for @taskStarUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating task star status'**
+  String get taskStarUpdateError;
+
+  /// No description provided for @taskDeleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting task'**
+  String get taskDeleteError;
+
+  /// No description provided for @taskUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Task updated successfully!'**
+  String get taskUpdatedSuccessfully;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
 }
 
 class _AppLocalizationsDelegate

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:voice_todo/features/todos/presentation/pages/add_task/add_task_page.dart';
 import 'package:voice_todo/features/todos/presentation/pages/home/home_page.dart';
-import 'package:voice_todo/features/todos/presentation/pages/settings/settings_page.dart';
+import 'package:voice_todo/features/settings/presentation/pages/settings_page.dart';
+import 'package:voice_todo/features/todos/presentation/pages/task_detail/task_detail_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../data/remote/supabase_service.dart';
@@ -40,6 +41,14 @@ class AppRouter {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/task-detail/:taskId',
+        name: 'task-detail',
+        builder: (context, state) {
+          final taskId = state.pathParameters['taskId']!;
+          return TaskDetailPage(taskId: taskId);
+        },
       ),
     ],
     errorBuilder: (context, state) => _buildErrorPage(context, state),
