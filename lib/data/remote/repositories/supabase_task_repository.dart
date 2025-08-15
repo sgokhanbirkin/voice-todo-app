@@ -87,7 +87,9 @@ class SupabaseTaskRepository implements ITaskRepository {
         query = query.contains('tags', tags);
       }
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {
-        query = query.or('title.ilike.%$searchQuery%,description.ilike.%$searchQuery%');
+        query = query.or(
+          'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%',
+        );
       }
 
       // Apply sorting
@@ -340,7 +342,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  // TODO: Implement remaining methods for full sync
   @override
   Future<AppResult<TaskEntity>> uncompleteTask(String id) async {
     try {
@@ -348,10 +349,7 @@ class SupabaseTaskRepository implements ITaskRepository {
 
       final response = await _supabase
           .from('tasks')
-          .update({
-            'status': 'pending',
-            'completed_at': null,
-          })
+          .update({'status': 'pending', 'completed_at': null})
           .eq('id', id)
           .select()
           .single();
@@ -365,7 +363,9 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(uncompletedTask);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error uncompleting task: $e');
-      return AppResult.failure(DatabaseFailure('Failed to uncomplete task: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to uncomplete task: $e'),
+      );
     }
   }
 
@@ -500,14 +500,18 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(updatedTask);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error adding audio to task: $e');
-      return AppResult.failure(DatabaseFailure('Failed to add audio to task: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to add audio to task: $e'),
+      );
     }
   }
 
   @override
   Future<AppResult<TaskEntity>> removeAudioFromTask(String id) async {
     try {
-      debugPrint('SupabaseTaskRepository: removeAudioFromTask called for id: $id');
+      debugPrint(
+        'SupabaseTaskRepository: removeAudioFromTask called for id: $id',
+      );
 
       final response = await _supabase
           .from('tasks')
@@ -529,7 +533,9 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(updatedTask);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error removing audio from task: $e');
-      return AppResult.failure(DatabaseFailure('Failed to remove audio from task: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to remove audio from task: $e'),
+      );
     }
   }
 
@@ -555,7 +561,7 @@ class SupabaseTaskRepository implements ITaskRepository {
           parentTaskId: parentId,
           userId: subtask.userId,
         );
-        
+
         final result = await createTask(subtaskWithParent);
         if (result.isSuccess) {
           createdSubtasks.add(result.dataOrNull!);
@@ -574,9 +580,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       return parentTaskResult;
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error adding subtasks: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to add subtasks: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to add subtasks: $e'));
     }
   }
 
@@ -698,7 +702,9 @@ class SupabaseTaskRepository implements ITaskRepository {
   @override
   Future<AppResult<List<TaskEntity>>> getTasksDueSoon(int days) async {
     try {
-      debugPrint('SupabaseTaskRepository: getTasksDueSoon called for $days days');
+      debugPrint(
+        'SupabaseTaskRepository: getTasksDueSoon called for $days days',
+      );
 
       final now = DateTime.now();
       final endDate = now.add(Duration(days: days));
@@ -740,7 +746,9 @@ class SupabaseTaskRepository implements ITaskRepository {
   @override
   Future<AppResult<List<TaskEntity>>> getTasksByTags(List<String> tags) async {
     try {
-      debugPrint('SupabaseTaskRepository: getTasksByTags called for tags: $tags');
+      debugPrint(
+        'SupabaseTaskRepository: getTasksByTags called for tags: $tags',
+      );
 
       if (tags.isEmpty) {
         return AppResult.success([]);
@@ -781,7 +789,9 @@ class SupabaseTaskRepository implements ITaskRepository {
   @override
   Future<AppResult<List<TaskEntity>>> searchTasks(String query) async {
     try {
-      debugPrint('SupabaseTaskRepository: searchTasks called for query: $query');
+      debugPrint(
+        'SupabaseTaskRepository: searchTasks called for query: $query',
+      );
 
       if (query.trim().isEmpty) {
         return AppResult.success([]);
@@ -813,9 +823,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(tasks);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error searching tasks: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to search tasks: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to search tasks: $e'));
     }
   }
 
@@ -831,59 +839,85 @@ class SupabaseTaskRepository implements ITaskRepository {
       }
 
       final tasks = tasksResult.dataOrNull!;
-      
+
       // Calculate statistics
       final totalTasks = tasks.length;
-      final completedTasks = tasks.where((task) => task.status == TaskStatus.completed).length;
-      final pendingTasks = tasks.where((task) => task.status == TaskStatus.pending).length;
-      final overdueTasks = tasks.where((task) => 
-        task.dueDate != null && 
-        task.dueDate!.isBefore(DateTime.now()) && 
-        task.status != TaskStatus.completed
-      ).length;
-      
+      final completedTasks = tasks
+          .where((task) => task.status == TaskStatus.completed)
+          .length;
+      final pendingTasks = tasks
+          .where((task) => task.status == TaskStatus.pending)
+          .length;
+      final overdueTasks = tasks
+          .where(
+            (task) =>
+                task.dueDate != null &&
+                task.dueDate!.isBefore(DateTime.now()) &&
+                task.status != TaskStatus.completed,
+          )
+          .length;
+
       // Priority-based statistics
-      final highPriorityTasks = tasks.where((task) => task.priority == TaskPriority.high).length;
-      final mediumPriorityTasks = tasks.where((task) => task.priority == TaskPriority.medium).length;
-      final lowPriorityTasks = tasks.where((task) => task.priority == TaskPriority.low).length;
-      
+      final highPriorityTasks = tasks
+          .where((task) => task.priority == TaskPriority.high)
+          .length;
+      final mediumPriorityTasks = tasks
+          .where((task) => task.priority == TaskPriority.medium)
+          .length;
+      final lowPriorityTasks = tasks
+          .where((task) => task.priority == TaskPriority.low)
+          .length;
+
       // Status-based statistics
       final starredTasks = tasks.where((task) => task.isStarred).length;
       final archivedTasks = tasks.where((task) => task.isArchived).length;
-      
+
       // Due today tasks
       final now = DateTime.now();
       final startOfDay = DateTime(now.year, now.month, now.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
-      final dueTodayTasks = tasks.where((task) => 
-        task.dueDate != null && 
-        task.dueDate!.isAfter(startOfDay) && 
-        task.dueDate!.isBefore(endOfDay)
-      ).length;
-      
+      final dueTodayTasks = tasks
+          .where(
+            (task) =>
+                task.dueDate != null &&
+                task.dueDate!.isAfter(startOfDay) &&
+                task.dueDate!.isBefore(endOfDay),
+          )
+          .length;
+
       // Time-based statistics
-      final completedThisWeek = tasks.where((task) => 
-        task.status == TaskStatus.completed && 
-        task.completedAt != null &&
-        task.completedAt!.isAfter(now.subtract(const Duration(days: 7)))
-      ).length;
-      
-      final completedThisMonth = tasks.where((task) => 
-        task.status == TaskStatus.completed && 
-        task.completedAt != null &&
-        task.completedAt!.isAfter(DateTime(now.year, now.month, 1))
-      ).length;
-      
+      final completedThisWeek = tasks
+          .where(
+            (task) =>
+                task.status == TaskStatus.completed &&
+                task.completedAt != null &&
+                task.completedAt!.isAfter(
+                  now.subtract(const Duration(days: 7)),
+                ),
+          )
+          .length;
+
+      final completedThisMonth = tasks
+          .where(
+            (task) =>
+                task.status == TaskStatus.completed &&
+                task.completedAt != null &&
+                task.completedAt!.isAfter(DateTime(now.year, now.month, 1)),
+          )
+          .length;
+
       // Calculate average completion time (simplified)
-      final completedTasksWithDate = tasks.where((task) => 
-        task.status == TaskStatus.completed && 
-        task.completedAt != null
-      ).toList();
-      
+      final completedTasksWithDate = tasks
+          .where(
+            (task) =>
+                task.status == TaskStatus.completed && task.completedAt != null,
+          )
+          .toList();
+
       double averageCompletionTime = 0.0;
       if (completedTasksWithDate.isNotEmpty) {
         final totalDays = completedTasksWithDate.fold<int>(0, (sum, task) {
-          if (task.completedAt != null && task.createdAt != null) {
+          if (task.completedAt != null) {
             return sum + task.completedAt!.difference(task.createdAt).inDays;
           }
           return sum;
@@ -953,7 +987,9 @@ class SupabaseTaskRepository implements ITaskRepository {
       );
       return AppResult.success(tasks);
     } catch (e) {
-      debugPrint('SupabaseTaskRepository: Error getting tasks by sync status: $e');
+      debugPrint(
+        'SupabaseTaskRepository: Error getting tasks by sync status: $e',
+      );
       return AppResult.failure(
         DatabaseFailure('Failed to get tasks by sync status: $e'),
       );
@@ -1003,14 +1039,15 @@ class SupabaseTaskRepository implements ITaskRepository {
       );
       return const AppResult.success(null);
     } catch (e) {
-      debugPrint('SupabaseTaskRepository: Error marking task as sync failed: $e');
+      debugPrint(
+        'SupabaseTaskRepository: Error marking task as sync failed: $e',
+      );
       return AppResult.failure(
         DatabaseFailure('Failed to mark task as sync failed: $e'),
       );
     }
   }
 
-  @override
   Future<AppResult<void>> clearCompletedTasks() async {
     try {
       debugPrint('SupabaseTaskRepository: clearCompletedTasks called');
@@ -1034,7 +1071,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  @override
   Future<AppResult<void>> clearArchivedTasks() async {
     try {
       debugPrint('SupabaseTaskRepository: clearArchivedTasks called');
@@ -1046,9 +1082,7 @@ class SupabaseTaskRepository implements ITaskRepository {
 
       debugPrint('SupabaseTaskRepository: Clear archived response: $response');
 
-      debugPrint(
-        'SupabaseTaskRepository: Successfully cleared archived tasks',
-      );
+      debugPrint('SupabaseTaskRepository: Successfully cleared archived tasks');
       return const AppResult.success(null);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error clearing archived tasks: $e');
@@ -1061,7 +1095,9 @@ class SupabaseTaskRepository implements ITaskRepository {
   @override
   Future<AppResult<String>> exportTasks(String format) async {
     try {
-      debugPrint('SupabaseTaskRepository: exportTasks called for format: $format');
+      debugPrint(
+        'SupabaseTaskRepository: exportTasks called for format: $format',
+      );
 
       // Get all tasks for export
       final tasksResult = await getAllTasks();
@@ -1078,10 +1114,14 @@ class SupabaseTaskRepository implements ITaskRepository {
           break;
         case 'csv':
           // Simple CSV export
-          final csvHeader = 'Title,Description,Priority,Status,Due Date,Created At\n';
-          final csvRows = tasks.map((task) => 
-            '${task.title},${task.description ?? ""},${task.priority.name},${task.status.name},${task.dueDate?.toIso8601String() ?? ""},${task.createdAt.toIso8601String()}'
-          ).join('\n');
+          final csvHeader =
+              'Title,Description,Priority,Status,Due Date,Created At\n';
+          final csvRows = tasks
+              .map(
+                (task) =>
+                    '${task.title},${task.description ?? ""},${task.priority.name},${task.status.name},${task.dueDate?.toIso8601String() ?? ""},${task.createdAt.toIso8601String()}',
+              )
+              .join('\n');
           exportData = csvHeader + csvRows;
           break;
         default:
@@ -1096,9 +1136,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(exportData);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error exporting tasks: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to export tasks: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to export tasks: $e'));
     }
   }
 
@@ -1108,7 +1146,9 @@ class SupabaseTaskRepository implements ITaskRepository {
     String format,
   ) async {
     try {
-      debugPrint('SupabaseTaskRepository: importTasks called for format: $format');
+      debugPrint(
+        'SupabaseTaskRepository: importTasks called for format: $format',
+      );
 
       List<TaskEntity> tasks = [];
 
@@ -1131,7 +1171,7 @@ class SupabaseTaskRepository implements ITaskRepository {
               DatabaseFailure('Invalid CSV format: insufficient data'),
             );
           }
-          
+
           for (int i = 1; i < lines.length; i++) {
             final line = lines[i].trim();
             if (line.isNotEmpty) {
@@ -1149,11 +1189,15 @@ class SupabaseTaskRepository implements ITaskRepository {
                       (s) => s.name == values[3],
                       orElse: () => TaskStatus.pending,
                     ),
-                    dueDate: values[4].isEmpty ? null : DateTime.parse(values[4]),
+                    dueDate: values[4].isEmpty
+                        ? null
+                        : DateTime.parse(values[4]),
                   );
                   tasks.add(task);
                 } catch (e) {
-                  debugPrint('SupabaseTaskRepository: Failed to parse CSV line $i: $e');
+                  debugPrint(
+                    'SupabaseTaskRepository: Failed to parse CSV line $i: $e',
+                  );
                 }
               }
             }
@@ -1186,13 +1230,10 @@ class SupabaseTaskRepository implements ITaskRepository {
       return AppResult.success(createdTasks);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error importing tasks: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to import tasks: $e'),
-      );
-      }
+      return AppResult.failure(DatabaseFailure('Failed to import tasks: $e'));
     }
+  }
 
-  @override
   Future<AppResult<void>> bulkUpdateTasks(List<TaskEntity> tasks) async {
     try {
       debugPrint(
@@ -1223,7 +1264,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  @override
   Future<AppResult<void>> bulkDeleteTasks(List<String> taskIds) async {
     try {
       debugPrint(
@@ -1253,7 +1293,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  @override
   Future<AppResult<void>> syncWithRemote() async {
     try {
       debugPrint('SupabaseTaskRepository: syncWithRemote called');
@@ -1286,7 +1325,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  @override
   Future<AppResult<void>> clearLocalData() async {
     try {
       debugPrint('SupabaseTaskRepository: clearLocalData called');
@@ -1294,7 +1332,9 @@ class SupabaseTaskRepository implements ITaskRepository {
       // This is a remote repository, so we clear remote data
       final response = await _supabase.from('tasks').delete().neq('id', '');
 
-      debugPrint('SupabaseTaskRepository: Clear local data response: $response');
+      debugPrint(
+        'SupabaseTaskRepository: Clear local data response: $response',
+      );
 
       debugPrint(
         'SupabaseTaskRepository: Successfully cleared all remote task data',
@@ -1308,7 +1348,6 @@ class SupabaseTaskRepository implements ITaskRepository {
     }
   }
 
-  @override
   Future<AppResult<void>> backupData() async {
     try {
       debugPrint('SupabaseTaskRepository: backupData called');
@@ -1329,16 +1368,14 @@ class SupabaseTaskRepository implements ITaskRepository {
       debugPrint(
         'SupabaseTaskRepository: Successfully backed up ${tasks.length} tasks',
       );
+      debugPrint('SupabaseTaskRepository: Backup data: $backupData');
       return const AppResult.success(null);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error backing up data: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to backup data: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to backup data: $e'));
     }
   }
 
-  @override
   Future<AppResult<void>> restoreData() async {
     try {
       debugPrint('SupabaseTaskRepository: restoreData called');
@@ -1351,9 +1388,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       return const AppResult.success(null);
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error restoring data: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to restore data: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to restore data: $e'));
     }
   }
 
@@ -1366,9 +1401,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       return await syncWithRemote();
     } catch (e) {
       debugPrint('SupabaseTaskRepository: Error syncing tasks: $e');
-      return AppResult.failure(
-        DatabaseFailure('Failed to sync tasks: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to sync tasks: $e'));
     }
   }
 }
