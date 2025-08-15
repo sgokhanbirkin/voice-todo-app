@@ -68,8 +68,3 @@ class Logger {
     }
   }
 }
-
-// TODO: Integrate with proper logging framework (e.g., logger package)
-// TODO: Add log file output
-// TODO: Add remote logging capabilities
-// TODO: Add log filtering and formatting options
