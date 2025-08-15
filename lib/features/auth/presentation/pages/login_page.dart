@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (result.isSuccess) {
         Logger.instance.info('Login successful: ${result.dataOrNull?.email}');
-        if (context.mounted) {
+        if (mounted) {
           context.go('/home'); // Navigate to home and clear stack
         }
       } else {
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -224,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),

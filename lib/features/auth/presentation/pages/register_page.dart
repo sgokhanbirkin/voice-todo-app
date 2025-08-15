@@ -56,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Logger.instance.info(
           'Registration successful: ${_emailController.text.trim()}',
         );
-        if (context.mounted) {
+        if (mounted) {
           context.go('/home'); // Navigate to home and clear stack
         }
       } else {
