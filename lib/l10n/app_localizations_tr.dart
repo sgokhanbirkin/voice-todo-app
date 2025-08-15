@@ -307,6 +307,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get taskCompletion => 'Görev Tamamlama';
 
   @override
+  String get syncStatus => 'Senkronizasyon Durumu';
+
+  @override
+  String get syncNow => 'Şimdi Senkronize Et';
+
+  @override
+  String get lastSync => 'Son senkronizasyon';
+
+  @override
+  String get justNow => 'Az önce';
+
+  @override
+  String get minutesAgo => 'dakika önce';
+
+  @override
+  String get hoursAgo => 'saat önce';
+
+  @override
+  String get daysAgo => 'gün önce';
+
+  @override
+  String get audio => 'Ses';
+
+  @override
+  String get taskDeletes => 'Görev Silmeleri';
+
+  @override
+  String get audioDeletes => 'Ses Silmeleri';
+
+  @override
   String get productivity => 'Verimlilik';
 
   @override

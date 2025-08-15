@@ -306,6 +306,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taskCompletion => 'Task Completion';
 
   @override
+  String get syncStatus => 'Sync Status';
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get lastSync => 'Last sync';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String get minutesAgo => 'minutes ago';
+
+  @override
+  String get hoursAgo => 'hours ago';
+
+  @override
+  String get daysAgo => 'days ago';
+
+  @override
+  String get audio => 'Audio';
+
+  @override
+  String get taskDeletes => 'Task Deletes';
+
+  @override
+  String get audioDeletes => 'Audio Deletes';
+
+  @override
   String get productivity => 'Productivity';
 
   @override

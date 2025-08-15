@@ -686,6 +686,66 @@ abstract class AppLocalizations {
   /// **'Task Completion'**
   String get taskCompletion;
 
+  /// No description provided for @syncStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Status'**
+  String get syncStatus;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Now'**
+  String get syncNow;
+
+  /// No description provided for @lastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync'**
+  String get lastSync;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes ago'**
+  String get minutesAgo;
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'hours ago'**
+  String get hoursAgo;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'days ago'**
+  String get daysAgo;
+
+  /// No description provided for @audio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get audio;
+
+  /// No description provided for @taskDeletes.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Deletes'**
+  String get taskDeletes;
+
+  /// No description provided for @audioDeletes.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Deletes'**
+  String get audioDeletes;
+
   /// No description provided for @productivity.
   ///
   /// In en, this message translates to:
