@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../features/todos/domain/task_entity.dart';
 import '../../../features/todos/domain/i_task_repository.dart';
@@ -275,7 +276,7 @@ class HiveTaskRepository implements ITaskRepository {
             .length,
         starredTasks: tasks.where((t) => t.isStarred).length,
         archivedTasks: tasks.where((t) => t.isArchived).length,
-        averageCompletionTime: 0.0, // TODO: Calculate from completed tasks
+        averageCompletionTime: _calculateAverageCompletionTime(tasks),
         completedThisWeek: tasks
             .where(
               (t) =>
@@ -287,7 +288,7 @@ class HiveTaskRepository implements ITaskRepository {
         completedThisMonth: tasks
             .where(
               (t) =>
-                  t.status == TaskStatus.pending &&
+                  t.status == TaskStatus.completed &&
                   t.completedAt != null &&
                   t.completedAt!.isAfter(monthAgo),
             )
@@ -383,8 +384,28 @@ class HiveTaskRepository implements ITaskRepository {
 
   @override
   Future<AppResult<TaskEntity>> unarchiveTask(String id) async {
-    // TODO: Implement unarchive task
-    throw UnimplementedError('unarchiveTask not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final unarchivedTask = task.copyWith(
+        isArchived: false,
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, unarchivedTask);
+
+      _logger.info('Unarchived task: ${task.title}');
+      return AppResult.success(unarchivedTask);
+    } catch (e) {
+      _logger.error('Failed to unarchive task: $e');
+      return AppResult.failure(DatabaseFailure('Failed to unarchive task: $e'));
+    }
   }
 
   @override
@@ -465,19 +486,66 @@ class HiveTaskRepository implements ITaskRepository {
     }
   }
 
-  // TODO: Implement remaining interface methods
   @override
   Future<AppResult<TaskEntity>> addAudioToTask(
     String id,
     String audioPath,
     int duration,
   ) async {
-    throw UnimplementedError('addAudioToTask not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final updatedTask = task.copyWith(
+        audioPath: audioPath,
+        audioDuration: Duration(seconds: duration),
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, updatedTask);
+
+      _logger.info('Added audio to task: ${task.title}');
+      return AppResult.success(updatedTask);
+    } catch (e) {
+      _logger.error('Failed to add audio to task: $e');
+      return AppResult.failure(
+        DatabaseFailure('Failed to add audio to task: $e'),
+      );
+    }
   }
 
   @override
   Future<AppResult<TaskEntity>> removeAudioFromTask(String id) async {
-    throw UnimplementedError('removeAudioFromTask not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final task = _tasksBox.get(id);
+      if (task == null) {
+        return AppResult.failure(DatabaseFailure('Task not found: $id'));
+      }
+
+      final updatedTask = task.copyWith(
+        audioPath: null,
+        audioDuration: null,
+        localUpdatedAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+
+      await _tasksBox.put(id, updatedTask);
+
+      _logger.info('Removed audio from task: ${task.title}');
+      return AppResult.success(updatedTask);
+    } catch (e) {
+      _logger.error('Failed to remove audio from task: $e');
+      return AppResult.failure(
+        DatabaseFailure('Failed to remove audio from task: $e'),
+      );
+    }
   }
 
   @override
@@ -485,7 +553,38 @@ class HiveTaskRepository implements ITaskRepository {
     String parentId,
     List<TaskEntity> subtasks,
   ) async {
-    throw UnimplementedError('addSubtasks not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final parentTask = _tasksBox.get(parentId);
+      if (parentTask == null) {
+        return AppResult.failure(
+          DatabaseFailure('Parent task not found: $parentId'),
+        );
+      }
+
+      // Create all subtasks with parent reference
+      final List<TaskEntity> createdSubtasks = [];
+      for (final subtask in subtasks) {
+        final subtaskWithParent = subtask.copyWith(
+          parentTaskId: parentId,
+          localCreatedAt: DateTime.now(),
+          localUpdatedAt: DateTime.now(),
+          syncStatus: 'pending',
+        );
+
+        await _tasksBox.put(subtaskWithParent.id, subtaskWithParent);
+        createdSubtasks.add(subtaskWithParent);
+      }
+
+      _logger.info(
+        'Added ${createdSubtasks.length} subtasks to parent: ${parentTask.title}',
+      );
+      return AppResult.success(parentTask);
+    } catch (e) {
+      _logger.error('Failed to add subtasks: $e');
+      return AppResult.failure(DatabaseFailure('Failed to add subtasks: $e'));
+    }
   }
 
   @override
@@ -493,27 +592,138 @@ class HiveTaskRepository implements ITaskRepository {
     String parentId,
     List<String> subtaskIds,
   ) async {
-    throw UnimplementedError('removeSubtasks not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final parentTask = _tasksBox.get(parentId);
+      if (parentTask == null) {
+        return AppResult.failure(
+          DatabaseFailure('Parent task not found: $parentId'),
+        );
+      }
+
+      // Delete all subtasks
+      for (final subtaskId in subtaskIds) {
+        await _tasksBox.delete(subtaskId);
+      }
+
+      _logger.info(
+        'Removed ${subtaskIds.length} subtasks from parent: ${parentTask.title}',
+      );
+      return AppResult.success(parentTask);
+    } catch (e) {
+      _logger.error('Failed to remove subtasks: $e');
+      return AppResult.failure(
+        DatabaseFailure('Failed to remove subtasks: $e'),
+      );
+    }
   }
 
   @override
   Future<AppResult<List<TaskEntity>>> getTasksDueToday() async {
-    throw UnimplementedError('getTasksDueToday not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+
+      final tasks = _tasksBox.values
+          .cast<TaskEntity>()
+          .where(
+            (task) =>
+                task.dueDate != null &&
+                task.dueDate!.isAfter(startOfDay) &&
+                task.dueDate!.isBefore(endOfDay),
+          )
+          .toList();
+
+      _logger.info('Found ${tasks.length} tasks due today');
+      return AppResult.success(tasks);
+    } catch (e) {
+      _logger.error('Failed to get tasks due today: $e');
+      return AppResult.failure(
+        DatabaseFailure('Failed to get tasks due today: $e'),
+      );
+    }
   }
 
   @override
   Future<AppResult<List<TaskEntity>>> getTasksDueSoon(int days) async {
-    throw UnimplementedError('getTasksDueSoon not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final now = DateTime.now();
+      final endDate = now.add(Duration(days: days));
+
+      final tasks = _tasksBox.values
+          .cast<TaskEntity>()
+          .where((task) =>
+              task.dueDate != null &&
+              task.dueDate!.isAfter(now) &&
+              task.dueDate!.isBefore(endDate) &&
+              task.status != TaskStatus.completed)
+          .toList();
+
+      _logger.info('Found ${tasks.length} tasks due in $days days');
+      return AppResult.success(tasks);
+    } catch (e) {
+      _logger.error('Failed to get tasks due soon: $e');
+      return AppResult.failure(DatabaseFailure('Failed to get tasks due soon: $e'));
+    }
   }
 
   @override
   Future<AppResult<List<TaskEntity>>> getTasksByTags(List<String> tags) async {
-    throw UnimplementedError('getTasksByTags not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      if (tags.isEmpty) {
+        return AppResult.success([]);
+      }
+
+      final tasks = _tasksBox.values
+          .cast<TaskEntity>()
+          .where((task) => task.tags.any((tag) => tags.contains(tag)))
+          .toList();
+
+      _logger.info('Found ${tasks.length} tasks with tags: $tags');
+      return AppResult.success(tasks);
+    } catch (e) {
+      _logger.error('Failed to get tasks by tags: $e');
+      return AppResult.failure(DatabaseFailure('Failed to get tasks by tags: $e'));
+    }
   }
 
   @override
   Future<AppResult<String>> exportTasks(String format) async {
-    throw UnimplementedError('exportTasks not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      final tasks = _tasksBox.values.cast<TaskEntity>().toList();
+      String exportData;
+
+      switch (format.toLowerCase()) {
+        case 'json':
+          exportData = tasks.map((task) => task.toJson()).toList().toString();
+          break;
+        case 'csv':
+          // Simple CSV export
+          final csvHeader = 'Title,Description,Priority,Status,Due Date,Created At\n';
+          final csvRows = tasks.map((task) =>
+              '${task.title},${task.description ?? ""},${task.priority.name},${task.status.name},${task.dueDate?.toIso8601String() ?? ""},${task.createdAt.toIso8601String()}').join('\n');
+          exportData = csvHeader + csvRows;
+          break;
+        default:
+          return AppResult.failure(DatabaseFailure('Unsupported export format: $format'));
+      }
+
+      _logger.info('Exported ${tasks.length} tasks in $format format');
+      return AppResult.success(exportData);
+    } catch (e) {
+      _logger.error('Failed to export tasks: $e');
+      return AppResult.failure(DatabaseFailure('Failed to export tasks: $e'));
+    }
   }
 
   @override
@@ -521,7 +731,77 @@ class HiveTaskRepository implements ITaskRepository {
     String data,
     String format,
   ) async {
-    throw UnimplementedError('importTasks not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      List<TaskEntity> tasks = [];
+
+      switch (format.toLowerCase()) {
+        case 'json':
+          try {
+            final List<dynamic> jsonList = jsonDecode(data);
+            tasks = jsonList.map((json) => TaskEntity.fromJson(json)).toList();
+          } catch (e) {
+            return AppResult.failure(DatabaseFailure('Invalid JSON format: $e'));
+          }
+          break;
+        case 'csv':
+          // Simple CSV import
+          final lines = data.split('\n');
+          if (lines.length < 2) {
+            return AppResult.failure(DatabaseFailure('Invalid CSV format: insufficient data'));
+          }
+
+          for (int i = 1; i < lines.length; i++) {
+            final line = lines[i].trim();
+            if (line.isNotEmpty) {
+              final values = line.split(',');
+              if (values.length >= 6) {
+                try {
+                  final task = TaskEntity.create(
+                    title: values[0],
+                    description: values[1].isEmpty ? null : values[1],
+                    priority: TaskPriority.values.firstWhere(
+                      (p) => p.name == values[2],
+                      orElse: () => TaskPriority.medium,
+                    ),
+                    status: TaskStatus.values.firstWhere(
+                      (s) => s.name == values[3],
+                      orElse: () => TaskStatus.pending,
+                    ),
+                    dueDate: values[4].isEmpty ? null : DateTime.parse(values[4]),
+                  );
+                  tasks.add(task);
+                } catch (e) {
+                  _logger.error('Failed to parse CSV line $i: $e');
+                }
+              }
+            }
+          }
+          break;
+        default:
+          return AppResult.failure(DatabaseFailure('Unsupported import format: $format'));
+      }
+
+      if (tasks.isEmpty) {
+        return AppResult.failure(DatabaseFailure('No valid tasks found in import data'));
+      }
+
+      // Create all imported tasks
+      final List<TaskEntity> createdTasks = [];
+      for (final task in tasks) {
+        final result = await createTask(task);
+        if (result.isSuccess) {
+          createdTasks.add(result.dataOrNull!);
+        }
+      }
+
+      _logger.info('Successfully imported ${createdTasks.length} tasks');
+      return AppResult.success(createdTasks);
+    } catch (e) {
+      _logger.error('Failed to import tasks: $e');
+      return AppResult.failure(DatabaseFailure('Failed to import tasks: $e'));
+    }
   }
 
   @override
@@ -538,11 +818,140 @@ class HiveTaskRepository implements ITaskRepository {
     int? limit,
     int? offset,
   }) async {
-    throw UnimplementedError('getTasks with filtering not implemented yet');
+    try {
+      // Database ready check removed - using direct box access
+
+      var tasks = _tasksBox.values.cast<TaskEntity>().toList();
+
+      // Apply filters
+      if (status != null) {
+        tasks = tasks.where((task) => task.status == status).toList();
+      }
+      if (priority != null) {
+        tasks = tasks.where((task) => task.priority == priority).toList();
+      }
+      if (isArchived != null) {
+        tasks = tasks.where((task) => task.isArchived == isArchived).toList();
+      }
+      if (isStarred != null) {
+        tasks = tasks.where((task) => task.isStarred == isStarred).toList();
+      }
+      if (dueDate != null) {
+        final startOfDay = DateTime(dueDate.year, dueDate.month, dueDate.day);
+        final endOfDay = startOfDay.add(const Duration(days: 1));
+        tasks = tasks.where((task) =>
+            task.dueDate != null &&
+            task.dueDate!.isAfter(startOfDay) &&
+            task.dueDate!.isBefore(endOfDay)).toList();
+      }
+      if (tags != null && tags.isNotEmpty) {
+        tasks = tasks.where((task) => task.tags.any((tag) => tags.contains(tag))).toList();
+      }
+      if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+        final lowercaseQuery = searchQuery.toLowerCase();
+        tasks = tasks.where((task) =>
+            task.title.toLowerCase().contains(lowercaseQuery) ||
+            (task.description?.toLowerCase().contains(lowercaseQuery) ?? false) ||
+            task.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery))).toList();
+      }
+
+      // Apply sorting
+      final sortField = sortBy ?? 'createdAt';
+      final ascending = sortAscending ?? false;
+      tasks.sort((a, b) {
+        dynamic aValue, bValue;
+        switch (sortField) {
+          case 'title':
+            aValue = a.title;
+            bValue = b.title;
+            break;
+          case 'priority':
+            aValue = a.priority.index;
+            bValue = b.priority.index;
+            break;
+          case 'status':
+            aValue = a.status.index;
+            bValue = b.status.index;
+            break;
+          case 'dueDate':
+            aValue = a.dueDate ?? DateTime(9999, 12, 31);
+            bValue = b.dueDate ?? DateTime(9999, 12, 31);
+            break;
+          case 'createdAt':
+          default:
+            aValue = a.createdAt;
+            bValue = b.createdAt;
+            break;
+        }
+        
+        if (ascending) {
+          return aValue.compareTo(bValue);
+        } else {
+          return bValue.compareTo(aValue);
+        }
+      });
+
+      // Apply pagination
+      if (offset != null && limit != null) {
+        final start = offset;
+        final end = (offset + limit).clamp(0, tasks.length);
+        tasks = tasks.sublist(start, end);
+      } else if (limit != null) {
+        tasks = tasks.take(limit).toList();
+      }
+
+      _logger.info('Retrieved ${tasks.length} filtered tasks');
+      return AppResult.success(tasks);
+    } catch (e) {
+      _logger.error('Failed to get filtered tasks: $e');
+      return AppResult.failure(DatabaseFailure('Failed to get filtered tasks: $e'));
+    }
   }
 
   @override
-  Future<AppResult<void>> syncTasks() {
-    throw UnimplementedError();
+  Future<AppResult<void>> syncTasks() async {
+    try {
+      // Database ready check removed - using direct box access
+
+      // For local repository, sync means marking all tasks as synced
+      final tasks = _tasksBox.values.cast<TaskEntity>().toList();
+      
+      for (final task in tasks) {
+        if (task.syncStatus != 'synced') {
+          final syncedTask = task.copyWith(
+            syncStatus: 'synced',
+            localUpdatedAt: DateTime.now(),
+          );
+          await _tasksBox.put(task.id, syncedTask);
+        }
+      }
+
+      _logger.info('Synced ${tasks.length} tasks');
+      return const AppResult.success(null);
+    } catch (e) {
+      _logger.error('Failed to sync tasks: $e');
+      return AppResult.failure(DatabaseFailure('Failed to sync tasks: $e'));
+    }
+  }
+
+  /// Calculate average completion time from completed tasks
+  double _calculateAverageCompletionTime(List<TaskEntity> tasks) {
+    final completedTasksWithDate = tasks
+        .where(
+          (task) =>
+              task.status == TaskStatus.completed && task.completedAt != null,
+        )
+        .toList();
+
+    if (completedTasksWithDate.isEmpty) return 0.0;
+
+    final totalDays = completedTasksWithDate.fold<int>(0, (sum, task) {
+      if (task.completedAt != null && task.createdAt != null) {
+        return sum + task.completedAt!.difference(task.createdAt).inDays;
+      }
+      return sum;
+    });
+
+    return totalDays / completedTasksWithDate.length;
   }
 }
