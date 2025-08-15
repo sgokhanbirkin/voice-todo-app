@@ -175,8 +175,10 @@ class SyncManager extends GetxController {
             final storageUrl = uploadResult.dataOrNull!;
             debugPrint('SyncManager: Audio uploaded to storage: $storageUrl');
 
-            // TODO: Update audio metadata in Supabase database
-            // This will be implemented when we create the Supabase audio repository
+            // Update audio metadata in Supabase database
+            // For now, we'll just log the success
+            // TODO: Create SupabaseAudioRepository and implement metadata sync
+            debugPrint('SyncManager: Audio metadata sync pending - repository not yet implemented');
           } else {
             debugPrint(
               'SyncManager: Failed to upload audio: ${uploadResult.errorOrNull?.message}',
@@ -236,9 +238,15 @@ class SyncManager extends GetxController {
     );
 
     // TODO: Implement Supabase audio delete sync
-    // This will be implemented when we create the Supabase repository
+    // This will be implemented when we create the SupabaseAudioRepository
+    // For now, we'll just log and clear the pending list
+    
+    if (pendingAudioDeletes.isNotEmpty) {
+      debugPrint('SyncManager: Audio delete sync pending - repository not yet implemented');
+      debugPrint('SyncManager: Would delete ${pendingAudioDeletes.length} audio files from Supabase');
+    }
 
-    // For now, just clear the pending list
+    // Clear the pending list for now
     pendingAudioDeletes.clear();
   }
 

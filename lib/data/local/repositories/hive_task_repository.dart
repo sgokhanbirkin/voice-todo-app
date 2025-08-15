@@ -658,18 +658,22 @@ class HiveTaskRepository implements ITaskRepository {
 
       final tasks = _tasksBox.values
           .cast<TaskEntity>()
-          .where((task) =>
-              task.dueDate != null &&
-              task.dueDate!.isAfter(now) &&
-              task.dueDate!.isBefore(endDate) &&
-              task.status != TaskStatus.completed)
+          .where(
+            (task) =>
+                task.dueDate != null &&
+                task.dueDate!.isAfter(now) &&
+                task.dueDate!.isBefore(endDate) &&
+                task.status != TaskStatus.completed,
+          )
           .toList();
 
       _logger.info('Found ${tasks.length} tasks due in $days days');
       return AppResult.success(tasks);
     } catch (e) {
       _logger.error('Failed to get tasks due soon: $e');
-      return AppResult.failure(DatabaseFailure('Failed to get tasks due soon: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to get tasks due soon: $e'),
+      );
     }
   }
 
@@ -679,7 +683,7 @@ class HiveTaskRepository implements ITaskRepository {
       // Database ready check removed - using direct box access
 
       if (tags.isEmpty) {
-        return AppResult.success([]);
+        return const AppResult.success([]);
       }
 
       final tasks = _tasksBox.values
@@ -691,7 +695,9 @@ class HiveTaskRepository implements ITaskRepository {
       return AppResult.success(tasks);
     } catch (e) {
       _logger.error('Failed to get tasks by tags: $e');
-      return AppResult.failure(DatabaseFailure('Failed to get tasks by tags: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to get tasks by tags: $e'),
+      );
     }
   }
 
@@ -709,13 +715,20 @@ class HiveTaskRepository implements ITaskRepository {
           break;
         case 'csv':
           // Simple CSV export
-          final csvHeader = 'Title,Description,Priority,Status,Due Date,Created At\n';
-          final csvRows = tasks.map((task) =>
-              '${task.title},${task.description ?? ""},${task.priority.name},${task.status.name},${task.dueDate?.toIso8601String() ?? ""},${task.createdAt.toIso8601String()}').join('\n');
+          final csvHeader =
+              'Title,Description,Priority,Status,Due Date,Created At\n';
+          final csvRows = tasks
+              .map(
+                (task) =>
+                    '${task.title},${task.description ?? ""},${task.priority.name},${task.status.name},${task.dueDate?.toIso8601String() ?? ""},${task.createdAt.toIso8601String()}',
+              )
+              .join('\n');
           exportData = csvHeader + csvRows;
           break;
         default:
-          return AppResult.failure(DatabaseFailure('Unsupported export format: $format'));
+          return AppResult.failure(
+            DatabaseFailure('Unsupported export format: $format'),
+          );
       }
 
       _logger.info('Exported ${tasks.length} tasks in $format format');
@@ -742,14 +755,18 @@ class HiveTaskRepository implements ITaskRepository {
             final List<dynamic> jsonList = jsonDecode(data);
             tasks = jsonList.map((json) => TaskEntity.fromJson(json)).toList();
           } catch (e) {
-            return AppResult.failure(DatabaseFailure('Invalid JSON format: $e'));
+            return AppResult.failure(
+              DatabaseFailure('Invalid JSON format: $e'),
+            );
           }
           break;
         case 'csv':
           // Simple CSV import
           final lines = data.split('\n');
           if (lines.length < 2) {
-            return AppResult.failure(DatabaseFailure('Invalid CSV format: insufficient data'));
+            return const AppResult.failure(
+              DatabaseFailure('Invalid CSV format: insufficient data'),
+            );
           }
 
           for (int i = 1; i < lines.length; i++) {
@@ -769,7 +786,9 @@ class HiveTaskRepository implements ITaskRepository {
                       (s) => s.name == values[3],
                       orElse: () => TaskStatus.pending,
                     ),
-                    dueDate: values[4].isEmpty ? null : DateTime.parse(values[4]),
+                    dueDate: values[4].isEmpty
+                        ? null
+                        : DateTime.parse(values[4]),
                   );
                   tasks.add(task);
                 } catch (e) {
@@ -780,11 +799,15 @@ class HiveTaskRepository implements ITaskRepository {
           }
           break;
         default:
-          return AppResult.failure(DatabaseFailure('Unsupported import format: $format'));
+          return AppResult.failure(
+            DatabaseFailure('Unsupported import format: $format'),
+          );
       }
 
       if (tasks.isEmpty) {
-        return AppResult.failure(DatabaseFailure('No valid tasks found in import data'));
+        return const AppResult.failure(
+          DatabaseFailure('No valid tasks found in import data'),
+        );
       }
 
       // Create all imported tasks
@@ -839,20 +862,33 @@ class HiveTaskRepository implements ITaskRepository {
       if (dueDate != null) {
         final startOfDay = DateTime(dueDate.year, dueDate.month, dueDate.day);
         final endOfDay = startOfDay.add(const Duration(days: 1));
-        tasks = tasks.where((task) =>
-            task.dueDate != null &&
-            task.dueDate!.isAfter(startOfDay) &&
-            task.dueDate!.isBefore(endOfDay)).toList();
+        tasks = tasks
+            .where(
+              (task) =>
+                  task.dueDate != null &&
+                  task.dueDate!.isAfter(startOfDay) &&
+                  task.dueDate!.isBefore(endOfDay),
+            )
+            .toList();
       }
       if (tags != null && tags.isNotEmpty) {
-        tasks = tasks.where((task) => task.tags.any((tag) => tags.contains(tag))).toList();
+        tasks = tasks
+            .where((task) => task.tags.any((tag) => tags.contains(tag)))
+            .toList();
       }
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {
         final lowercaseQuery = searchQuery.toLowerCase();
-        tasks = tasks.where((task) =>
-            task.title.toLowerCase().contains(lowercaseQuery) ||
-            (task.description?.toLowerCase().contains(lowercaseQuery) ?? false) ||
-            task.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery))).toList();
+        tasks = tasks
+            .where(
+              (task) =>
+                  task.title.toLowerCase().contains(lowercaseQuery) ||
+                  (task.description?.toLowerCase().contains(lowercaseQuery) ??
+                      false) ||
+                  task.tags.any(
+                    (tag) => tag.toLowerCase().contains(lowercaseQuery),
+                  ),
+            )
+            .toList();
       }
 
       // Apply sorting
@@ -883,7 +919,7 @@ class HiveTaskRepository implements ITaskRepository {
             bValue = b.createdAt;
             break;
         }
-        
+
         if (ascending) {
           return aValue.compareTo(bValue);
         } else {
@@ -904,7 +940,9 @@ class HiveTaskRepository implements ITaskRepository {
       return AppResult.success(tasks);
     } catch (e) {
       _logger.error('Failed to get filtered tasks: $e');
-      return AppResult.failure(DatabaseFailure('Failed to get filtered tasks: $e'));
+      return AppResult.failure(
+        DatabaseFailure('Failed to get filtered tasks: $e'),
+      );
     }
   }
 
@@ -915,7 +953,7 @@ class HiveTaskRepository implements ITaskRepository {
 
       // For local repository, sync means marking all tasks as synced
       final tasks = _tasksBox.values.cast<TaskEntity>().toList();
-      
+
       for (final task in tasks) {
         if (task.syncStatus != 'synced') {
           final syncedTask = task.copyWith(
@@ -946,7 +984,7 @@ class HiveTaskRepository implements ITaskRepository {
     if (completedTasksWithDate.isEmpty) return 0.0;
 
     final totalDays = completedTasksWithDate.fold<int>(0, (sum, task) {
-      if (task.completedAt != null && task.createdAt != null) {
+      if (task.completedAt != null) {
         return sum + task.completedAt!.difference(task.createdAt).inDays;
       }
       return sum;

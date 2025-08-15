@@ -56,7 +56,7 @@ class Logger {
     final timestamp = DateTime.now().toIso8601String();
     final logMessage = '[$timestamp] $level: $message';
 
-    // TODO: Replace with proper logging framework
+    // Use debugPrint for now, can be replaced with proper logging framework later
     debugPrint(logMessage);
 
     if (error != null) {
