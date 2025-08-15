@@ -1,3 +1,5 @@
+import 'dart:io';
+
 /// Audio file entity for storing audio metadata
 class AudioEntity {
   /// Unique identifier for the audio file
@@ -170,8 +172,14 @@ class AudioEntity {
 
   /// Checks if audio file exists locally
   bool get existsLocally {
-    // TODO: Implement file existence check
-    return localPath.isNotEmpty;
+    try {
+      if (localPath.isEmpty) return false;
+      final file = File(localPath);
+      return file.existsSync();
+    } catch (e) {
+      // If there's an error checking file existence, assume it doesn't exist
+      return false;
+    }
   }
 
   @override

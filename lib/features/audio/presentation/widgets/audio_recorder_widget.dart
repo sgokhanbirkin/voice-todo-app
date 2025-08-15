@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../product/responsive/responsive.dart';
 import '../../../../product/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/audio_controller.dart';
 
-// TODO Localization
-// TODO Responsive
 /// Widget for recording audio with visual feedback
 class AudioRecorderWidget extends StatelessWidget {
   final String taskId;
@@ -20,6 +19,7 @@ class AudioRecorderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audioController = Get.find<AudioController>();
+    final l10n = AppLocalizations.of(context);
 
     return Obx(() {
       final isRecording = audioController.isRecording.value;
@@ -73,7 +73,9 @@ class AudioRecorderWidget extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    isRecording ? 'Ses Kaydediliyor...' : 'Ses Kaydı',
+                    isRecording
+                        ? (l10n?.recordingInProgress ?? 'Ses Kaydediliyor...')
+                        : (l10n?.audioRecording ?? 'Ses Kaydı'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -116,7 +118,7 @@ class AudioRecorderWidget extends StatelessWidget {
             ],
 
             // Control buttons
-            _buildControlButtons(context, audioController),
+            _buildControlButtons(context, audioController, l10n),
           ],
         ),
       );
@@ -178,6 +180,7 @@ class AudioRecorderWidget extends StatelessWidget {
   Widget _buildControlButtons(
     BuildContext context,
     AudioController audioController,
+    AppLocalizations? l10n,
   ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -189,13 +192,17 @@ class AudioRecorderWidget extends StatelessWidget {
           return ElevatedButton.icon(
             onPressed: () {
               if (isRecording) {
-                _stopRecording(audioController);
+                _stopRecording(audioController, l10n);
               } else {
-                _startRecording(audioController);
+                _startRecording(audioController, l10n);
               }
             },
             icon: Icon(isRecording ? Icons.stop : Icons.mic),
-            label: Text(isRecording ? 'Durdur' : 'Kaydet'),
+            label: Text(
+              isRecording
+                  ? (l10n?.stopRecording ?? 'Durdur')
+                  : (l10n?.recordVoice ?? 'Kaydet'),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: isRecording
                   ? AppColors.error
@@ -226,9 +233,9 @@ class AudioRecorderWidget extends StatelessWidget {
           if (!isRecording) return const SizedBox.shrink();
 
           return ElevatedButton.icon(
-            onPressed: () => _cancelRecording(audioController),
+            onPressed: () => _cancelRecording(audioController, l10n),
             icon: const Icon(Icons.close),
-            label: const Text('İptal'),
+            label: Text(l10n?.cancel ?? 'İptal'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               foregroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -253,20 +260,26 @@ class AudioRecorderWidget extends StatelessWidget {
     );
   }
 
-  Future<void> _startRecording(AudioController audioController) async {
+  Future<void> _startRecording(
+    AudioController audioController,
+    AppLocalizations? l10n,
+  ) async {
     try {
       await audioController.startRecording();
     } catch (e) {
       Get.snackbar(
-        'Hata',
-        'Ses kaydı başlatılamadı: $e',
+        l10n?.error ?? 'Hata',
+        '${l10n?.failedToStartRecording ?? 'Ses kaydı başlatılamadı'}: $e',
         backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     }
   }
 
-  Future<void> _stopRecording(AudioController audioController) async {
+  Future<void> _stopRecording(
+    AudioController audioController,
+    AppLocalizations? l10n,
+  ) async {
     try {
       await audioController.stopRecording();
       final audioPath = audioController.getLastRecordedAudioPath();
@@ -275,34 +288,37 @@ class AudioRecorderWidget extends StatelessWidget {
       }
 
       Get.snackbar(
-        'Başarılı',
-        'Ses kaydı tamamlandı!',
+        l10n?.success ?? 'Başarılı',
+        l10n?.audioRecordedSuccessfully ?? 'Ses kaydı tamamlandı!',
         backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Hata',
-        'Ses kaydı durdurulamadı: $e',
+        l10n?.error ?? 'Hata',
+        '${l10n?.failedToStopRecording ?? 'Ses kaydı durdurulamadı'}: $e',
         backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     }
   }
 
-  Future<void> _cancelRecording(AudioController audioController) async {
+  Future<void> _cancelRecording(
+    AudioController audioController,
+    AppLocalizations? l10n,
+  ) async {
     try {
       await audioController.cancelRecording();
       Get.snackbar(
-        'İptal Edildi',
-        'Ses kaydı iptal edildi',
+        l10n?.cancel ?? 'İptal',
+        '${l10n?.cancel ?? 'İptal'} edildi',
         backgroundColor: AppColors.secondaryTeal,
         colorText: Colors.black,
       );
     } catch (e) {
       Get.snackbar(
-        'Hata',
-        'Ses kaydı iptal edilemedi: $e',
+        l10n?.error ?? 'Hata',
+        '${l10n?.cancel ?? 'İptal'} edilemedi: $e',
         backgroundColor: AppColors.error,
         colorText: Colors.white,
       );

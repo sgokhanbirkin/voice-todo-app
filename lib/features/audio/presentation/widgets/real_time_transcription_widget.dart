@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:voice_todo/product/responsive/responsive.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/voice_commands_controller.dart';
 
-// TODO Localization
-// TODO Responsive
 /// Real-time Transcription Widget - Konuşurken metni gerçek zamanlı gösterir
 class RealTimeTranscriptionWidget extends StatefulWidget {
   final VoiceCommandsController controller;
@@ -27,7 +26,6 @@ class _RealTimeTranscriptionWidgetState
     extends State<RealTimeTranscriptionWidget> {
   final TextEditingController _textController = TextEditingController();
   bool _isListening = false;
-  String _recognizedText = '';
   double _confidence = 0.0;
   VoiceRecognitionState _recognitionState = VoiceRecognitionState.notListening;
 
@@ -83,7 +81,6 @@ class _RealTimeTranscriptionWidgetState
     widget.controller.textStream.listen((text) {
       if (mounted) {
         setState(() {
-          _recognizedText = text;
           _textController.text = text;
         });
       }
@@ -116,13 +113,13 @@ class _RealTimeTranscriptionWidgetState
   /// Clear text
   void _clearText() {
     setState(() {
-      _recognizedText = '';
       _textController.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: Responsive.getResponsivePadding(context),
       decoration: BoxDecoration(
@@ -143,7 +140,7 @@ class _RealTimeTranscriptionWidgetState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          _buildHeader(),
+          _buildHeader(l10n),
 
           SizedBox(
             height: Responsive.getResponsiveSpacing(
@@ -155,7 +152,7 @@ class _RealTimeTranscriptionWidgetState
           ),
 
           // Transcription Display
-          _buildTranscriptionDisplay(),
+          _buildTranscriptionDisplay(l10n),
 
           SizedBox(
             height: Responsive.getResponsiveSpacing(
@@ -167,7 +164,7 @@ class _RealTimeTranscriptionWidgetState
           ),
 
           // Control Buttons
-          _buildControlButtons(),
+          _buildControlButtons(l10n),
 
           // Confidence Indicator
           if (_isListening) _buildConfidenceIndicator(),
@@ -177,7 +174,7 @@ class _RealTimeTranscriptionWidgetState
   }
 
   /// Build header section
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations? l10n) {
     return Row(
       children: [
         Icon(
@@ -205,7 +202,7 @@ class _RealTimeTranscriptionWidgetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Voice Commands',
+                l10n?.recordVoice ?? 'Voice Commands',
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -227,7 +224,7 @@ class _RealTimeTranscriptionWidgetState
   }
 
   /// Build transcription display
-  Widget _buildTranscriptionDisplay() {
+  Widget _buildTranscriptionDisplay(AppLocalizations? l10n) {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -261,8 +258,9 @@ class _RealTimeTranscriptionWidgetState
         textAlignVertical: TextAlignVertical.top,
         decoration: InputDecoration(
           hintText: _isListening
-              ? 'Konuşmaya başlayın...'
-              : 'Mikrofon butonuna basarak konuşmaya başlayın',
+              ? (l10n?.recordingInProgress ?? 'Konuşmaya başlayın...')
+              : (l10n?.recordVoice ??
+                    'Mikrofon butonuna basarak konuşmaya başlayın'),
           hintStyle: TextStyle(
             color: Theme.of(
               context,
@@ -282,7 +280,7 @@ class _RealTimeTranscriptionWidgetState
   }
 
   /// Build control buttons
-  Widget _buildControlButtons() {
+  Widget _buildControlButtons(AppLocalizations? l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -290,7 +288,7 @@ class _RealTimeTranscriptionWidgetState
         Expanded(
           child: _buildActionButton(
             icon: Icons.clear,
-            label: 'Temizle',
+            label: l10n?.clear ?? 'Temizle',
             onPressed: _clearText,
             backgroundColor: Theme.of(
               context,
@@ -313,7 +311,9 @@ class _RealTimeTranscriptionWidgetState
           flex: 2,
           child: _buildActionButton(
             icon: _isListening ? Icons.stop : Icons.mic,
-            label: _isListening ? 'Durdur' : 'Dinlemeye Başla',
+            label: _isListening
+                ? (l10n?.stopRecording ?? 'Durdur')
+                : (l10n?.recordVoice ?? 'Dinlemeye Başla'),
             onPressed: _isListening ? _stopListening : _startListening,
             backgroundColor: _isListening
                 ? Theme.of(context).colorScheme.error
@@ -337,7 +337,7 @@ class _RealTimeTranscriptionWidgetState
         Expanded(
           child: _buildActionButton(
             icon: Icons.close,
-            label: 'İptal',
+            label: l10n?.cancel ?? 'İptal',
             onPressed: _cancelListening,
             backgroundColor: Theme.of(
               context,

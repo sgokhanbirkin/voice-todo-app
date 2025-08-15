@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../product/responsive/responsive.dart';
 import '../../../../product/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../controllers/audio_controller.dart';
 
-// TODO Localization
-// TODO Responsive
 /// Widget for converting speech to text
 class SpeechToTextWidget extends StatelessWidget {
   final Function(String text)? onTextRecognized;
@@ -22,6 +21,7 @@ class SpeechToTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audioController = Get.find<AudioController>();
+    final l10n = AppLocalizations.of(context);
 
     return Obx(() {
       final isListening = audioController.isListening.value;
@@ -76,7 +76,9 @@ class SpeechToTextWidget extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    isListening ? 'Dinleniyor...' : 'Sesden Yazıya',
+                    isListening
+                        ? (l10n?.recordingInProgress ?? 'Dinleniyor...')
+                        : (l10n?.recordVoice ?? 'Sesden Yazıya'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),

@@ -112,12 +112,17 @@ class AudioPermissionController extends GetxController {
   /// Request notification permission
   Future<bool> requestNotificationPermission() async {
     try {
-      // TODO: Implement actual permission request when permission_handler is added
       debugPrint(
         'AudioPermissionController: Requesting notification permission',
       );
-      _hasNotificationPermission.value = true;
-      return true;
+      final status = await Permission.notification.request();
+      _hasNotificationPermission.value = status.isGranted;
+
+      if (status.isPermanentlyDenied) {
+        showPermissionExplanation('Bildirim');
+      }
+
+      return status.isGranted;
     } catch (e) {
       debugPrint(
         'AudioPermissionController: Failed to request notification permission: $e',
@@ -150,6 +155,23 @@ class AudioPermissionController extends GetxController {
     }
   }
 
+  /// Open app settings
+  Future<void> _openAppSettings() async {
+    try {
+      await openAppSettings();
+      debugPrint('AudioPermissionController: App settings opened');
+    } catch (e) {
+      debugPrint('AudioPermissionController: Failed to open app settings: $e');
+      // Fallback: Show error message
+      Get.snackbar(
+        'Hata',
+        'Ayarlar açılamadı. Lütfen manuel olarak ayarlardan izin verin.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   /// Show permission explanation dialog
   void showPermissionExplanation(String permissionName) {
     Get.dialog(
@@ -162,9 +184,9 @@ class AudioPermissionController extends GetxController {
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('İptal')),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Get.back();
-              // TODO: Open app settings when permission_handler is added
+              await _openAppSettings();
             },
             child: const Text('Ayarlar'),
           ),
