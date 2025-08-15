@@ -751,7 +751,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       );
 
       if (tags.isEmpty) {
-        return AppResult.success([]);
+        return const AppResult.success([]);
       }
 
       final response = await _supabase
@@ -794,7 +794,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       );
 
       if (query.trim().isEmpty) {
-        return AppResult.success([]);
+        return const AppResult.success([]);
       }
 
       final response = await _supabase
@@ -1167,7 +1167,7 @@ class SupabaseTaskRepository implements ITaskRepository {
           // Simple CSV import
           final lines = data.split('\n');
           if (lines.length < 2) {
-            return AppResult.failure(
+            return const AppResult.failure(
               DatabaseFailure('Invalid CSV format: insufficient data'),
             );
           }
@@ -1210,7 +1210,7 @@ class SupabaseTaskRepository implements ITaskRepository {
       }
 
       if (tasks.isEmpty) {
-        return AppResult.failure(
+        return const AppResult.failure(
           DatabaseFailure('No valid tasks found in import data'),
         );
       }

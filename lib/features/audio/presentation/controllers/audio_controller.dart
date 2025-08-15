@@ -213,7 +213,7 @@ class AudioController extends GetxController {
     // Cancel timers
     _recordingTimer?.cancel();
     _playbackTimer?.cancel();
-    
+
     stopRecording();
     stopPlayback();
     super.onClose();
@@ -457,7 +457,7 @@ class AudioController extends GetxController {
 
       final audioPath = await _audioRecorder.stopRecording();
       isRecording.value = false;
-      
+
       // Stop recording timer
       _recordingTimer?.cancel();
 
@@ -528,7 +528,7 @@ class AudioController extends GetxController {
       await _audioRecorder.cancelRecording();
       isRecording.value = false;
       recordingDuration.value = Duration.zero;
-      
+
       // Stop recording timer
       _recordingTimer?.cancel();
       _showSafeSnackbar('Cancelled', 'Audio recording cancelled');
@@ -648,7 +648,7 @@ class AudioController extends GetxController {
       isPaused.value = false;
       playingAudio.value = null;
       playbackPosition.value = Duration.zero;
-      
+
       // Stop playback timer
       _playbackTimer?.cancel();
       _showSafeSnackbar('Stopped', 'Audio playback stopped');
@@ -764,11 +764,14 @@ class AudioController extends GetxController {
   void _startRecordingTimer() {
     // Cancel existing timer if any
     _recordingTimer?.cancel();
-    
+
     // Start periodic timer to update recording duration
-    _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (
+      timer,
+    ) {
       if (isRecording.value) {
-        recordingDuration.value = recordingDuration.value + const Duration(milliseconds: 100);
+        recordingDuration.value =
+            recordingDuration.value + const Duration(milliseconds: 100);
       } else {
         timer.cancel();
       }
@@ -779,7 +782,7 @@ class AudioController extends GetxController {
   void _startPlaybackTimer() {
     // Cancel existing timer if any
     _playbackTimer?.cancel();
-    
+
     // Start periodic timer to update playback position
     _playbackTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (isPlaying.value && !isCompleted.value) {

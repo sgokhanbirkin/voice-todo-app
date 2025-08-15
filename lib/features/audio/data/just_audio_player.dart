@@ -18,7 +18,7 @@ class JustAudioPlayer implements IAudioPlayer {
         AudioSource.uri(Uri.parse('dummy://init')),
         preload: false,
       );
-      
+
       // iOS audio session configuration
       await _audioPlayer.setAudioSource(
         AudioSource.uri(Uri.parse('dummy://init')),

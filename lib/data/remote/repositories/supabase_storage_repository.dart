@@ -32,9 +32,7 @@ class SupabaseStorageRepository {
       debugPrint('SupabaseStorageRepository: Generated file path: $filePath');
 
       // Upload file to Supabase Storage
-      await _supabase.storage
-          .from(_audioBucket)
-          .upload(filePath, file);
+      await _supabase.storage.from(_audioBucket).upload(filePath, file);
 
       debugPrint('SupabaseStorageRepository: File uploaded successfully');
 
