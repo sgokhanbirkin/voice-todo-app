@@ -325,7 +325,6 @@ class HiveTaskRepository implements ITaskRepository {
     }
   }
 
-  // TODO: Implement remaining interface methods
   @override
   Future<AppResult<TaskEntity>> completeTask(String id) async {
     try {
