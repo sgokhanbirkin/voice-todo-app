@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/sync/sync_manager.dart';
 import '../responsive/responsive.dart';
 import '../../l10n/app_localizations.dart';
@@ -36,7 +37,7 @@ class SyncStatusWidget extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           ),
@@ -53,9 +54,9 @@ class SyncStatusWidget extends StatelessWidget {
                       : needsSync
                       ? Theme.of(context).colorScheme.secondary
                       : Theme.of(context).colorScheme.tertiary,
-                  size: 20,
+                  size: 20.sp,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     l10n.syncStatus,
@@ -67,22 +68,22 @@ class SyncStatusWidget extends StatelessWidget {
                 if (needsSync && !isSyncing)
                   ElevatedButton.icon(
                     onPressed: () => syncManager.manualSync(),
-                    icon: const Icon(Icons.sync, size: 16),
+                    icon: Icon(Icons.sync, size: 16.sp),
                     label: Text(
                       l10n.syncNow,
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 12.sp),
                     ),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
                       ),
                       minimumSize: Size.zero,
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               syncStatus,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -96,24 +97,26 @@ class SyncStatusWidget extends StatelessWidget {
             ),
 
             // Show detailed sync info
-                    if (needsSync && !isSyncing) ...[
-          SizedBox(height: Responsive.getResponsiveSpacing(
-            context,
-            mobile: 8,
-            tablet: 12,
-            desktop: 16,
-          )),
-          _buildSyncDetails(
-            context,
-            l10n,
-            pendingTasks,
-            pendingAudio,
-            pendingTaskDeletes,
-            pendingAudioDeletes,
-          ),
-        ],
+            if (needsSync && !isSyncing) ...[
+              SizedBox(
+                height: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 12,
+                  desktop: 16,
+                ),
+              ),
+              _buildSyncDetails(
+                context,
+                l10n,
+                pendingTasks,
+                pendingAudio,
+                pendingTaskDeletes,
+                pendingAudioDeletes,
+              ),
+            ],
             if (lastSyncTime != null) ...[
-              const SizedBox(height: 4),
+              SizedBox(height: 4.h),
               Text(
                 '${l10n.lastSync}: ${_formatLastSyncTime(lastSyncTime, l10n)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -124,7 +127,7 @@ class SyncStatusWidget extends StatelessWidget {
               ),
             ],
             if (isSyncing) ...[
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               LinearProgressIndicator(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -167,9 +170,19 @@ class SyncStatusWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (pendingTasks > 0)
-          _buildSyncItem(context, '📝 ${l10n.tasks}', pendingTasks, Colors.blue),
+          _buildSyncItem(
+            context,
+            '📝 ${l10n.tasks}',
+            pendingTasks,
+            Colors.blue,
+          ),
         if (pendingAudio > 0)
-          _buildSyncItem(context, '🎵 ${l10n.audio}', pendingAudio, Colors.green),
+          _buildSyncItem(
+            context,
+            '🎵 ${l10n.audio}',
+            pendingAudio,
+            Colors.green,
+          ),
         if (pendingTaskDeletes > 0)
           _buildSyncItem(
             context,
@@ -196,18 +209,18 @@ class SyncStatusWidget extends StatelessWidget {
     Color color,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: EdgeInsets.only(bottom: 4.h),
       child: Row(
         children: [
-          Icon(Icons.circle, size: 8, color: color),
-          const SizedBox(width: 8),
+          Icon(Icons.circle, size: 8.sp, color: color),
+          SizedBox(width: 8.w),
           Text(
             '$label: $count',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(
                 context,
               ).colorScheme.onSurface.withValues(alpha: 0.8),
-              fontSize: 11,
+              fontSize: 11.sp,
             ),
           ),
         ],
