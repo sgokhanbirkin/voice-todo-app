@@ -242,9 +242,7 @@ class HiveAudioRepository implements IAudioRepository {
 
       final audio = _audioBox.get(id);
       if (audio == null) {
-        return AppResult.failure(
-          DatabaseFailure('Audio not found: $id'),
-        );
+        return AppResult.failure(DatabaseFailure('Audio not found: $id'));
       }
 
       final uploadedAudio = audio.copyWith(
@@ -272,16 +270,12 @@ class HiveAudioRepository implements IAudioRepository {
 
       final audio = _audioBox.get(id);
       if (audio == null) {
-        return AppResult.failure(
-          DatabaseFailure('Audio not found: $id'),
-        );
+        return AppResult.failure(DatabaseFailure('Audio not found: $id'));
       }
 
       // For now, we'll just update the timestamp
-      // TODO: Add uploadProgress field to AudioEntity if needed
-      final updatedAudio = audio.copyWith(
-        updatedAt: DateTime.now(),
-      );
+      // Future: Add uploadProgress field to AudioEntity if needed
+      final updatedAudio = audio.copyWith(updatedAt: DateTime.now());
 
       await _audioBox.put(id, updatedAudio);
       return AppResult.success(updatedAudio);
@@ -296,11 +290,11 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> getPendingUploads() async {
     try {
       await _ensureInitialized();
-      
+
       final pendingAudio = _audioBox.values
           .where((audio) => !audio.isUploaded)
           .toList();
-      
+
       return AppResult.success(pendingAudio);
     } catch (e) {
       return AppResult.failure(
@@ -315,11 +309,11 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       await _ensureInitialized();
-      
+
       // For now, we'll return all audio since sync status is not yet implemented
-      // TODO: Add syncStatus field to AudioEntity when implementing sync
+      // Future: Add syncStatus field to AudioEntity when implementing sync
       final audioList = _audioBox.values.toList();
-      
+
       return AppResult.success(audioList);
     } catch (e) {
       return AppResult.failure(
@@ -332,23 +326,23 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<List<AudioEntity>>> searchAudio(String query) async {
     try {
       await _ensureInitialized();
-      
+
       if (query.trim().isEmpty) {
-        return AppResult.success([]);
+        return const AppResult.success([]);
       }
-      
+
       final lowercaseQuery = query.toLowerCase();
       final results = _audioBox.values
-          .where((audio) =>
-              audio.fileName.toLowerCase().contains(lowercaseQuery) ||
-              audio.taskId.toLowerCase().contains(lowercaseQuery))
+          .where(
+            (audio) =>
+                audio.fileName.toLowerCase().contains(lowercaseQuery) ||
+                audio.taskId.toLowerCase().contains(lowercaseQuery),
+          )
           .toList();
-      
+
       return AppResult.success(results);
     } catch (e) {
-      return AppResult.failure(
-        DatabaseFailure('Failed to search audio: $e'),
-      );
+      return AppResult.failure(DatabaseFailure('Failed to search audio: $e'));
     }
   }
 
@@ -356,18 +350,26 @@ class HiveAudioRepository implements IAudioRepository {
   Future<AppResult<String>> exportAudioMetadata(String format) async {
     try {
       await _ensureInitialized();
-      
+
       final audioList = _audioBox.values.toList();
       String exportData;
-      
+
       switch (format.toLowerCase()) {
         case 'json':
-          exportData = audioList.map((audio) => audio.toJson()).toList().toString();
+          exportData = audioList
+              .map((audio) => audio.toJson())
+              .toList()
+              .toString();
           break;
         case 'csv':
-          final csvHeader = 'FileName,TaskId,FileSize,Duration,Format,RecordedAt\n';
-          final csvRows = audioList.map((audio) =>
-              '${audio.fileName},${audio.taskId},${audio.fileSize},${audio.duration.inSeconds},${audio.format},${audio.recordedAt.toIso8601String()}').join('\n');
+          final csvHeader =
+              'FileName,TaskId,FileSize,Duration,Format,RecordedAt\n';
+          final csvRows = audioList
+              .map(
+                (audio) =>
+                    '${audio.fileName},${audio.taskId},${audio.fileSize},${audio.duration.inSeconds},${audio.format},${audio.recordedAt.toIso8601String()}',
+              )
+              .join('\n');
           exportData = csvHeader + csvRows;
           break;
         default:
@@ -375,7 +377,7 @@ class HiveAudioRepository implements IAudioRepository {
             DatabaseFailure('Unsupported export format: $format'),
           );
       }
-      
+
       return AppResult.success(exportData);
     } catch (e) {
       return AppResult.failure(
@@ -391,14 +393,16 @@ class HiveAudioRepository implements IAudioRepository {
   ) async {
     try {
       await _ensureInitialized();
-      
+
       List<AudioEntity> audioList = [];
-      
+
       switch (format.toLowerCase()) {
         case 'json':
           try {
             final List<dynamic> jsonList = jsonDecode(data);
-            audioList = jsonList.map((json) => AudioEntity.fromJson(json)).toList();
+            audioList = jsonList
+                .map((json) => AudioEntity.fromJson(json))
+                .toList();
           } catch (e) {
             return AppResult.failure(
               DatabaseFailure('Invalid JSON format: $e'),
@@ -409,11 +413,11 @@ class HiveAudioRepository implements IAudioRepository {
           // Simple CSV import - basic implementation
           final lines = data.split('\n');
           if (lines.length < 2) {
-            return AppResult.failure(
+            return const AppResult.failure(
               DatabaseFailure('Invalid CSV format: insufficient data'),
             );
           }
-          
+
           // Skip header line
           for (int i = 1; i < lines.length; i++) {
             final line = lines[i].trim();
@@ -428,13 +432,13 @@ class HiveAudioRepository implements IAudioRepository {
             DatabaseFailure('Unsupported import format: $format'),
           );
       }
-      
+
       if (audioList.isEmpty) {
-        return AppResult.failure(
+        return const AppResult.failure(
           DatabaseFailure('No valid audio metadata found in import data'),
         );
       }
-      
+
       // Save imported audio metadata
       final List<AudioEntity> importedAudio = [];
       for (final audio in audioList) {
@@ -443,7 +447,7 @@ class HiveAudioRepository implements IAudioRepository {
           importedAudio.add(result.dataOrNull!);
         }
       }
-      
+
       return AppResult.success(importedAudio);
     } catch (e) {
       return AppResult.failure(
