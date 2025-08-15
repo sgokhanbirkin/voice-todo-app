@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import '../../domain/i_text_to_speech.dart';
-import '../../data/flutter_tts_service.dart';
-import '../../../core/logger.dart';
+import 'package:voice_todo/core/logger.dart';
+import 'package:voice_todo/features/audio/data/flutter_tts_service.dart';
+import 'package:voice_todo/features/audio/domain/i_text_to_speech.dart';
 
 /// Text-to-Speech Controller
 class TextToSpeechController extends GetxController {
@@ -22,7 +22,8 @@ class TextToSpeechController extends GetxController {
 
   // Available options
   final RxList<String> availableLanguages = <String>[].obs;
-  final RxList<Map<String, dynamic>> availableVoices = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> availableVoices =
+      <Map<String, dynamic>>[].obs;
 
   // Error handling
   final RxString errorMessage = ''.obs;
@@ -58,11 +59,11 @@ class TextToSpeechController extends GetxController {
         if (available) {
           // Load available languages and voices
           await _loadAvailableOptions();
-          
+
           // Set completion and error callbacks
           _ttsService.setCompletionCallback(_onSpeechCompleted);
           _ttsService.setErrorCallback(_onSpeechError);
-          
+
           _logger.info('TTS Controller: Initialized successfully');
         } else {
           _logger.warning('TTS Controller: TTS not available on this device');
@@ -88,7 +89,9 @@ class TextToSpeechController extends GetxController {
       final voices = await _ttsService.getAvailableVoices();
       availableVoices.value = voices;
 
-      _logger.info('TTS Controller: Loaded ${languages.length} languages and ${voices.length} voices');
+      _logger.info(
+        'TTS Controller: Loaded ${languages.length} languages and ${voices.length} voices',
+      );
     } catch (e) {
       _logger.error('TTS Controller: Failed to load available options: $e');
     }
@@ -127,7 +130,12 @@ class TextToSpeechController extends GetxController {
   }
 
   /// Speak task details
-  Future<void> speakTask(String title, {String? description, String? priority, DateTime? dueDate}) async {
+  Future<void> speakTask(
+    String title, {
+    String? description,
+    String? priority,
+    DateTime? dueDate,
+  }) async {
     try {
       if (!isInitialized.value) {
         await _initializeTTS();
@@ -141,7 +149,12 @@ class TextToSpeechController extends GetxController {
       hasError.value = false;
       errorMessage.value = '';
 
-      await _ttsService.speakTask(title, description: description, priority: priority, dueDate: dueDate);
+      await _ttsService.speakTask(
+        title,
+        description: description,
+        priority: priority,
+        dueDate: dueDate,
+      );
       isSpeaking.value = true;
       currentStatus.value = SpeechStatus.speaking;
       isPaused.value = false;
@@ -263,7 +276,7 @@ class TextToSpeechController extends GetxController {
   Future<void> applyConfig(TTSConfig config) async {
     try {
       await _ttsService.applyConfig(config);
-      
+
       currentLanguage.value = config.languageCode;
       currentVoice.value = config.voiceId;
       currentSpeechRate.value = config.speechRate;
@@ -322,7 +335,7 @@ class TextToSpeechController extends GetxController {
       if (isInitialized.value) {
         final status = await _ttsService.getStatus();
         currentStatus.value = status;
-        
+
         final speaking = await _ttsService.isSpeaking();
         isSpeaking.value = speaking;
       }

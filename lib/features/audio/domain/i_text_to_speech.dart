@@ -56,18 +56,33 @@ abstract class ITextToSpeech {
 
   /// Dispose TTS resources
   Future<void> dispose();
+
+  /// Apply TTS configuration
+  Future<void> applyConfig(TTSConfig config);
+
+  /// Speak task details with formatting
+  Future<void> speakTask(
+    String title, {
+    String? description,
+    String? priority,
+    DateTime? dueDate,
+  });
 }
 
 /// Speech status enum
 enum SpeechStatus {
   /// Not speaking
   stopped,
+
   /// Currently speaking
   speaking,
+
   /// Paused
   paused,
+
   /// Speaking completed
   completed,
+
   /// Error occurred
   error,
 }

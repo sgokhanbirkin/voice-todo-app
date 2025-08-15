@@ -1,6 +1,5 @@
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:get/get.dart';
-import '../../domain/i_text_to_speech.dart';
+import 'package:voice_todo/features/audio/domain/i_text_to_speech.dart';
 import '../../../core/logger.dart';
 
 /// Flutter TTS service implementation
@@ -12,6 +11,7 @@ class FlutterTTSService implements ITextToSpeech {
   Function(String error)? _errorCallback;
 
   bool _isInitialized = false;
+  bool _isCurrentlySpeaking = false;
 
   @override
   Future<bool> initialize() async {
@@ -20,13 +20,16 @@ class FlutterTTSService implements ITextToSpeech {
 
       // Set completion and error callbacks
       _flutterTts.setCompletionHandler(() {
+        _isCurrentlySpeaking = false;
         _logger.info('TTS: Speech completed');
         _completionCallback?.call();
       });
 
-      _flutterTts.setErrorHandler((String error) {
-        _logger.error('TTS Error: $error');
-        _errorCallback?.call(error);
+      // Flutter TTS 4.x error handling - using proper error handler
+      _flutterTts.setErrorHandler((msg) {
+        _isCurrentlySpeaking = false;
+        _logger.error('TTS Error: $msg');
+        _errorCallback?.call(msg);
       });
 
       // Set default configuration
@@ -156,8 +159,11 @@ class FlutterTTSService implements ITextToSpeech {
         return;
       }
 
+      _isCurrentlySpeaking = true;
       await _flutterTts.speak(text);
-      _logger.info('TTS: Started speaking: ${text.substring(0, text.length > 50 ? 50 : text.length)}...');
+      _logger.info(
+        'TTS: Started speaking: ${text.substring(0, text.length > 50 ? 50 : text.length)}...',
+      );
     } catch (e) {
       _logger.error('TTS: Failed to speak text: $e');
       rethrow;
@@ -168,6 +174,7 @@ class FlutterTTSService implements ITextToSpeech {
   Future<void> stop() async {
     try {
       await _flutterTts.stop();
+      _isCurrentlySpeaking = false;
       _logger.info('TTS: Speech stopped');
     } catch (e) {
       _logger.error('TTS: Failed to stop speech: $e');
@@ -179,6 +186,7 @@ class FlutterTTSService implements ITextToSpeech {
   Future<void> pause() async {
     try {
       await _flutterTts.pause();
+      _isCurrentlySpeaking = false;
       _logger.info('TTS: Speech paused');
     } catch (e) {
       _logger.error('TTS: Failed to pause speech: $e');
@@ -191,6 +199,7 @@ class FlutterTTSService implements ITextToSpeech {
     try {
       // Flutter TTS doesn't have a direct resume method
       // We'll need to implement this differently
+      _isCurrentlySpeaking = true;
       _logger.info('TTS: Resume not supported, restarting speech');
     } catch (e) {
       _logger.error('TTS: Failed to resume speech: $e');
@@ -201,8 +210,9 @@ class FlutterTTSService implements ITextToSpeech {
   @override
   Future<bool> isSpeaking() async {
     try {
-      final speaking = await _flutterTts.isSpeaking();
-      return speaking ?? false;
+      // Flutter TTS 4.x doesn't have isSpeaking getter
+      // We'll track this manually
+      return _isCurrentlySpeaking;
     } catch (e) {
       _logger.error('TTS: Failed to check speaking status: $e');
       return false;
@@ -250,12 +260,14 @@ class FlutterTTSService implements ITextToSpeech {
     try {
       await _flutterTts.stop();
       _isInitialized = false;
+      _isCurrentlySpeaking = false;
       _logger.info('TTS: Disposed successfully');
     } catch (e) {
       _logger.error('TTS: Failed to dispose: $e');
     }
   }
 
+  @override
   /// Apply TTS configuration
   Future<void> applyConfig(TTSConfig config) async {
     try {
@@ -273,8 +285,14 @@ class FlutterTTSService implements ITextToSpeech {
     }
   }
 
+  @override
   /// Speak task details with formatting
-  Future<void> speakTask(String title, {String? description, String? priority, DateTime? dueDate}) async {
+  Future<void> speakTask(
+    String title, {
+    String? description,
+    String? priority,
+    DateTime? dueDate,
+  }) async {
     try {
       final text = _formatTaskForSpeech(title, description, priority, dueDate);
       await speak(text);
@@ -285,23 +303,28 @@ class FlutterTTSService implements ITextToSpeech {
   }
 
   /// Format task information for speech
-  String _formatTaskForSpeech(String title, String? description, String? priority, DateTime? dueDate) {
+  String _formatTaskForSpeech(
+    String title,
+    String? description,
+    String? priority,
+    DateTime? dueDate,
+  ) {
     final buffer = StringBuffer();
-    
+
     buffer.write('Task: $title');
-    
+
     if (description != null && description.isNotEmpty) {
       buffer.write('. Description: $description');
     }
-    
+
     if (priority != null && priority.isNotEmpty) {
       buffer.write('. Priority: $priority');
     }
-    
+
     if (dueDate != null) {
       final now = DateTime.now();
       final difference = dueDate.difference(now);
-      
+
       if (difference.isNegative) {
         buffer.write('. This task is overdue');
       } else if (difference.inDays == 0) {
@@ -312,7 +335,7 @@ class FlutterTTSService implements ITextToSpeech {
         buffer.write('. Due in ${difference.inDays} days');
       }
     }
-    
+
     return buffer.toString();
   }
 }
