@@ -249,6 +249,162 @@ class ResponsiveWidgets {
     );
   }
 
+  /// Create a responsive card with enhanced theming
+  static Card responsiveCard(
+    BuildContext context, {
+    required Widget child,
+    Color? backgroundColor,
+    double? borderRadius,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+    Border? border,
+    List<BoxShadow>? shadows,
+    VoidCallback? onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Card(
+      margin:
+          margin ??
+          EdgeInsets.all(
+            Responsive.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 12,
+              desktop: 16,
+            ),
+          ),
+      elevation: isDark ? 6 : 4,
+      shadowColor: isDark
+          ? Colors.black.withValues(alpha: 0.5)
+          : Colors.black.withValues(alpha: 0.15),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          borderRadius ??
+              Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 18,
+                desktop: 20,
+              ),
+        ),
+        side: border?.top ?? BorderSide.none,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(
+          borderRadius ??
+              Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 18,
+                desktop: 20,
+              ),
+        ),
+        child: Container(
+          padding:
+              padding ??
+              EdgeInsets.all(
+                Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 16,
+                  tablet: 20,
+                  desktop: 24,
+                ),
+              ),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(
+              borderRadius ??
+                  Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 16,
+                    tablet: 18,
+                    desktop: 20,
+                  ),
+            ),
+            border: border,
+            boxShadow: shadows,
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  /// Create enhanced task card with better theming
+  static Widget enhancedTaskCard(
+    BuildContext context, {
+    required Widget child,
+    bool isCompleted = false,
+    Color? priorityColor,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+
+    return Card(
+      margin:
+          margin ??
+          EdgeInsets.all(
+            Responsive.getResponsiveSpacing(
+              context,
+              mobile: 8,
+              tablet: 12,
+              desktop: 16,
+            ),
+          ),
+      elevation: isDark ? 8 : 6,
+      shadowColor: isDark
+          ? Colors.black.withValues(alpha: 0.6)
+          : Colors.black.withValues(alpha: 0.2),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isCompleted
+              ? theme.colorScheme.outline.withValues(alpha: 0.3)
+              : priorityColor?.withValues(alpha: 0.3) ??
+                    theme.colorScheme.outline.withValues(alpha: 0.2),
+          width: isCompleted ? 1 : 2,
+        ),
+      ),
+      child: Container(
+        padding:
+            padding ??
+            EdgeInsets.all(
+              Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
+              ),
+            ),
+        decoration: BoxDecoration(
+          color: isCompleted
+              ? theme.colorScheme.surface.withValues(alpha: 0.7)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          gradient: isCompleted
+              ? null
+              : (priorityColor != null
+                    ? LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          theme.colorScheme.surface,
+                          priorityColor.withValues(alpha: 0.05),
+                        ],
+                      )
+                    : null),
+        ),
+        child: child,
+      ),
+    );
+  }
+
   /// Create responsive text with device-appropriate font sizes
   static Widget responsiveText(
     BuildContext context, {

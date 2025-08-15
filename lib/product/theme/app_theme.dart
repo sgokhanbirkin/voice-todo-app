@@ -134,12 +134,14 @@ class AppTheme {
 
   /// Card theme
   CardThemeData get _cardTheme {
-    return const CardThemeData(
-      elevation: 2,
-      margin: EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-      ),
+    return CardThemeData(
+      elevation: 4,
+      margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shadowColor: currentThemeMode == ThemeMode.dark
+          ? Colors.black.withValues(alpha: 0.4)
+          : Colors.black.withValues(alpha: 0.1),
+      surfaceTintColor: Colors.transparent,
     );
   }
 
@@ -150,19 +152,6 @@ class AppTheme {
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    );
-  }
-
-  /// Page transitions for theme switching
-  PageTransitionsTheme get _pageTransitionsTheme {
-    return const PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-      },
     );
   }
 
