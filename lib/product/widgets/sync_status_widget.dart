@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/sync/sync_manager.dart';
 import '../responsive/responsive.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Widget to display sync status and allow manual sync
 class SyncStatusWidget extends StatelessWidget {
@@ -9,6 +10,7 @@ class SyncStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final syncManager = Get.find<SyncManager>();
 
     return Obx(() {
@@ -53,10 +55,10 @@ class SyncStatusWidget extends StatelessWidget {
                       : Theme.of(context).colorScheme.tertiary,
                   size: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Sync Status',
+                    l10n.syncStatus,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -65,10 +67,13 @@ class SyncStatusWidget extends StatelessWidget {
                 if (needsSync && !isSyncing)
                   ElevatedButton.icon(
                     onPressed: () => syncManager.manualSync(),
-                    icon: Icon(Icons.sync, size: 16),
-                    label: Text('Sync Now', style: TextStyle(fontSize: 12)),
+                    icon: const Icon(Icons.sync, size: 16),
+                    label: Text(
+                      l10n.syncNow,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 8,
                       ),
@@ -77,7 +82,7 @@ class SyncStatusWidget extends StatelessWidget {
                   ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               syncStatus,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -91,20 +96,26 @@ class SyncStatusWidget extends StatelessWidget {
             ),
 
             // Show detailed sync info
-            if (needsSync && !isSyncing) ...[
-              SizedBox(height: 8),
-              _buildSyncDetails(
-                context,
-                pendingTasks,
-                pendingAudio,
-                pendingTaskDeletes,
-                pendingAudioDeletes,
-              ),
-            ],
+                    if (needsSync && !isSyncing) ...[
+          SizedBox(height: Responsive.getResponsiveSpacing(
+            context,
+            mobile: 8,
+            tablet: 12,
+            desktop: 16,
+          )),
+          _buildSyncDetails(
+            context,
+            l10n,
+            pendingTasks,
+            pendingAudio,
+            pendingTaskDeletes,
+            pendingAudioDeletes,
+          ),
+        ],
             if (lastSyncTime != null) ...[
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                'Last sync: ${_formatLastSyncTime(lastSyncTime)}',
+                '${l10n.lastSync}: ${_formatLastSyncTime(lastSyncTime, l10n)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(
                     context,
@@ -113,7 +124,7 @@ class SyncStatusWidget extends StatelessWidget {
               ),
             ],
             if (isSyncing) ...[
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               LinearProgressIndicator(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -128,24 +139,25 @@ class SyncStatusWidget extends StatelessWidget {
   }
 
   /// Format last sync time
-  String _formatLastSyncTime(DateTime lastSync) {
+  String _formatLastSyncTime(DateTime lastSync, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(lastSync);
 
     if (difference.inMinutes < 1) {
-      return 'Just now';
+      return l10n.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minutes ago';
+      return '${difference.inMinutes} ${l10n.minutesAgo}';
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} hours ago';
+      return '${difference.inHours} ${l10n.hoursAgo}';
     } else {
-      return '${difference.inDays} days ago';
+      return '${difference.inDays} ${l10n.daysAgo}';
     }
   }
 
   /// Build detailed sync information widget
   Widget _buildSyncDetails(
     BuildContext context,
+    AppLocalizations l10n,
     int pendingTasks,
     int pendingAudio,
     int pendingTaskDeletes,
@@ -155,20 +167,20 @@ class SyncStatusWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (pendingTasks > 0)
-          _buildSyncItem(context, '📝 Tasks', pendingTasks, Colors.blue),
+          _buildSyncItem(context, '📝 ${l10n.tasks}', pendingTasks, Colors.blue),
         if (pendingAudio > 0)
-          _buildSyncItem(context, '🎵 Audio', pendingAudio, Colors.green),
+          _buildSyncItem(context, '🎵 ${l10n.audio}', pendingAudio, Colors.green),
         if (pendingTaskDeletes > 0)
           _buildSyncItem(
             context,
-            '🗑️ Task Deletes',
+            '🗑️ ${l10n.taskDeletes}',
             pendingTaskDeletes,
             Colors.red,
           ),
         if (pendingAudioDeletes > 0)
           _buildSyncItem(
             context,
-            '🗑️ Audio Deletes',
+            '🗑️ ${l10n.audioDeletes}',
             pendingAudioDeletes,
             Colors.orange,
           ),
@@ -184,11 +196,11 @@ class SyncStatusWidget extends StatelessWidget {
     Color color,
   ) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
           Icon(Icons.circle, size: 8, color: color),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             '$label: $count',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
