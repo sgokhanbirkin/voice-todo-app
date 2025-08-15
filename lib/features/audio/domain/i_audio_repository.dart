@@ -3,6 +3,9 @@ import 'audio_entity.dart';
 
 /// Audio repository interface for managing audio files and metadata
 abstract class IAudioRepository {
+  /// Initialize the repository
+  Future<void> initialize();
+
   /// Save audio metadata to local storage
   Future<AppResult<AudioEntity>> saveAudioMetadata(AudioEntity audio);
 

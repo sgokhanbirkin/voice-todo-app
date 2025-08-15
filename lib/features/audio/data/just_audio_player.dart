@@ -1,4 +1,5 @@
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter/foundation.dart';
 import '../domain/i_audio_player.dart';
 
 /// Just Audio player implementation
@@ -7,35 +8,66 @@ class JustAudioPlayer implements IAudioPlayer {
 
   @override
   Future<void> initialize() async {
-    // TODO: Initialize audio session and configure audio settings
-    // TODO: Set up audio focus and routing
-    // TODO: Configure default audio quality settings
+    try {
+      // Loop mode'u kapat (tek parça için)
+      await _audioPlayer.setLoopMode(LoopMode.off);
+
+      // Audio session ve focus ayarları
+      // TODO: Android audio focus ve routing
+      // TODO: iOS audio session configuration
+
+      debugPrint('JustAudioPlayer: Initialized successfully');
+    } catch (e) {
+      debugPrint('JustAudioPlayer: Failed to initialize: $e');
+      rethrow;
+    }
   }
 
   @override
   Future<void> play(String audioPath) async {
     try {
+      // NON-BLOCKING: await sadece source set etmek için
       await _audioPlayer.setFilePath(audioPath);
-      await _audioPlayer.play();
+      _audioPlayer.play(); // await YOK - non-blocking
+
+      debugPrint('JustAudioPlayer: Started playing: $audioPath');
     } catch (e) {
-      // TODO: Handle audio playback errors
+      debugPrint('JustAudioPlayer: Failed to play: $e');
       rethrow;
     }
   }
 
   @override
   Future<void> pause() async {
-    await _audioPlayer.pause();
+    try {
+      await _audioPlayer.pause();
+      debugPrint('JustAudioPlayer: Paused playback');
+    } catch (e) {
+      debugPrint('JustAudioPlayer: Failed to pause: $e');
+      rethrow;
+    }
   }
 
   @override
   Future<void> resume() async {
-    await _audioPlayer.play();
+    try {
+      _audioPlayer.play(); // await YOK - non-blocking
+      debugPrint('JustAudioPlayer: Resumed playback');
+    } catch (e) {
+      debugPrint('JustAudioPlayer: Failed to resume: $e');
+      rethrow;
+    }
   }
 
   @override
   Future<void> stop() async {
-    await _audioPlayer.stop();
+    try {
+      await _audioPlayer.stop();
+      debugPrint('JustAudioPlayer: Stopped playback');
+    } catch (e) {
+      debugPrint('JustAudioPlayer: Failed to stop: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -60,6 +92,14 @@ class JustAudioPlayer implements IAudioPlayer {
   bool get isStopped =>
       !_audioPlayer.playing && _audioPlayer.position == Duration.zero;
 
+  /// Get current processing state
+  @override
+  ProcessingState get processingState => _audioPlayer.processingState;
+
+  /// Get current player state
+  @override
+  PlayerState get playerState => _audioPlayer.playerState;
+
   @override
   Future<void> setSpeed(double speed) async {
     await _audioPlayer.setSpeed(speed);
@@ -82,9 +122,13 @@ class JustAudioPlayer implements IAudioPlayer {
   @override
   Stream<AudioPlaybackState> get playbackStateStream {
     return _audioPlayer.playerStateStream.map((state) {
-      // TODO: Map actual PlayerState values to AudioPlaybackState
-      // This is a simplified implementation
-      if (_audioPlayer.playing) {
+      // Map JustAudio PlayerState to our AudioPlaybackState
+      if (state.processingState == 'completed') {
+        return AudioPlaybackState.completed;
+      } else if (state.processingState == 'loading' ||
+          state.processingState == 'buffering') {
+        return AudioPlaybackState.loading;
+      } else if (_audioPlayer.playing) {
         return AudioPlaybackState.playing;
       } else if (_audioPlayer.position > Duration.zero) {
         return AudioPlaybackState.paused;
@@ -93,6 +137,10 @@ class JustAudioPlayer implements IAudioPlayer {
       }
     });
   }
+
+  /// Stream of player state changes (JustAudio specific)
+  @override
+  Stream<dynamic> get playerStateStream => _audioPlayer.playerStateStream;
 
   @override
   Stream<Duration> get durationStream => _audioPlayer.durationStream

@@ -54,6 +54,15 @@ abstract class IAudioPlayer {
   /// Stream of audio duration updates
   Stream<Duration> get durationStream;
 
+  /// Stream of player state changes (for JustAudio integration)
+  Stream<dynamic> get playerStateStream;
+
+  /// Get current processing state (for JustAudio integration)
+  dynamic get processingState;
+
+  /// Get current player state (for JustAudio integration)
+  dynamic get playerState;
+
   /// Disposes the audio player and releases resources
   Future<void> dispose();
 }
