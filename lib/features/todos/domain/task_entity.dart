@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 /// Task priority levels
 enum TaskPriority {
   /// Low priority
@@ -110,6 +112,42 @@ class TaskEntity {
     this.syncStatus,
   });
 
+  /// Factory constructor to create a new task with generated UUID
+  factory TaskEntity.create({
+    required String title,
+    String? description,
+    TaskPriority priority = TaskPriority.medium,
+    TaskStatus status = TaskStatus.pending,
+    DateTime? dueDate,
+    String? audioPath,
+    Duration? audioDuration,
+    List<String> tags = const [],
+    String? parentTaskId,
+    String? userId,
+  }) {
+    final now = DateTime.now();
+    final uuid = const Uuid().v4();
+
+    return TaskEntity(
+      id: uuid,
+      title: title,
+      description: description,
+      priority: priority,
+      status: status,
+      dueDate: dueDate,
+      createdAt: now,
+      updatedAt: now,
+      audioPath: audioPath,
+      audioDuration: audioDuration,
+      tags: tags,
+      parentTaskId: parentTaskId,
+      userId: userId,
+      localCreatedAt: now,
+      localUpdatedAt: now,
+      syncStatus: 'pending',
+    );
+  }
+
   /// Creates a copy of this task with updated values
   TaskEntity copyWith({
     String? id,
@@ -171,39 +209,38 @@ class TaskEntity {
         (e) => e.name == json['status'],
         orElse: () => TaskStatus.pending,
       ),
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
+      dueDate: json['due_date'] != null
+          ? DateTime.parse(json['due_date'] as String)
           : null,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      completedAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'] as String)
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'] as String)
           : null,
-      audioPath: json['audioPath'] as String?,
-      audioDuration: json['audioDuration'] != null
-          ? Duration(seconds: json['audioDuration'] as int)
+      audioPath: json['audio_path'] as String?,
+      audioDuration: json['audio_duration'] != null
+          ? Duration(seconds: json['audio_duration'] as int)
           : null,
       tags: List<String>.from(json['tags'] ?? []),
-      isArchived: json['isArchived'] as bool? ?? false,
-      isStarred: json['isStarred'] as bool? ?? false,
-      subtasks:
-          (json['subtasks'] as List<dynamic>?)
+      isArchived: json['is_archived'] as bool? ?? false,
+      isStarred: json['is_starred'] as bool? ?? false,
+      subtasks: (json['subtasks'] as List<dynamic>?)
               ?.map((e) => TaskEntity.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      parentTaskId: json['parentTaskId'] as String?,
-      userId: json['userId'] as String?,
-      localCreatedAt: json['localCreatedAt'] != null
-          ? DateTime.parse(json['localCreatedAt'] as String)
+      parentTaskId: json['parent_task_id'] as String?,
+      userId: json['user_id'] as String?,
+      localCreatedAt: json['local_created_at'] != null
+          ? DateTime.parse(json['local_created_at'] as String)
           : null,
-      localUpdatedAt: json['localUpdatedAt'] != null
-          ? DateTime.parse(json['localUpdatedAt'] as String)
+      localUpdatedAt: json['local_updated_at'] != null
+          ? DateTime.parse(json['local_created_at'] as String)
           : null,
-      syncStatus: json['syncStatus'] as String?,
+      syncStatus: json['sync_status'] as String?,
     );
   }
 
-  /// Converts the task to JSON data
+  /// Converts the task to JSON data for Supabase
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -211,21 +248,21 @@ class TaskEntity {
       'description': description,
       'priority': priority.name,
       'status': status.name,
-      'dueDate': dueDate?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'completedAt': completedAt?.toIso8601String(),
-      'audioPath': audioPath,
-      'audioDuration': audioDuration?.inSeconds,
+      'due_date': dueDate?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'completed_at': completedAt?.toIso8601String(),
+      'audio_path': audioPath,
+      'audio_duration': audioDuration?.inSeconds,
+      'audio_file_name': audioPath?.split('/').last,
       'tags': tags,
-      'isArchived': isArchived,
-      'isStarred': isStarred,
-      'subtasks': subtasks.map((e) => e.toJson()).toList(),
-      'parentTaskId': parentTaskId,
-      'userId': userId,
-      'localCreatedAt': localCreatedAt?.toIso8601String(),
-      'localUpdatedAt': localUpdatedAt?.toIso8601String(),
-      'syncStatus': syncStatus,
+      'is_archived': isArchived,
+      'is_starred': isStarred,
+      'parent_task_id': parentTaskId,
+      'user_id': userId,
+      'local_created_at': localCreatedAt?.toIso8601String(),
+      'local_updated_at': localUpdatedAt?.toIso8601String(),
+      'sync_status': syncStatus,
     };
   }
 

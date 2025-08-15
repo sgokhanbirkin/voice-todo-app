@@ -29,6 +29,19 @@ class _AddTaskFormState extends State<_AddTaskForm> {
     super.initState();
     _taskController = Get.find<TaskController>();
     _audioController = Get.find<AudioController>();
+
+    // Ses tanıma callback'ini ayarla
+    _audioController.onTextRecognized = (String recognizedText) {
+      // Tanınan metni description'a ekle
+      final currentText = _descriptionController.text;
+      final newText = currentText.isEmpty
+          ? recognizedText
+          : '$currentText\n\n$recognizedText';
+
+      setState(() {
+        _descriptionController.text = newText;
+      });
+    };
   }
 
   @override
@@ -37,6 +50,8 @@ class _AddTaskFormState extends State<_AddTaskForm> {
       key: _formKey,
       child: SingleChildScrollView(
         padding: Responsive.getResponsivePadding(context),
+        physics:
+            const ClampingScrollPhysics(), // Android'de daha iyi scroll davranışı
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -124,8 +139,11 @@ class _AddTaskFormState extends State<_AddTaskForm> {
     });
 
     try {
-      final task = TaskEntity(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      // Get current user ID from Supabase
+      final supabaseService = Get.find<SupabaseService>();
+      final currentUserId = supabaseService.currentUser?.id;
+
+      final task = TaskEntity.create(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim().isEmpty
             ? null
@@ -133,29 +151,33 @@ class _AddTaskFormState extends State<_AddTaskForm> {
         priority: _selectedPriority,
         dueDate: _selectedDueDate,
         audioPath: _audioPath,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        userId: currentUserId,
       );
 
       await _taskController.createTask(task);
 
       if (mounted) {
-        Get.snackbar(
-          'Success',
-          'Task created successfully!',
-          backgroundColor: AppColors.success.withValues(alpha: 0.9),
-          colorText: Colors.white,
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.taskCreatedSuccessfully),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
 
-        context.pop();
+        // Ana sayfaya dön
+        context.go('/');
       }
     } catch (e) {
       if (mounted) {
-        Get.snackbar(
-          'Error',
-          'Failed to create task: $e',
-          backgroundColor: AppColors.error.withValues(alpha: 0.9),
-          colorText: Colors.white,
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.failedToCreateTask}: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     } finally {

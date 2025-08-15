@@ -2,6 +2,8 @@ part of 'add_task_page.dart';
 
 /// Audio recording component with play/pause/delete functionality
 /// Provides visual feedback and error handling for audio operations
+///
+/// TODO LOCALIZATION
 class _AddTaskAudioRecorder extends StatelessWidget {
   final String? audioPath;
   final Function(String?) onAudioPathChanged;
@@ -45,35 +47,22 @@ class _AddTaskAudioRecorder extends StatelessWidget {
             ),
           ),
 
-          // Recording Controls
-          ResponsiveBuilder(
-            mobile: (context) => Column(
-              children: [
-                _buildRecordButton(context, l10n, isRecording),
-                if (audioPath != null) ...[
-                  SizedBox(height: 12.h),
-                  _buildPlayButton(context, l10n, isPlaying),
-                ],
+          // Recording Controls - Always in Row
+          Row(
+            children: [
+              Expanded(child: _buildRecordButton(context, l10n, isRecording)),
+              if (audioPath != null) ...[
+                SizedBox(
+                  width: Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 12,
+                    tablet: 16,
+                    desktop: 20,
+                  ),
+                ),
+                Expanded(child: _buildPlayButton(context, l10n, isPlaying)),
               ],
-            ),
-            tablet: (context) => Row(
-              children: [
-                Expanded(child: _buildRecordButton(context, l10n, isRecording)),
-                if (audioPath != null) ...[
-                  SizedBox(width: 16.w),
-                  Expanded(child: _buildPlayButton(context, l10n, isPlaying)),
-                ],
-              ],
-            ),
-            desktop: (context) => Row(
-              children: [
-                Expanded(child: _buildRecordButton(context, l10n, isRecording)),
-                if (audioPath != null) ...[
-                  SizedBox(width: 24.w),
-                  Expanded(child: _buildPlayButton(context, l10n, isPlaying)),
-                ],
-              ],
-            ),
+            ],
           ),
 
           // Audio visualization or status
@@ -94,33 +83,87 @@ class _AddTaskAudioRecorder extends StatelessWidget {
                 ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    isRecording ? Icons.mic : Icons.audio_file,
-                    color: isRecording
-                        ? AppColors.audioRecording
-                        : AppColors.audioStopped,
-                    size: 20.sp,
+                  // Status row
+                  Row(
+                    children: [
+                      Icon(
+                        isRecording ? Icons.mic : Icons.audio_file,
+                        color: isRecording
+                            ? AppColors.audioRecording
+                            : AppColors.audioStopped,
+                        size: 20.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          isRecording
+                              ? l10n.recordingInProgress
+                              : l10n.audioRecordedSuccessfully,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                      if (audioPath != null)
+                        IconButton(
+                          onPressed: () {
+                            onAudioPathChanged(null);
+                            audioController.stopPlayback();
+                          },
+                          icon: const Icon(Icons.delete_outline),
+                          iconSize: 18.sp,
+                        ),
+                    ],
                   ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Text(
-                      isRecording
-                          ? 'Recording in progress...'
-                          : 'Audio recorded successfully',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  if (audioPath != null)
-                    IconButton(
-                      onPressed: () {
-                        onAudioPathChanged(null);
-                        audioController.stopPlayback();
-                      },
-                      icon: const Icon(Icons.delete_outline),
-                      iconSize: 18.sp,
-                    ),
+
+                  // Live transcription display
+                  if (isRecording) ...[
+                    SizedBox(height: 8.h),
+                    Obx(() {
+                      final recognizedText =
+                          audioController.recognizedText.value;
+                      final isListening = audioController.isListening.value;
+
+                      if (isListening && recognizedText.isNotEmpty) {
+                        return Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(6.r),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.auto_awesome,
+                                size: 16.sp,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Text(
+                                  recognizedText,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                  ],
                 ],
               ),
             ),
@@ -165,48 +208,100 @@ class _AddTaskAudioRecorder extends StatelessWidget {
     );
   }
 
-  /// Build play button
+  /// Build play button with reactive icon states
   Widget _buildPlayButton(
     BuildContext context,
     AppLocalizations l10n,
     bool isPlaying,
   ) {
-    return ElevatedButton.icon(
-      onPressed: isPlaying ? _pauseAudio : _playAudio,
-      icon: Icon(
-        isPlaying ? Icons.pause : Icons.play_arrow,
-        color: AppColors.audioPlaying,
-      ),
-      label: Text(
-        isPlaying ? l10n.pauseAudio : l10n.playAudio,
-        style: TextStyle(
-          fontSize: Responsive.getResponsiveFontSize(
-            context,
-            mobile: 14,
-            tablet: 16,
-            desktop: 18,
+    return Obx(() {
+      // Get reactive states from AudioController
+      final isBuffering = audioController.isBuffering.value;
+      final isCompleted = audioController.isCompleted.value;
+      final isCurrentlyPlaying = audioController.isPlaying.value;
+
+      // Determine icon and action based on state
+      IconData icon;
+      String label;
+      VoidCallback? onPressed;
+
+      if (isBuffering) {
+        // Buffering: show spinner
+        icon = Icons.autorenew;
+        label = l10n.loading;
+        onPressed = null; // Disabled during buffering
+      } else if (isCurrentlyPlaying) {
+        // Playing: show pause
+        icon = Icons.pause;
+        label = l10n.pauseAudio;
+        onPressed = _pauseAudio;
+      } else if (isCompleted) {
+        // Completed: show replay
+        icon = Icons.replay;
+        label = l10n.playAudio; // Use existing key for now
+        onPressed = _playAudio;
+      } else {
+        // Stopped/Paused: show play
+        icon = Icons.play_arrow;
+        label = l10n.playAudio;
+        onPressed = _playAudio;
+      }
+
+      return ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: isBuffering
+            ? SizedBox(
+                width: 16.w,
+                height: 16.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.w,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.audioPlaying,
+                  ),
+                ),
+              )
+            : Icon(icon, color: AppColors.audioPlaying),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: Responsive.getResponsiveFontSize(
+              context,
+              mobile: 14,
+              tablet: 16,
+              desktop: 18,
+            ),
           ),
         ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.audioPlaying.withValues(alpha: 0.1),
-        foregroundColor: AppColors.audioPlaying,
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      ),
-    );
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.audioPlaying.withValues(alpha: 0.1),
+          foregroundColor: AppColors.audioPlaying,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        ),
+      );
+    });
   }
 
   /// Start recording audio
   Future<void> _startRecording() async {
     try {
+      debugPrint('AddTaskAudioRecorder: _startRecording called');
       await audioController.startRecording();
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to start recording: $e',
-        backgroundColor: AppColors.error.withValues(alpha: 0.9),
-        colorText: Colors.white,
-      );
+      debugPrint('AddTaskAudioRecorder: startRecording completed successfully');
+    } catch (e, stackTrace) {
+      debugPrint('AddTaskAudioRecorder: Failed to start recording: $e');
+      debugPrint('AddTaskAudioRecorder: Error stack trace: $stackTrace');
+      debugPrint('AddTaskAudioRecorder: Error type: ${e.runtimeType}');
+
+      // Use Flutter's native SnackBar instead of Get.snackbar
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start recording: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -214,16 +309,28 @@ class _AddTaskAudioRecorder extends StatelessWidget {
   Future<void> _stopRecording() async {
     try {
       await audioController.stopRecording();
-      
-      // AudioController should provide the recorded path
-      onAudioPathChanged('recorded_audio_${DateTime.now().millisecondsSinceEpoch}.m4a');
+
+      // AudioController'dan gerçek path'i al
+      final lastRecordedPath = audioController.getLastRecordedAudioPath();
+      if (lastRecordedPath != null) {
+        onAudioPathChanged(lastRecordedPath);
+        debugPrint(
+          'AddTaskAudioRecorder: Updated audio path: $lastRecordedPath',
+        );
+      } else {
+        debugPrint('AddTaskAudioRecorder: No recorded audio path found');
+      }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to stop recording: $e',
-        backgroundColor: AppColors.error.withValues(alpha: 0.9),
-        colorText: Colors.white,
-      );
+      // Use Flutter's native SnackBar instead of Get.snackbar
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text('Failed to stop recording: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -248,12 +355,16 @@ class _AddTaskAudioRecorder extends StatelessWidget {
         );
         await audioController.playAudio(audioEntity);
       } catch (e) {
-        Get.snackbar(
-          'Error',
-          'Failed to play audio: $e',
-          backgroundColor: AppColors.error.withValues(alpha: 0.9),
-          colorText: Colors.white,
-        );
+        // Use Flutter's native SnackBar instead of Get.snackbar
+        if (Get.context != null) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Text('Failed to play audio: $e'),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     }
   }
@@ -263,12 +374,16 @@ class _AddTaskAudioRecorder extends StatelessWidget {
     try {
       await audioController.pausePlayback();
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to pause audio: $e',
-        backgroundColor: AppColors.error.withValues(alpha: 0.9),
-        colorText: Colors.white,
-      );
+      // Use Flutter's native SnackBar instead of Get.snackbar
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pause audio: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }

@@ -25,156 +25,442 @@ class _AddTaskFormFields extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Task Title Field
-        _buildTitleField(context, l10n),
+        _buildModernTitleField(context, l10n),
 
         SizedBox(
           height: Responsive.getResponsiveSpacing(
             context,
-            mobile: 16,
-            tablet: 20,
-            desktop: 24,
+            mobile: 20,
+            tablet: 24,
+            desktop: 28,
           ),
         ),
 
         // Description Field
-        _buildDescriptionField(context, l10n),
+        _buildModernDescriptionField(context, l10n),
 
         SizedBox(
           height: Responsive.getResponsiveSpacing(
+            context,
+            mobile: 20,
+            tablet: 24,
+            desktop: 28,
+          ),
+        ),
+
+        // Due Date Selection
+        _buildModernDueDateSection(context, l10n),
+      ],
+    );
+  }
+
+  /// Build modern task title field
+  Widget _buildModernTitleField(BuildContext context, AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(
+          Responsive.getResponsiveSpacing(
             context,
             mobile: 16,
             tablet: 20,
             desktop: 24,
           ),
         ),
-
-        // Due Date Selection
-        _buildDueDateSection(context, l10n),
-      ],
-    );
-  }
-
-  /// Build task title field
-  Widget _buildTitleField(BuildContext context, AppLocalizations l10n) {
-    return TextFormField(
-      controller: titleController,
-      decoration: InputDecoration(
-        labelText: l10n.taskTitle,
-        hintText: 'Enter task title...',
-        prefixIcon: const Icon(Icons.title),
-        border: const OutlineInputBorder(),
-      ),
-      style: TextStyle(
-        fontSize: Responsive.getResponsiveFontSize(
-          context,
-          mobile: 16,
-          tablet: 18,
-          desktop: 20,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      validator: taskController.validateTaskTitle,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      textInputAction: TextInputAction.next,
-    );
-  }
-
-  /// Build description field
-  Widget _buildDescriptionField(BuildContext context, AppLocalizations l10n) {
-    return TextFormField(
-      controller: descriptionController,
-      decoration: InputDecoration(
-        labelText: l10n.taskDescription,
-        hintText: 'Enter task description (optional)...',
-        prefixIcon: const Icon(Icons.description),
-        border: const OutlineInputBorder(),
-        alignLabelWithHint: true,
-      ),
-      style: TextStyle(
-        fontSize: Responsive.getResponsiveFontSize(
-          context,
-          mobile: 14,
-          tablet: 16,
-          desktop: 18,
+      child: TextFormField(
+        controller: titleController,
+        decoration: InputDecoration(
+          labelText: l10n.taskTitle,
+          hintText: l10n.taskTitleHint,
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(
+              left: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(
+                Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.title,
+                color: Theme.of(context).colorScheme.primary,
+                size: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 20,
+                  tablet: 22,
+                  desktop: 24,
+                ),
+              ),
+            ),
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.all(
+            Responsive.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 20,
+              desktop: 24,
+            ),
+          ),
         ),
+        style: TextStyle(
+          fontSize: Responsive.getResponsiveFontSize(
+            context,
+            mobile: 16,
+            tablet: 18,
+            desktop: 20,
+          ),
+          fontWeight: FontWeight.w500,
+        ),
+        validator: taskController.validateTaskTitle,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        textInputAction: TextInputAction.next,
       ),
-      maxLines: Responsive.isDesktop(context) ? 4 : 3,
-      validator: taskController.validateTaskDescription,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      textInputAction: TextInputAction.newline,
     );
   }
 
-  /// Build due date selection section
-  Widget _buildDueDateSection(BuildContext context, AppLocalizations l10n) {
+  /// Build modern description field
+  Widget _buildModernDescriptionField(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(
+          Responsive.getResponsiveSpacing(
+            context,
+            mobile: 16,
+            tablet: 20,
+            desktop: 24,
+          ),
+        ),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: descriptionController,
+        decoration: InputDecoration(
+          labelText: l10n.taskDescription,
+          hintText: l10n.taskDescriptionHint,
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(
+              left: Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(
+                Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.secondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.description,
+                color: Theme.of(context).colorScheme.secondary,
+                size: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 20,
+                  tablet: 22,
+                  desktop: 24,
+                ),
+              ),
+            ),
+          ),
+          border: InputBorder.none,
+          alignLabelWithHint: true,
+          contentPadding: EdgeInsets.all(
+            Responsive.getResponsiveSpacing(
+              context,
+              mobile: 16,
+              tablet: 20,
+              desktop: 24,
+            ),
+          ),
+        ),
+        style: TextStyle(
+          fontSize: Responsive.getResponsiveFontSize(
+            context,
+            mobile: 14,
+            tablet: 16,
+            desktop: 18,
+          ),
+          fontWeight: FontWeight.w400,
+        ),
+        maxLines: Responsive.isDesktop(context) ? 4 : 3,
+        validator: taskController.validateTaskDescription,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        textInputAction: TextInputAction.newline,
+      ),
+    );
+  }
+
+  /// Build modern due date selection section
+  Widget _buildModernDueDateSection(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.taskDueDate,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontSize: Responsive.getResponsiveFontSize(
+        // Section Header
+        Container(
+          margin: EdgeInsets.only(
+            bottom: Responsive.getResponsiveSpacing(
               context,
-              mobile: 16,
-              tablet: 18,
+              mobile: 12,
+              tablet: 16,
               desktop: 20,
             ),
-            fontWeight: FontWeight.w600,
           ),
-        ),
-        SizedBox(
-          height: Responsive.getResponsiveSpacing(
-            context,
-            mobile: 8,
-            tablet: 12,
-            desktop: 16,
-          ),
-        ),
-        InkWell(
-          onTap: () => _selectDueDate(context),
-          child: Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today,
+                color: Theme.of(context).colorScheme.tertiary,
+                size: Responsive.getResponsiveSpacing(
                   context,
-                ).colorScheme.outline.withValues(alpha: 0.5),
-              ),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Theme.of(context).colorScheme.primary,
+                  mobile: 20,
+                  tablet: 22,
+                  desktop: 24,
                 ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Text(
-                    selectedDueDate != null
-                        ? '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}'
-                        : 'Select due date (optional)',
-                    style: TextStyle(
+              ),
+              SizedBox(
+                width: Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  desktop: 12,
+                ),
+              ),
+              Text(
+                l10n.taskDueDate,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontSize: Responsive.getResponsiveFontSize(
+                    context,
+                    mobile: 16,
+                    tablet: 18,
+                    desktop: 20,
+                  ),
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Modern Date Picker Container
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _selectDueDate(context),
+            borderRadius: BorderRadius.circular(
+              Responsive.getResponsiveSpacing(
+                context,
+                mobile: 16,
+                tablet: 20,
+                desktop: 24,
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(
+                Responsive.getResponsiveSpacing(
+                  context,
+                  mobile: 20,
+                  tablet: 24,
+                  desktop: 28,
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(
+                  Responsive.getResponsiveSpacing(
+                    context,
+                    mobile: 16,
+                    tablet: 20,
+                    desktop: 24,
+                  ),
+                ),
+                border: Border.all(
+                  color: selectedDueDate != null
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.tertiary.withValues(alpha: 0.3)
+                      : Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.2),
+                  width: selectedDueDate != null ? 2 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Calendar Icon Container
+                  Container(
+                    padding: EdgeInsets.all(
+                      Responsive.getResponsiveSpacing(
+                        context,
+                        mobile: 10,
+                        tablet: 12,
+                        desktop: 14,
+                      ),
+                    ),
+                    decoration: BoxDecoration(
                       color: selectedDueDate != null
-                          ? Theme.of(context).colorScheme.onSurface
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.tertiary.withValues(alpha: 0.15)
                           : Theme.of(
                               context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontSize: Responsive.getResponsiveFontSize(
+                            ).colorScheme.tertiary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.calendar_today,
+                      color: Theme.of(context).colorScheme.tertiary,
+                      size: Responsive.getResponsiveSpacing(
                         context,
-                        mobile: 16,
-                        tablet: 18,
-                        desktop: 20,
+                        mobile: 22,
+                        tablet: 24,
+                        desktop: 26,
                       ),
                     ),
                   ),
-                ),
-                if (selectedDueDate != null)
-                  IconButton(
-                    onPressed: () => onDueDateChanged(null),
-                    icon: const Icon(Icons.clear),
-                    iconSize: 20.sp,
+
+                  SizedBox(
+                    width: Responsive.getResponsiveSpacing(
+                      context,
+                      mobile: 16,
+                      tablet: 20,
+                      desktop: 24,
+                    ),
                   ),
-              ],
+
+                  // Date Text
+                  Expanded(
+                    child: Text(
+                      selectedDueDate != null
+                          ? '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}'
+                          : l10n.selectDueDateHint,
+                      style: TextStyle(
+                        color: selectedDueDate != null
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: Responsive.getResponsiveFontSize(
+                          context,
+                          mobile: 16,
+                          tablet: 18,
+                          desktop: 20,
+                        ),
+                        fontWeight: selectedDueDate != null
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+
+                  // Clear Button
+                  if (selectedDueDate != null)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: IconButton(
+                        onPressed: () => onDueDateChanged(null),
+                        icon: Icon(
+                          Icons.clear,
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                          size: Responsive.getResponsiveSpacing(
+                            context,
+                            mobile: 18,
+                            tablet: 20,
+                            desktop: 22,
+                          ),
+                        ),
+                        padding: EdgeInsets.all(
+                          Responsive.getResponsiveSpacing(
+                            context,
+                            mobile: 6,
+                            tablet: 8,
+                            desktop: 10,
+                          ),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: Responsive.getResponsiveSpacing(
+                            context,
+                            mobile: 32,
+                            tablet: 36,
+                            desktop: 40,
+                          ),
+                          minHeight: Responsive.getResponsiveSpacing(
+                            context,
+                            mobile: 32,
+                            tablet: 36,
+                            desktop: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

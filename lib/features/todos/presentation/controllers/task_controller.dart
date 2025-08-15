@@ -3,10 +3,15 @@ import 'package:get/get.dart';
 import '../../domain/task_entity.dart';
 import '../../domain/i_task_repository.dart';
 import '../../../../core/validation/validators.dart';
+import '../../../../core/sync/sync_manager.dart';
+
+/// Sort order options for tasks
+enum SortOrder { dateAscending, dateDescending, priority, alphabetical }
 
 /// Task controller for managing task state and operations
 class TaskController extends GetxController {
   final ITaskRepository _taskRepository;
+  final SyncManager _syncManager = Get.find<SyncManager>();
 
   /// Observable list of all tasks
   final RxList<TaskEntity> tasks = <TaskEntity>[].obs;
@@ -52,6 +57,21 @@ class TaskController extends GetxController {
 
   /// Current sort direction
   final RxBool sortAscending = false.obs;
+
+  /// Current sort order
+  final Rx<SortOrder> sortOrder = SortOrder.dateDescending.obs;
+
+  /// Audio filter
+  final RxBool audioFilter = false.obs;
+
+  /// Completed filter
+  final RxBool completedFilter = false.obs;
+
+  /// Pending filter
+  final RxBool pendingFilter = false.obs;
+
+  /// Overdue filter
+  final RxBool overdueFilter = false.obs;
 
   /// Whether tasks are currently loading
   final RxBool isLoading = false.obs;
@@ -163,6 +183,10 @@ class TaskController extends GetxController {
           _updateFilteredTasks();
           _updateCategorizedTasks();
           loadTaskStatistics(); // Statistics'i güncelle
+
+          // Add to sync queue for Supabase
+          _syncManager.addTaskToSyncQueue(createdTask);
+
           _showSnackbar('Success', 'Task created successfully');
         },
         (failure) {
@@ -194,6 +218,10 @@ class TaskController extends GetxController {
             tasks[index] = updatedTask;
             _updateFilteredTasks();
             _updateCategorizedTasks();
+
+            // Add to sync queue for Supabase
+            _syncManager.addTaskToSyncQueue(updatedTask);
+
             _showSnackbar('Success', 'Task updated successfully');
           }
         },
@@ -225,6 +253,10 @@ class TaskController extends GetxController {
           _updateFilteredTasks();
           _updateCategorizedTasks();
           loadTaskStatistics(); // Statistics'i güncelle
+
+          // Add to sync queue for Supabase delete
+          _syncManager.addTaskDeleteToSyncQueue(taskId);
+
           _showSnackbar('Success', 'Task deleted successfully');
         },
         (failure) {
@@ -366,10 +398,16 @@ class TaskController extends GetxController {
 
   /// Sets the filter priority and updates filtered tasks
   void setFilterPriority(TaskPriority? priority) {
-    print('🔥 Filter changing from ${filterPriority.value} to $priority');
+    debugPrint('🔥 Filter changing from ${filterPriority.value} to $priority');
     filterPriority.value = priority;
     _updateFilteredTasks();
-    print('🔥 After filter: ${filteredTasks.length} tasks shown');
+    debugPrint('🔥 After filter: ${filteredTasks.length} tasks shown');
+  }
+
+  /// Set sort order
+  void setSortOrder(SortOrder order) {
+    sortOrder.value = order;
+    _updateFilteredTasks();
   }
 
   /// Sets the sort field and updates filtered tasks
@@ -425,35 +463,57 @@ class TaskController extends GetxController {
           .toList();
     }
 
-    // Apply sorting
+    // Apply audio filter
+    if (audioFilter.value) {
+      filtered = filtered
+          .where((task) => task.audioPath != null && task.audioPath!.isNotEmpty)
+          .toList();
+    }
+
+    // Apply completed filter
+    if (completedFilter.value) {
+      filtered = filtered
+          .where((task) => task.status == TaskStatus.completed)
+          .toList();
+    }
+
+    // Apply pending filter
+    if (pendingFilter.value) {
+      filtered = filtered
+          .where((task) => task.status == TaskStatus.pending)
+          .toList();
+    }
+
+    // Apply overdue filter
+    if (overdueFilter.value) {
+      filtered = filtered
+          .where(
+            (task) =>
+                task.dueDate != null && task.dueDate!.isBefore(DateTime.now()),
+          )
+          .toList();
+    }
+
+    // Apply sorting based on sort order
     filtered.sort((a, b) {
       int comparison = 0;
 
-      switch (sortBy.value) {
-        case 'title':
-          comparison = a.title.compareTo(b.title);
-          break;
-        case 'priority':
-          comparison = a.priority.index.compareTo(b.priority.index);
-          break;
-        case 'dueDate':
-          if (a.dueDate == null && b.dueDate == null) {
-            comparison = 0;
-          } else if (a.dueDate == null) {
-            comparison = 1;
-          } else if (b.dueDate == null) {
-            comparison = -1;
-          } else {
-            comparison = a.dueDate!.compareTo(b.dueDate!);
-          }
-          break;
-        case 'createdAt':
-        default:
+      switch (sortOrder.value) {
+        case SortOrder.dateAscending:
           comparison = a.createdAt.compareTo(b.createdAt);
+          break;
+        case SortOrder.dateDescending:
+          comparison = b.createdAt.compareTo(a.createdAt);
+          break;
+        case SortOrder.priority:
+          comparison = b.priority.index.compareTo(a.priority.index);
+          break;
+        case SortOrder.alphabetical:
+          comparison = a.title.toLowerCase().compareTo(b.title.toLowerCase());
           break;
       }
 
-      return sortAscending.value ? comparison : -comparison;
+      return comparison;
     });
 
     filteredTasks.assignAll(filtered);
@@ -505,6 +565,41 @@ class TaskController extends GetxController {
     filterPriority.value = null;
     sortBy.value = 'createdAt';
     sortAscending.value = false;
+    _updateFilteredTasks();
+  }
+
+  /// Clears all advanced filters (audio, completed, pending, overdue)
+  void clearAllFilters() {
+    clearFilters();
+    audioFilter.value = false;
+    completedFilter.value = false;
+    pendingFilter.value = false;
+    overdueFilter.value = false;
+    sortOrder.value = SortOrder.dateDescending;
+    _updateFilteredTasks();
+  }
+
+  /// Toggle audio filter
+  void toggleAudioFilter() {
+    audioFilter.value = !audioFilter.value;
+    _updateFilteredTasks();
+  }
+
+  /// Toggle completed filter
+  void toggleCompletedFilter() {
+    completedFilter.value = !completedFilter.value;
+    _updateFilteredTasks();
+  }
+
+  /// Toggle pending filter
+  void togglePendingFilter() {
+    pendingFilter.value = !pendingFilter.value;
+    _updateFilteredTasks();
+  }
+
+  /// Toggle overdue filter
+  void toggleOverdueFilter() {
+    overdueFilter.value = !overdueFilter.value;
     _updateFilteredTasks();
   }
 }
