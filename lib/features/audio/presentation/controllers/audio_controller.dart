@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../domain/audio_entity.dart';
 import '../../domain/i_audio_repository.dart';
 import '../../domain/i_audio_recorder.dart';
@@ -10,7 +10,6 @@ import '../../domain/i_speech_to_text.dart';
 import 'audio_permission_controller.dart';
 import '../../../../core/sync/sync_manager.dart';
 
-// TODO Localization
 /// Audio controller for managing audio recording, playback, and storage
 class AudioController extends GetxController {
   final IAudioRepository _audioRepository;
@@ -78,6 +77,12 @@ class AudioController extends GetxController {
 
   /// Callback for recognized text
   Function(String)? onTextRecognized;
+
+  /// Timer for recording duration updates
+  Timer? _recordingTimer;
+
+  /// Timer for playback position updates
+  Timer? _playbackTimer;
 
   /// Speech-to-text state
   final RxBool isListening = false.obs;
@@ -205,6 +210,10 @@ class AudioController extends GetxController {
 
   @override
   void onClose() {
+    // Cancel timers
+    _recordingTimer?.cancel();
+    _playbackTimer?.cancel();
+    
     stopRecording();
     stopPlayback();
     super.onClose();
@@ -436,60 +445,6 @@ class AudioController extends GetxController {
     }
   }
 
-  /// Get safe audio directory for recording
-  Future<Directory> _getAudioDirectory() async {
-    try {
-      Directory directory;
-
-      if (Platform.isAndroid) {
-        // Android: Use app documents directory
-        directory = await getApplicationDocumentsDirectory();
-        final audioDir = Directory('${directory.path}/audio');
-        if (!await audioDir.exists()) {
-          await audioDir.create(recursive: true);
-        }
-        return audioDir;
-      } else if (Platform.isIOS) {
-        // iOS: Use app documents directory
-        directory = await getApplicationDocumentsDirectory();
-        final audioDir = Directory('${directory.path}/audio');
-        if (!await audioDir.exists()) {
-          await audioDir.create(recursive: true);
-        }
-        return audioDir;
-      } else {
-        // Web/Desktop: Use temporary directory
-        directory = await getTemporaryDirectory();
-        final audioDir = Directory('${directory.path}/audio');
-        if (!await audioDir.exists()) {
-          await audioDir.create(recursive: true);
-        }
-        return audioDir;
-      }
-    } catch (e) {
-      debugPrint('AudioController: Failed to get audio directory: $e');
-      // Fallback to temporary directory
-      final tempDir = await getTemporaryDirectory();
-      return tempDir;
-    }
-  }
-
-  /// Generate safe audio file path
-  Future<String> _generateAudioFilePath() async {
-    try {
-      final audioDir = await _getAudioDirectory();
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final fileName = 'audio_$timestamp.m4a';
-      return '${audioDir.path}/$fileName';
-    } catch (e) {
-      debugPrint('AudioController: Failed to generate audio file path: $e');
-      // Fallback to temporary file
-      final tempDir = await getTemporaryDirectory();
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      return '${tempDir.path}/audio_$timestamp.m4a';
-    }
-  }
-
   /// Stop audio recording and save
   Future<void> stopRecording({String? taskId}) async {
     try {
@@ -502,6 +457,9 @@ class AudioController extends GetxController {
 
       final audioPath = await _audioRecorder.stopRecording();
       isRecording.value = false;
+      
+      // Stop recording timer
+      _recordingTimer?.cancel();
 
       debugPrint(
         'AudioController: Received audio path from recorder: $audioPath',
@@ -570,6 +528,9 @@ class AudioController extends GetxController {
       await _audioRecorder.cancelRecording();
       isRecording.value = false;
       recordingDuration.value = Duration.zero;
+      
+      // Stop recording timer
+      _recordingTimer?.cancel();
       _showSafeSnackbar('Cancelled', 'Audio recording cancelled');
     } catch (e) {
       Get.snackbar(
@@ -687,6 +648,9 @@ class AudioController extends GetxController {
       isPaused.value = false;
       playingAudio.value = null;
       playbackPosition.value = Duration.zero;
+      
+      // Stop playback timer
+      _playbackTimer?.cancel();
       _showSafeSnackbar('Stopped', 'Audio playback stopped');
     } catch (e) {
       _showSafeSnackbar(
@@ -798,14 +762,35 @@ class AudioController extends GetxController {
 
   /// Start recording timer
   void _startRecordingTimer() {
-    // TODO: Implement recording timer
-    // This would typically use a periodic timer to update recording duration
+    // Cancel existing timer if any
+    _recordingTimer?.cancel();
+    
+    // Start periodic timer to update recording duration
+    _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (isRecording.value) {
+        recordingDuration.value = recordingDuration.value + const Duration(milliseconds: 100);
+      } else {
+        timer.cancel();
+      }
+    });
   }
 
   /// Start playback timer
   void _startPlaybackTimer() {
-    // TODO: Implement playback timer
-    // This would typically use a periodic timer to update playback position
+    // Cancel existing timer if any
+    _playbackTimer?.cancel();
+    
+    // Start periodic timer to update playback position
+    _playbackTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (isPlaying.value && !isCompleted.value) {
+        // Update position from player if available
+        if (_audioPlayer.position > Duration.zero) {
+          playbackPosition.value = _audioPlayer.position;
+        }
+      } else {
+        timer.cancel();
+      }
+    });
   }
 
   /// Get file size in bytes
@@ -829,57 +814,6 @@ class AudioController extends GetxController {
   }
 
   // ===== SPEECH-TO-TEXT METHODS =====
-
-  /// Convert recorded audio to text
-  Future<void> _convertAudioToText(AudioEntity audioEntity) async {
-    try {
-      debugPrint(
-        'AudioController: Converting audio to text: ${audioEntity.localPath}',
-      );
-
-      _showSafeSnackbar(
-        'Info',
-        'Ses metne dönüştürülüyor...',
-        backgroundColor: Colors.blue,
-      );
-
-      // Speech-to-text'i başlat
-      await startSpeechRecognition();
-
-      // Ses dosyasını oynat (speech recognition çalışırken)
-      await playAudio(audioEntity);
-
-      // Ses oynatma bitene kadar bekle
-      while (isPlaying.value) {
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-
-      // Speech recognition'i durdur
-      await stopSpeechRecognition();
-
-      // Tanınan metni callback'e gönder
-      if (recognizedText.value.isNotEmpty) {
-        onTextRecognized?.call(recognizedText.value);
-        _showSafeSnackbar(
-          'Success',
-          'Metin tanındı: ${recognizedText.value.substring(0, 50)}...',
-        );
-      } else {
-        _showSafeSnackbar(
-          'Info',
-          'Metin tanınamadı, tekrar deneyin',
-          backgroundColor: Colors.orange,
-        );
-      }
-    } catch (e) {
-      debugPrint('AudioController: Failed to convert audio to text: $e');
-      _showSafeSnackbar(
-        'Error',
-        'Ses metne dönüştürülemedi: $e',
-        backgroundColor: Colors.red,
-      );
-    }
-  }
 
   /// Start speech recognition
   Future<void> startSpeechRecognition() async {
