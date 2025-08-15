@@ -4,11 +4,11 @@ import '../../../../../product/responsive/responsive.dart';
 import '../../../../../product/theme/app_theme.dart';
 import '../../controllers/task_controller.dart';
 
-// TODO LOCALIZATION
+// Localization implemented
 /// Loading, error, and empty states for home page body
 class HomePageBodyStates {
   /// Build loading state with circular progress indicator
-  static Widget buildLoadingState(BuildContext context) {
+  static Widget buildLoadingState(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -22,7 +22,7 @@ class HomePageBodyStates {
           ),
           ResponsiveWidgets.responsiveText(
             context,
-            text: 'Loading tasks...',
+            text: l10n.loading,
             mobileFontSize: 16,
             tabletFontSize: 18,
             desktopFontSize: 20,
@@ -37,6 +37,7 @@ class HomePageBodyStates {
   static Widget buildErrorState(
     BuildContext context,
     TaskController controller,
+    AppLocalizations l10n,
   ) {
     return Center(
       child: ResponsiveWidgets.responsiveContainer(
@@ -61,7 +62,7 @@ class HomePageBodyStates {
             ),
             ResponsiveWidgets.responsiveText(
               context,
-              text: 'Failed to load tasks',
+              text: l10n.error,
               mobileFontSize: 18,
               tabletFontSize: 20,
               desktopFontSize: 22,
@@ -78,7 +79,7 @@ class HomePageBodyStates {
             ),
             ResponsiveWidgets.responsiveText(
               context,
-              text: 'Please check your connection and try again',
+              text: l10n.taskLoadError,
               mobileFontSize: 14,
               tabletFontSize: 16,
               desktopFontSize: 18,
@@ -96,7 +97,7 @@ class HomePageBodyStates {
               icon: const Icon(Icons.refresh),
               label: ResponsiveWidgets.responsiveText(
                 context,
-                text: 'Retry',
+                text: l10n.retry,
                 mobileFontSize: 16,
                 tabletFontSize: 18,
                 desktopFontSize: 20,
@@ -151,7 +152,7 @@ class HomePageBodyStates {
             ),
             ResponsiveWidgets.responsiveText(
               context,
-              text: 'Create your first task to get started',
+              text: l10n.noTasksDescription,
               mobileFontSize: 16,
               tabletFontSize: 18,
               desktopFontSize: 20,

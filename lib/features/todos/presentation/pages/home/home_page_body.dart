@@ -11,11 +11,11 @@ class HomePageBody extends StatelessWidget {
       final controller = Get.find<TaskController>();
 
       if (controller.isLoading.value) {
-        return HomePageBodyStates.buildLoadingState(context);
+        return HomePageBodyStates.buildLoadingState(context, l10n);
       }
 
       if (controller.hasError.value) {
-        return HomePageBodyStates.buildErrorState(context, controller);
+        return HomePageBodyStates.buildErrorState(context, controller, l10n);
       }
 
       if (controller.tasks.isEmpty) {

@@ -3,7 +3,7 @@ part of 'add_task_page.dart';
 /// Audio recording component with play/pause/delete functionality
 /// Provides visual feedback and error handling for audio operations
 ///
-/// TODO LOCALIZATION
+/// Localization implemented
 class _AddTaskAudioRecorder extends StatelessWidget {
   final String? audioPath;
   final Function(String?) onAudioPathChanged;
@@ -180,7 +180,9 @@ class _AddTaskAudioRecorder extends StatelessWidget {
     bool isRecording,
   ) {
     return ElevatedButton.icon(
-      onPressed: isRecording ? _stopRecording : _startRecording,
+      onPressed: isRecording
+          ? () => _stopRecording(l10n)
+          : () => _startRecording(l10n),
       icon: Icon(
         isRecording ? Icons.stop : Icons.mic,
         color: isRecording ? AppColors.error : AppColors.audioRecording,
@@ -234,27 +236,27 @@ class _AddTaskAudioRecorder extends StatelessWidget {
         // Playing: show pause
         icon = Icons.pause;
         label = l10n.pauseAudio;
-        onPressed = _pauseAudio;
+        onPressed = () => _pauseAudio(l10n);
       } else if (isCompleted) {
         // Completed: show replay
         icon = Icons.replay;
         label = l10n.playAudio; // Use existing key for now
-        onPressed = _playAudio;
+        onPressed = () => _playAudio(l10n);
       } else {
         // Stopped/Paused: show play
         icon = Icons.play_arrow;
         label = l10n.playAudio;
-        onPressed = _playAudio;
+        onPressed = () => _playAudio(l10n);
       }
 
       return ElevatedButton.icon(
         onPressed: onPressed,
         icon: isBuffering
-            ? SizedBox(
-                width: 16.w,
-                height: 16.h,
+            ? const SizedBox(
+                width: 16,
+                height: 16,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
+                  strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     AppColors.audioPlaying,
                   ),
@@ -275,14 +277,14 @@ class _AddTaskAudioRecorder extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.audioPlaying.withValues(alpha: 0.1),
           foregroundColor: AppColors.audioPlaying,
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       );
     });
   }
 
   /// Start recording audio
-  Future<void> _startRecording() async {
+  Future<void> _startRecording(AppLocalizations l10n) async {
     try {
       debugPrint('AddTaskAudioRecorder: _startRecording called');
       await audioController.startRecording();
@@ -296,7 +298,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(
-            content: Text('Failed to start recording: $e'),
+            content: Text('${l10n.failedToStartRecording}: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -306,7 +308,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
   }
 
   /// Stop recording audio
-  Future<void> _stopRecording() async {
+  Future<void> _stopRecording(AppLocalizations l10n) async {
     try {
       await audioController.stopRecording();
 
@@ -325,7 +327,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(
-            content: Text('Failed to stop recording: $e'),
+            content: Text('${l10n.failedToStopRecording}: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -335,7 +337,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
   }
 
   /// Play audio
-  Future<void> _playAudio() async {
+  Future<void> _playAudio(AppLocalizations l10n) async {
     if (audioPath != null) {
       try {
         // Create a temporary AudioEntity for playback
@@ -345,9 +347,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
           fileName: audioPath!,
           localPath: audioPath!,
           fileSize: 0, // Will be determined during playback
-          duration: const Duration(
-            seconds: 0,
-          ), // Will be determined during playback
+          duration: Duration.zero, // Will be determined during playback
           format: 'm4a',
           recordedAt: DateTime.now(),
           createdAt: DateTime.now(),
@@ -359,7 +359,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
         if (Get.context != null) {
           ScaffoldMessenger.of(Get.context!).showSnackBar(
             SnackBar(
-              content: Text('Failed to play audio: $e'),
+              content: Text('${l10n.failedToPlayAudio}: $e'),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
             ),
@@ -370,7 +370,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
   }
 
   /// Pause audio
-  Future<void> _pauseAudio() async {
+  Future<void> _pauseAudio(AppLocalizations l10n) async {
     try {
       await audioController.pausePlayback();
     } catch (e) {
@@ -378,7 +378,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(
-            content: Text('Failed to pause audio: $e'),
+            content: Text('${l10n.failedToPauseAudio}: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
