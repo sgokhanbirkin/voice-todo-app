@@ -120,7 +120,20 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             _AddTaskActionButtons(
               isSubmitting: _isSubmitting,
               onSubmit: _submitForm,
-              onCancel: () => context.pop(),
+              onCancel: () {
+                try {
+                  // Önce Navigator ile dene
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    // go_router ile dene
+                    context.pop();
+                  }
+                } catch (e) {
+                  // Hata durumunda ana sayfaya git
+                  context.go('/');
+                }
+              },
             ),
           ],
         ),

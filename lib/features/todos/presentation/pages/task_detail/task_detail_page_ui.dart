@@ -327,7 +327,7 @@ extension _TaskDetailPageUI on _TaskDetailPageState {
                   icon = Icons.pause;
                   onPressed = () {
                     if (_audioPath != null) {
-                      _audioController.pausePlayback();
+                      _audioController.pauseAudio();
                     }
                   };
                 } else if (isCompleted) {
@@ -380,7 +380,7 @@ extension _TaskDetailPageUI on _TaskDetailPageState {
               IconButton(
                 onPressed: () {
                   if (_audioPath != null) {
-                    _audioController.stopPlayback();
+                    _audioController.stopAudio();
                   }
                 },
                 icon: const Icon(Icons.stop),

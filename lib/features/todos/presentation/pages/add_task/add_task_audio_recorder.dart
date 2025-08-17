@@ -109,7 +109,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             onAudioPathChanged(null);
-                            audioController.stopPlayback();
+                            audioController.stopAudio();
                           },
                           icon: const Icon(Icons.delete_outline),
                           iconSize: 18.sp,
@@ -313,15 +313,9 @@ class _AddTaskAudioRecorder extends StatelessWidget {
       await audioController.stopRecording();
 
       // AudioController'dan gerçek path'i al
-      final lastRecordedPath = audioController.getLastRecordedAudioPath();
-      if (lastRecordedPath != null) {
-        onAudioPathChanged(lastRecordedPath);
-        debugPrint(
-          'AddTaskAudioRecorder: Updated audio path: $lastRecordedPath',
-        );
-      } else {
-        debugPrint('AddTaskAudioRecorder: No recorded audio path found');
-      }
+      final lastRecordedPath = audioController.currentRecordingPath.value;
+      onAudioPathChanged(lastRecordedPath);
+      debugPrint('AddTaskAudioRecorder: Updated audio path: $lastRecordedPath');
     } catch (e) {
       // Use Flutter's native SnackBar instead of Get.snackbar
       if (Get.context != null) {
@@ -372,7 +366,7 @@ class _AddTaskAudioRecorder extends StatelessWidget {
   /// Pause audio
   Future<void> _pauseAudio(AppLocalizations l10n) async {
     try {
-      await audioController.pausePlayback();
+      await audioController.pauseAudio();
     } catch (e) {
       // Use Flutter's native SnackBar instead of Get.snackbar
       if (Get.context != null) {
