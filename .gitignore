@@ -45,3 +45,4 @@ app.*.map.json
 /android/app/release
 .env
 PROJECT_ROADMAP.md
+PROJECT_ANALYSIS_TODO.md

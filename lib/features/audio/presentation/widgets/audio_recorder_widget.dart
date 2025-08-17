@@ -282,8 +282,8 @@ class AudioRecorderWidget extends StatelessWidget {
   ) async {
     try {
       await audioController.stopRecording();
-      final audioPath = audioController.getLastRecordedAudioPath();
-      if (onAudioRecorded != null && audioPath != null) {
+      final audioPath = audioController.currentRecordingPath.value;
+      if (onAudioRecorded != null) {
         onAudioRecorded!(audioPath);
       }
 
